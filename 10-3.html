@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{margin: 0; padding: 0;}
+        /* 基准字号：手机默认 12px，其他断点下重新设置 */
+        html{ font-size: 12px; }
+        /* 全屏盒子 */
+        .box{
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            /* 文字大小用 rem，随根元素 html 的 font-size 变化 */
+            font-size: 3rem;
+            text-align: center;
+        }
+        .box .tip{
+            font-size: 1.2rem;
+            margin-top: 2rem;
+        }
+        /* 媒体查询：默认（手机，<=600px）红色 */
+        .box{ background-color: red; }
+        .box .tip::after{ content: "当前是手机屏幕（小于600px），背景：红色"; }
+        /* 平板：601px ~ 1024px，蓝色，根字号变大 */
+        @media screen and (min-width: 601px) and (max-width: 1024px){
+            html{ font-size: 20px; }
+            .box{ background-color: blue; }
+            .box .tip::after{ content: "当前是平板屏幕（601px~1024px），背景：蓝色"; }
+        }
+        /* 电脑：1025px 以上，紫色，根字号最大 */
+        @media screen and (min-width: 1025px){
+            html{ font-size: 28px; }
+            .box{ background-color: purple; }
+            .box .tip::after{ content: "当前是电脑屏幕（大于1024px），背景：紫色"; }
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        王鹏宇的全屏盒子
+        <div class="tip"></div>
+    </div>
+</body>
+</html>

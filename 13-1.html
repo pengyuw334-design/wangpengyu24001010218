@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>13-1 Font Awesome 字体图标应用</title>
+    <!-- 引入本地 cdn 目录下的 Font Awesome 核心样式表 -->
+    <link rel="stylesheet" href="./cdn/font-awesome/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-purple: #8b5cf6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 页面头部 */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 24px 20px;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.25);
+        }
+
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 15px;
+            opacity: 0.9;
+        }
+
+        /* 顶部导航切换链接 */
+        .page-switch-bar {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin: 16px 0 24px;
+        }
+
+        .page-switch-bar a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .page-switch-bar .active {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+        }
+
+        .page-switch-bar .inactive {
+            background-color: #ffffff;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .page-switch-bar .inactive:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        /* 通用卡片容器 */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-main);
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 10px;
+        }
+
+        .card-title i {
+            color: var(--primary-color);
+        }
+
+        /* 字体图标原理提示条 */
+        .principle-banner {
+            background-color: #eff6ff;
+            border-left: 4px solid var(--primary-color);
+            padding: 14px 18px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 16px;
+            font-size: 14px;
+            color: #1e40af;
+        }
+
+        .principle-banner code {
+            background-color: #dbeafe;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: Consolas, monospace;
+        }
+
+        /* 图标网格布局 */
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 14px;
+        }
+
+        .icon-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 10px;
+            background-color: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.25s ease;
+            cursor: pointer;
+        }
+
+        .icon-box:hover {
+            transform: translateY(-3px);
+            background-color: #ffffff;
+            border-color: var(--primary-color);
+            box-shadow: 0 6px 14px -2px rgba(37, 99, 235, 0.15);
+        }
+
+        .icon-box i {
+            font-size: 26px;
+            margin-bottom: 8px;
+            color: var(--text-main);
+            transition: color 0.2s;
+        }
+
+        .icon-box:hover i {
+            color: var(--primary-color);
+        }
+
+        .icon-box span {
+            font-size: 12px;
+            color: var(--text-muted);
+            word-break: break-all;
+            font-family: Consolas, monospace;
+        }
+
+        /* 字体特性演示区 */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+        }
+
+        .feature-block {
+            background-color: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .feature-block h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .feature-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            min-height: 70px;
+            background-color: #ffffff;
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            flex-wrap: wrap;
+        }
+
+        .feature-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        /* 颜色类名辅助 */
+        .c-blue   { color: #2563eb !important; }
+        .c-green  { color: #10b981 !important; }
+        .c-amber  { color: #f59e0b !important; }
+        .c-rose   { color: #f43f5e !important; }
+        .c-purple { color: #8b5cf6 !important; }
+
+        /* 实战组件应用 */
+        /* 1. 模拟导航栏 */
+        .demo-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #1e293b;
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+        }
+
+        .demo-nav .brand {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+        }
+
+        .demo-nav .nav-links {
+            display: flex;
+            gap: 18px;
+            list-style: none;
+            font-size: 14px;
+        }
+
+        .demo-nav .nav-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+        }
+
+        .demo-nav .nav-links a:hover,
+        .demo-nav .nav-links a.active {
+            color: #60a5fa;
+        }
+
+        .demo-nav .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .badge-btn {
+            position: relative;
+            background: none;
+            border: none;
+            color: #cbd5e1;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .badge-btn .badge {
+            position: absolute;
+            top: -3px;
+            right: -6px;
+            background-color: #ef4444;
+            color: #ffffff;
+            font-size: 10px;
+            padding: 1px 5px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        /* 2. 统计信息卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .stat-card {
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .stat-icon.bg-blue   { background-color: #dbeafe; color: #2563eb; }
+        .stat-icon.bg-green  { background-color: #d1fae5; color: #059669; }
+        .stat-icon.bg-amber  { background-color: #fef3c7; color: #d97706; }
+        .stat-icon.bg-purple { background-color: #ede9fe; color: #7c3aed; }
+
+        .stat-info h5 {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .stat-info p {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* 3. 交互按钮组与搜索框 */
+        .ui-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 16px;
+            font-size: 14px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: #ffffff;
+        }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+
+        .btn-success {
+            background-color: var(--accent-green);
+            color: #ffffff;
+        }
+        .btn-success:hover { background-color: #059669; }
+
+        .btn-danger {
+            background-color: var(--accent-rose);
+            color: #ffffff;
+        }
+        .btn-danger:hover { background-color: #e11d48; }
+
+        .btn-outline {
+            background-color: transparent;
+            border-color: var(--border-color);
+            color: var(--text-main);
+        }
+        .btn-outline:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 220px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 9px 12px 9px 36px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* 交互实验台 */
+        .sandbox-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+            background-color: #f1f5f9;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .control-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .control-item label {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .sandbox-stage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 160px;
+            background-color: #ffffff;
+            border: 2px dashed #cbd5e1;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        #dynamicFaIcon {
+            transition: all 0.2s ease;
+        }
+
+        .code-preview {
+            background-color: #0f172a;
+            color: #38bdf8;
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            margin-top: 14px;
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        /* 页脚 */
+        footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 头部横幅 -->
+    <header>
+        <h1>王鹏宇的网页设计实验 13-1</h1>
+        <p>Font Awesome 字体图标应用展示 —— 采用基于 @font-face 的“字体图标”方式渲染</p>
+    </header>
+
+    <!-- 实验页面快捷切换导航 -->
+    <div class="page-switch-bar">
+        <a href="13-1.html" class="active">
+            <i class="fa-solid fa-font"></i> 13-1: Font Awesome 字体图标
+        </a>
+        <a href="13-2.html" class="inactive">
+            <i class="fa-solid fa-vector-square"></i> 13-2: Lucide SVG 图标
+        </a>
+    </div>
+
+    <!-- 1. 字体图标工作原理卡片 -->
+    <div class="card">
+        <div class="card-title">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>字体图标（Font Icons）实现原理</span>
+        </div>
+        <div class="principle-banner">
+            <p><strong>技术本质：</strong>Font Awesome 字体图标是将矢量图标像英文字母一样打包进字体文件（<code>.woff2</code> / <code>.ttf</code>）中。通过 CSS 规则 <code>@font-face</code> 载入自定义字体，再利用伪元素 <code>i::before { content: "\f015"; }</code> 将特定 Unicode 编码字符呈现在网页中。</p>
+            <p style="margin-top: 6px;"><strong>主要优势：</strong>可以完全像普通文字一样，通过 CSS 样式 <code>font-size</code>、<code>color</code>、<code>text-shadow</code> 任意缩放控制，矢量高清且体积紧凑。</p>
+        </div>
+    </div>
+
+    <!-- 2. 图标分类与基础展示 -->
+    <div class="card">
+        <div class="card-title">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>常用图标展示（Solid / Regular / Brands 三大类别）</span>
+        </div>
+
+        <h3 style="font-size: 15px; margin: 12px 0 10px; color: var(--text-main);">
+            <i class="fa-solid fa-shapes c-blue"></i> Solid 实心风格 (fa-solid)
+        </h3>
+        <div class="icon-grid">
+            <div class="icon-box"><i class="fa-solid fa-house"></i><span>fa-house</span></div>
+            <div class="icon-box"><i class="fa-solid fa-user"></i><span>fa-user</span></div>
+            <div class="icon-box"><i class="fa-solid fa-gear"></i><span>fa-gear</span></div>
+            <div class="icon-box"><i class="fa-solid fa-magnifying-glass"></i><span>fa-magnifying-glass</span></div>
+            <div class="icon-box"><i class="fa-solid fa-heart c-rose"></i><span>fa-heart</span></div>
+            <div class="icon-box"><i class="fa-solid fa-bell c-amber"></i><span>fa-bell</span></div>
+            <div class="icon-box"><i class="fa-solid fa-envelope c-blue"></i><span>fa-envelope</span></div>
+            <div class="icon-box"><i class="fa-solid fa-star c-amber"></i><span>fa-star</span></div>
+            <div class="icon-box"><i class="fa-solid fa-download c-green"></i><span>fa-download</span></div>
+            <div class="icon-box"><i class="fa-solid fa-shield-halved c-blue"></i><span>fa-shield-halved</span></div>
+            <div class="icon-box"><i class="fa-solid fa-bolt c-amber"></i><span>fa-bolt</span></div>
+            <div class="icon-box"><i class="fa-solid fa-cloud c-blue"></i><span>fa-cloud</span></div>
+        </div>
+
+        <h3 style="font-size: 15px; margin: 20px 0 10px; color: var(--text-main);">
+            <i class="fa-regular fa-clone c-green"></i> Regular 空心/描边风格 (fa-regular)
+        </h3>
+        <div class="icon-grid">
+            <div class="icon-box"><i class="fa-regular fa-face-smile c-amber"></i><span>fa-face-smile</span></div>
+            <div class="icon-box"><i class="fa-regular fa-calendar c-blue"></i><span>fa-calendar</span></div>
+            <div class="icon-box"><i class="fa-regular fa-clock"></i><span>fa-clock</span></div>
+            <div class="icon-box"><i class="fa-regular fa-bookmark c-rose"></i><span>fa-bookmark</span></div>
+            <div class="icon-box"><i class="fa-regular fa-comment c-green"></i><span>fa-comment</span></div>
+            <div class="icon-box"><i class="fa-regular fa-file"></i><span>fa-file</span></div>
+        </div>
+
+        <h3 style="font-size: 15px; margin: 20px 0 10px; color: var(--text-main);">
+            <i class="fa-brands fa-buffer c-purple"></i> Brands 品牌与社交媒体图标 (fa-brands)
+        </h3>
+        <div class="icon-grid">
+            <div class="icon-box"><i class="fa-brands fa-github"></i><span>fa-github</span></div>
+            <div class="icon-box"><i class="fa-brands fa-weixin c-green"></i><span>fa-weixin</span></div>
+            <div class="icon-box"><i class="fa-brands fa-qq c-blue"></i><span>fa-qq</span></div>
+            <div class="icon-box"><i class="fa-brands fa-bilibili c-blue"></i><span>fa-bilibili</span></div>
+            <div class="icon-box"><i class="fa-brands fa-zhihu c-blue"></i><span>fa-zhihu</span></div>
+            <div class="icon-box"><i class="fa-brands fa-apple"></i><span>fa-apple</span></div>
+            <div class="icon-box"><i class="fa-brands fa-chrome c-amber"></i><span>fa-chrome</span></div>
+            <div class="icon-box"><i class="fa-brands fa-html5 c-rose"></i><span>fa-html5</span></div>
+            <div class="icon-box"><i class="fa-brands fa-css3-alt c-blue"></i><span>fa-css3-alt</span></div>
+            <div class="icon-box"><i class="fa-brands fa-js c-amber"></i><span>fa-js</span></div>
+        </div>
+    </div>
+
+    <!-- 3. 字体特性与专属控制类演示 -->
+    <div class="card">
+        <div class="card-title">
+            <i class="fa-solid fa-sliders"></i>
+            <span>字体图标的丰富特性（尺寸、色彩、旋转、叠层、动画）</span>
+        </div>
+
+        <div class="features-grid">
+            <!-- 特性 1: 尺寸控制 -->
+            <div class="feature-block">
+                <h4><i class="fa-solid fa-maximize c-blue"></i> 尺寸等级控制</h4>
+                <div class="feature-display">
+                    <i class="fa-solid fa-camera fa-xs" title="fa-xs"></i>
+                    <i class="fa-solid fa-camera fa-sm" title="fa-sm"></i>
+                    <i class="fa-solid fa-camera fa-lg" title="fa-lg"></i>
+                    <i class="fa-solid fa-camera fa-xl" title="fa-xl"></i>
+                    <i class="fa-solid fa-camera fa-2x" title="fa-2x"></i>
+                    <i class="fa-solid fa-camera fa-3x" title="fa-3x"></i>
+                </div>
+                <div class="feature-desc">内置类 <code>fa-xs</code> 到 <code>fa-3x</code>，亦可直接写 <code>font-size: 32px</code>。</div>
+            </div>
+
+            <!-- 特性 2: 颜色与文字阴影 -->
+            <div class="feature-block">
+                <h4><i class="fa-solid fa-palette c-purple"></i> 颜色与文字阴影</h4>
+                <div class="feature-display">
+                    <i class="fa-solid fa-heart fa-2x c-rose" style="text-shadow: 0 4px 8px rgba(244,63,94,0.4);"></i>
+                    <i class="fa-solid fa-gem fa-2x c-blue" style="text-shadow: 0 4px 8px rgba(37,99,235,0.4);"></i>
+                    <i class="fa-solid fa-fire fa-2x c-amber" style="text-shadow: 0 4px 8px rgba(245,158,11,0.4);"></i>
+                    <i class="fa-solid fa-leaf fa-2x c-green" style="text-shadow: 0 4px 8px rgba(16,185,129,0.4);"></i>
+                </div>
+                <div class="feature-desc">继承 CSS 字体样式，使用 <code>color</code> 与 <code>text-shadow</code> 产生文字光晕。</div>
+            </div>
+
+            <!-- 特性 3: 旋转与翻转 -->
+            <div class="feature-block">
+                <h4><i class="fa-solid fa-arrows-rotate c-amber"></i> 旋转与镜像翻转</h4>
+                <div class="feature-display">
+                    <i class="fa-solid fa-shield-halved fa-2x"></i>
+                    <i class="fa-solid fa-shield-halved fa-2x fa-rotate-90" title="fa-rotate-90"></i>
+                    <i class="fa-solid fa-shield-halved fa-2x fa-rotate-180" title="fa-rotate-180"></i>
+                    <i class="fa-solid fa-shield-halved fa-2x fa-flip-horizontal" title="fa-flip-horizontal"></i>
+                </div>
+                <div class="feature-desc">使用 <code>fa-rotate-90/180/270</code> 与 <code>fa-flip-*</code> 实现翻转。</div>
+            </div>
+
+            <!-- 特性 4: 旋转动画 -->
+            <div class="feature-block">
+                <h4><i class="fa-solid fa-spinner c-green"></i> 动态旋转加载</h4>
+                <div class="feature-display">
+                    <i class="fa-solid fa-spinner fa-2x fa-spin c-blue"></i>
+                    <i class="fa-solid fa-circle-notch fa-2x fa-spin c-purple"></i>
+                    <i class="fa-solid fa-sync fa-2x fa-spin c-green"></i>
+                    <i class="fa-solid fa-gear fa-2x fa-spin c-amber"></i>
+                </div>
+                <div class="feature-desc">使用 <code>fa-spin</code> 或 <code>fa-pulse</code>（8步节拍旋转）赋予动效。</div>
+            </div>
+
+            <!-- 特性 5: 叠层组合图标 -->
+            <div class="feature-block">
+                <h4><i class="fa-solid fa-layer-group c-rose"></i> 叠层组合图标 (fa-stack)</h4>
+                <div class="feature-display">
+                    <!-- 蓝色圆底白旗 -->
+                    <span class="fa-stack fa-lg">
+                        <i class="fa-solid fa-circle fa-stack-2x c-blue"></i>
+                        <i class="fa-solid fa-flag fa-stack-1x fa-inverse"></i>
+                    </span>
+                    <!-- 黑色照相机加红色禁止斜杠 -->
+                    <span class="fa-stack fa-lg">
+                        <i class="fa-solid fa-camera fa-stack-1x"></i>
+                        <i class="fa-solid fa-ban fa-stack-2x c-rose"></i>
+                    </span>
+                    <!-- 微信绿色底白色微信图标 -->
+                    <span class="fa-stack fa-lg">
+                        <i class="fa-solid fa-square fa-stack-2x c-green"></i>
+                        <i class="fa-brands fa-weixin fa-stack-1x fa-inverse"></i>
+                    </span>
+                </div>
+                <div class="feature-desc">通过 <code>fa-stack</code> 将两枚图标叠合，创造复合新图标。</div>
+            </div>
+
+            <!-- 特性 6: 定宽图标列表 -->
+            <div class="feature-block">
+                <h4><i class="fa-solid fa-align-left c-blue"></i> 定宽对齐 (fa-fw)</h4>
+                <div class="feature-display" style="justify-content: flex-start; flex-direction: column; gap: 6px; font-size: 14px;">
+                    <div><i class="fa-solid fa-house fa-fw c-blue"></i> 个人首页</div>
+                    <div><i class="fa-solid fa-envelope fa-fw c-green"></i> 站内信件</div>
+                    <div><i class="fa-solid fa-gear fa-fw c-amber"></i> 系统设置</div>
+                </div>
+                <div class="feature-desc">使用 <code>fa-fw</code> 强制图标等宽，菜单文字完美垂直对齐。</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 综合界面实战应用 -->
+    <div class="card">
+        <div class="card-title">
+            <i class="fa-solid fa-desktop"></i>
+            <span>实际 UI 场景综合应用</span>
+        </div>
+
+        <!-- 模拟导航栏 -->
+        <nav class="demo-nav">
+            <div class="brand">
+                <i class="fa-solid fa-graduation-cap c-blue"></i>
+                <span>智慧学习平台</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" class="active"><i class="fa-solid fa-house"></i> 首页</a></li>
+                <li><a href="#"><i class="fa-solid fa-book-open"></i> 课程</a></li>
+                <li><a href="#"><i class="fa-solid fa-chart-line"></i> 学习分析</a></li>
+                <li><a href="#"><i class="fa-solid fa-comments"></i> 社区讨论</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="badge-btn" title="消息通知">
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="badge">4</span>
+                </button>
+                <button class="badge-btn" title="个人中心">
+                    <i class="fa-solid fa-circle-user"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- 统计指标卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon bg-blue">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div class="stat-info">
+                    <h5>注册学员</h5>
+                    <p>12,850</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-green">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div class="stat-info">
+                    <h5>已结课时</h5>
+                    <p>368 节</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-amber">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div class="stat-info">
+                    <h5>优秀证书</h5>
+                    <p>1,420</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-purple">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <div class="stat-info">
+                    <h5>云端资源</h5>
+                    <p>98.6 GB</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 按钮与输入框交互组 -->
+        <div class="ui-actions">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="输入课程名或知识点搜索...">
+            </div>
+            <button class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i> 新建项目
+            </button>
+            <button class="btn btn-success">
+                <i class="fa-solid fa-download"></i> 导出报表
+            </button>
+            <button class="btn btn-danger">
+                <i class="fa-solid fa-trash"></i> 批量删除
+            </button>
+            <button class="btn btn-outline">
+                <i class="fa-solid fa-share-nodes"></i> 分享
+            </button>
+        </div>
+    </div>
+
+    <!-- 5. 交互式实验操练台 -->
+    <div class="card">
+        <div class="card-title">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>实时交互实验台（动态修改字体图标的 CSS 属性）</span>
+        </div>
+
+        <div class="sandbox-controls">
+            <div class="control-item">
+                <label for="iconSelect">切换图标：</label>
+                <select id="iconSelect" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color);">
+                    <option value="fa-heart">❤️ 爱心 (fa-heart)</option>
+                    <option value="fa-star">⭐ 星星 (fa-star)</option>
+                    <option value="fa-rocket" selected>🚀 火箭 (fa-rocket)</option>
+                    <option value="fa-bell">🔔 铃铛 (fa-bell)</option>
+                    <option value="fa-gear">⚙️ 齿轮 (fa-gear)</option>
+                    <option value="fa-music">🎵 音乐 (fa-music)</option>
+                </select>
+            </div>
+
+            <div class="control-item">
+                <label for="sizeRange">字号大小 (font-size)：<span id="sizeVal">48px</span></label>
+                <input type="range" id="sizeRange" min="20" max="100" value="48" style="cursor: pointer;">
+            </div>
+
+            <div class="control-item">
+                <label for="colorPicker">字体颜色 (color)：</label>
+                <input type="color" id="colorPicker" value="#2563eb" style="width: 38px; height: 32px; border: none; cursor: pointer; border-radius: 4px;">
+            </div>
+
+            <div class="control-item">
+                <label><input type="checkbox" id="spinCheck" style="margin-right: 6px;"> 启用旋转动画 (fa-spin)</label>
+            </div>
+        </div>
+
+        <div class="sandbox-stage">
+            <i id="dynamicFaIcon" class="fa-solid fa-rocket" style="font-size: 48px; color: #2563eb;"></i>
+            <div class="code-preview" id="codePreview">
+                &lt;i class="fa-solid fa-rocket" style="font-size: 48px; color: #2563eb;"&gt;&lt;/i&gt;
+            </div>
+        </div>
+    </div>
+
+    <!-- 页面底部 -->
+    <footer>
+        <p>13-1.html | 网页设计课程作业 | 制作者：王鹏宇 | 资源路径：<code>./cdn/font-awesome/css/all.min.css</code></p>
+    </footer>
+</div>
+
+<script>
+    // 交互实验台脚本
+    const iconSelect = document.getElementById('iconSelect');
+    const sizeRange = document.getElementById('sizeRange');
+    const sizeVal = document.getElementById('sizeVal');
+    const colorPicker = document.getElementById('colorPicker');
+    const spinCheck = document.getElementById('spinCheck');
+    const dynamicFaIcon = document.getElementById('dynamicFaIcon');
+    const codePreview = document.getElementById('codePreview');
+
+    function updateIcon() {
+        const iconName = iconSelect.value;
+        const size = sizeRange.value + 'px';
+        const color = colorPicker.value;
+        const isSpin = spinCheck.checked;
+
+        sizeVal.textContent = size;
+
+        // 设置图标 class
+        dynamicFaIcon.className = `fa-solid ${iconName} ${isSpin ? 'fa-spin' : ''}`;
+        dynamicFaIcon.style.fontSize = size;
+        dynamicFaIcon.style.color = color;
+
+        // 更新代码预览
+        const spinClass = isSpin ? ' fa-spin' : '';
+        codePreview.textContent = `<i class="fa-solid ${iconName}${spinClass}" style="font-size: ${size}; color: ${color};"></i>`;
+    }
+
+    iconSelect.addEventListener('change', updateIcon);
+    sizeRange.addEventListener('input', updateIcon);
+    colorPicker.addEventListener('input', updateIcon);
+    spinCheck.addEventListener('change', updateIcon);
+    updateIcon();
+</script>
+
+</body>
+</html>

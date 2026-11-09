@@ -1,0 +1,1209 @@
+<!-- 姓名：王鹏宇，日期：2026-11-05，功能名称：基于 ECharts 的数据可视化图表 (官方样例: area-stack-gradient & pie-roseType) -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#060b17">
+    <meta name="color-scheme" content="dark light">
+    <title>18-4 ECharts 数据可视化分析看板 · 王鹏宇</title>
+    <!-- 本地下载的 ECharts 5.5.0 CDN 核心库 -->
+    <script src="cdn/echarts.min.js"></script>
+    <style>
+        :root {
+            --bg: #060b17;
+            --surface: rgba(10, 20, 38, 0.72);
+            --surface-solid: #0d1729;
+            --surface-elevated: #13223d;
+            --ink: #f0f6fc;
+            --muted: #8b9eb7;
+            --dim: #50647e;
+            --line: rgba(148, 184, 220, 0.16);
+            --line-strong: rgba(148, 184, 220, 0.32);
+            --line-subtle: rgba(148, 184, 220, 0.08);
+
+            /* Modern Palette */
+            --cyan: #38bdf8;
+            --blue: #2563eb;
+            --violet: #8b5cf6;
+            --purple: #a855f7;
+            --green: #10b981;
+            --amber: #f59e0b;
+            --rose: #f43f5e;
+            --teal: #14b8a6;
+
+            --mono: "SFMono-Regular", Consolas, "Cascadia Code", "Fira Code", monospace;
+            --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Roboto, sans-serif;
+            --ease: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* 浅色主题模式 */
+        body.theme-light {
+            --bg: #f8fafc;
+            --surface: rgba(255, 255, 255, 0.92);
+            --surface-solid: #ffffff;
+            --surface-elevated: #f1f5f9;
+            --ink: #0f172a;
+            --muted: #475569;
+            --dim: #94a3b8;
+            --line: rgba(51, 65, 85, 0.14);
+            --line-strong: rgba(51, 65, 85, 0.28);
+            --line-subtle: rgba(51, 65, 85, 0.06);
+
+            --cyan: #0284c7;
+            --blue: #1d4ed8;
+            --violet: #7c3aed;
+            --purple: #9333ea;
+            --green: #059669;
+            --amber: #d97706;
+            --rose: #e11d48;
+            --teal: #0d9488;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            font-family: var(--sans);
+            color: var(--ink);
+            background: var(--bg);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 背景几何微网格 */
+        body::before {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            content: "";
+            background-image:
+                linear-gradient(var(--line-subtle) 1px, transparent 1px),
+                linear-gradient(90deg, var(--line-subtle) 1px, transparent 1px);
+            background-size: 56px 56px;
+            opacity: 0.85;
+        }
+
+        body::after {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            content: "";
+            background: radial-gradient(circle at 20% 15%, rgba(56, 189, 248, 0.08), transparent 60%),
+                        radial-gradient(circle at 80% 85%, rgba(139, 92, 246, 0.07), transparent 65%);
+        }
+
+        .app {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ==================== 顶部导航栏 ==================== */
+        .topbar {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 16px;
+            height: 70px;
+            padding: 0 24px;
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--line);
+            flex-shrink: 0;
+        }
+
+        .identity {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .identity_mark {
+            display: grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(139, 92, 246, 0.15));
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+        }
+
+        .identity_text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .identity_text strong {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            color: var(--ink);
+        }
+
+        .identity_text small {
+            font-family: var(--mono);
+            font-size: 9px;
+            color: var(--muted);
+            letter-spacing: 0.1em;
+        }
+
+        .page_title {
+            text-align: center;
+            min-width: 0;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: 0.18em;
+            color: var(--cyan);
+            text-transform: uppercase;
+        }
+
+        .eyebrow_dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 8px var(--green);
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+
+        .page_title h1 {
+            font-size: 19px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            color: var(--ink);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+        }
+
+        .top_right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px;
+            background: var(--surface-solid);
+            border: 1px solid var(--line);
+            border-radius: 999px;
+        }
+
+        .nav a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            text-decoration: none;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav a .nav_code {
+            font-family: var(--mono);
+            font-size: 9px;
+            opacity: 0.8;
+        }
+
+        .nav a:hover {
+            color: var(--ink);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav a.is-active {
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--blue), var(--cyan));
+            box-shadow: 0 2px 10px rgba(56, 189, 248, 0.3);
+        }
+
+        .live_badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--green);
+            font-family: var(--mono);
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+        }
+
+        /* ==================== 统计指标栏 (KPI Ribbon) ==================== */
+        .kpi_ribbon {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            padding: 16px 24px;
+        }
+
+        .kpi_card {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 14px 18px;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+            transition: all 0.25s var(--ease);
+        }
+
+        .kpi_card:hover {
+            transform: translateY(-2px);
+            border-color: var(--line-strong);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+        }
+
+        .kpi_header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .kpi_title {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .kpi_badge {
+            font-family: var(--mono);
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--cyan);
+        }
+
+        .kpi_value {
+            font-family: var(--mono);
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: -0.02em;
+        }
+
+        .kpi_footer {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            color: var(--dim);
+        }
+
+        .kpi_trend {
+            font-weight: 600;
+            color: var(--green);
+        }
+
+        /* ==================== 主图表展示网格 ==================== */
+        .chart_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(540px, 1fr));
+            gap: 20px;
+            padding: 0 24px 24px;
+            flex: 1;
+        }
+
+        .chart_card {
+            display: flex;
+            flex-direction: column;
+            background: var(--surface-solid);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+            overflow: hidden;
+            transition: border-color 0.25s ease;
+        }
+
+        .chart_card:hover {
+            border-color: var(--line-strong);
+        }
+
+        .card_header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--line-subtle);
+            background: var(--surface);
+            flex-wrap: wrap;
+        }
+
+        .card_title_group {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .card_title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card_source {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-family: var(--mono);
+            font-size: 9.5px;
+            color: var(--muted);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .card_source:hover {
+            color: var(--cyan);
+        }
+
+        .card_actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn_group {
+            display: inline-flex;
+            align-items: center;
+            background: var(--bg);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 2px;
+        }
+
+        .btn_chip {
+            padding: 4px 9px;
+            border-radius: 4px;
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn_chip:hover {
+            color: var(--ink);
+        }
+
+        .btn_chip.is-active {
+            background: rgba(56, 189, 248, 0.16);
+            color: var(--cyan);
+            font-weight: 600;
+        }
+
+        .icon_btn {
+            display: grid;
+            place-items: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid var(--line);
+            background: var(--surface);
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .icon_btn:hover {
+            color: var(--ink);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--line-strong);
+        }
+
+        .chart_container {
+            width: 100%;
+            height: 480px;
+            position: relative;
+        }
+
+        .card_footer_info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            border-top: 1px solid var(--line-subtle);
+            background: var(--surface);
+            font-size: 11px;
+            color: var(--dim);
+            font-family: var(--mono);
+        }
+
+        .footer_indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .indicator_dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+        }
+
+        /* ==================== 底部版权与技术栈 ==================== */
+        .footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 24px;
+            background: var(--surface-solid);
+            border-top: 1px solid var(--line);
+            font-size: 11px;
+            color: var(--muted);
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .footer_left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer_links a {
+            color: var(--cyan);
+            text-decoration: none;
+        }
+
+        .footer_links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 900px) {
+            .topbar {
+                grid-template-columns: 1fr;
+                height: auto;
+                padding: 12px 16px;
+                gap: 10px;
+            }
+            .page_title h1 {
+                font-size: 16px;
+            }
+            .chart_grid {
+                grid-template-columns: 1fr;
+                padding: 0 16px 16px;
+            }
+            .chart_container {
+                height: 380px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- 顶部导航栏 -->
+        <header class="topbar">
+            <a class="identity" href="18-4.html">
+                <div class="identity_mark">WP</div>
+                <div class="identity_text">
+                    <strong>王鹏宇 · 数据图表</strong>
+                    <small>DATE: 2026-11-05 · ECHARTS V5.5</small>
+                </div>
+            </a>
+
+            <div class="page_title">
+                <div class="eyebrow">
+                    <span class="eyebrow_dot"></span>
+                    <span>Apache ECharts Official Gallery Integration</span>
+                </div>
+                <h1>ECharts 官方样例交互分析看板</h1>
+            </div>
+
+            <div class="top_right">
+                <nav class="nav" aria-label="章节导航">
+                    <a href="18-1.html">
+                        <span class="nav_code">18—01</span>
+                        <span class="nav_label">粒子文字</span>
+                    </a>
+                    <a href="18-2.html">
+                        <span class="nav_code">18—02</span>
+                        <span class="nav_label">电商架构</span>
+                    </a>
+                    <a href="18-3.html">
+                        <span class="nav_code">18—03</span>
+                        <span class="nav_label">智能客服</span>
+                    </a>
+                    <a class="is-active" href="18-4.html" aria-current="page">
+                        <span class="nav_code">18—04</span>
+                        <span class="nav_label">图表分析</span>
+                    </a>
+                    <a href="18-6.html">
+                        <span class="nav_code">18—06</span>
+                        <span class="nav_label">流程与ER</span>
+                    </a>
+                    <a href="18-7.html">
+                        <span class="nav_code">18—07</span>
+                        <span class="nav_label">3D图表</span>
+                    </a>
+                    <a href="18-8.html">
+                        <span class="nav_code">18—08</span>
+                        <span class="nav_label">数据大屏</span>
+                    </a>
+                </nav>
+                <div class="live_badge">
+                    <span>LOCAL CDN READY</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- KPI 核心指标概览 -->
+        <section class="kpi_ribbon">
+            <div class="kpi_card">
+                <div class="kpi_header">
+                    <span class="kpi_title">今日服务总调用量</span>
+                    <span class="kpi_badge">QPS 2,480</span>
+                </div>
+                <div class="kpi_value" id="kpiTotal">1,489,200</div>
+                <div class="kpi_footer">
+                    <span class="kpi_trend">↑ 14.8%</span>
+                    <span>较昨日同时段</span>
+                </div>
+            </div>
+
+            <div class="kpi_card">
+                <div class="kpi_header">
+                    <span class="kpi_title">知识库混合检索命中率</span>
+                    <span class="kpi_badge">Graph + Dense</span>
+                </div>
+                <div class="kpi_value" style="color: var(--cyan);">96.8%</div>
+                <div class="kpi_footer">
+                    <span class="kpi_trend">↑ 2.3%</span>
+                    <span>多跳子图召回增强</span>
+                </div>
+            </div>
+
+            <div class="kpi_card">
+                <div class="kpi_header">
+                    <span class="kpi_title">端到端平均推理耗时</span>
+                    <span class="kpi_badge">P95: 410ms</span>
+                </div>
+                <div class="kpi_value" style="color: var(--green);">328 <small style="font-size: 14px;">ms</small></div>
+                <div class="kpi_footer">
+                    <span class="kpi_trend">↓ 18.5%</span>
+                    <span>vLLM 投机采样加速</span>
+                </div>
+            </div>
+
+            <div class="kpi_card">
+                <div class="kpi_header">
+                    <span class="kpi_title">AI 客服问答解决满意度</span>
+                    <span class="kpi_badge">CSAT Score</span>
+                </div>
+                <div class="kpi_value" style="color: var(--purple);">98.6%</div>
+                <div class="kpi_footer">
+                    <span class="kpi_trend">↑ 0.9%</span>
+                    <span>Self-RAG 幻觉率 &lt; 1.4%</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ECharts 官方双样例图表主展示区 -->
+        <main class="chart_grid">
+            <!-- ================= 图表一：渐变堆叠面积图 (area-stack-gradient) ================= -->
+            <article class="chart_card">
+                <header class="card_header">
+                    <div class="card_title_group">
+                        <div class="card_title">
+                            <span>📈 知识库服务并发与多路检索时序吞吐量</span>
+                        </div>
+                        <a class="card_source" href="https://echarts.apache.org/examples/zh/editor.html?c=area-stack-gradient" target="_blank" rel="noopener noreferrer">
+                            <span>🔗 官方样例: area-stack-gradient (渐变堆叠面积图)</span>
+                        </a>
+                    </div>
+                    <div class="card_actions">
+                        <div class="btn_group" role="group">
+                            <button class="btn_chip is-active" onclick="switchAreaGranularity('day', this)">24小时</button>
+                            <button class="btn_chip" onclick="switchAreaGranularity('week', this)">近7天</button>
+                            <button class="btn_chip" onclick="switchAreaGranularity('month', this)">近30天</button>
+                        </div>
+                        <button class="icon_btn" id="streamToggleBtn" onclick="toggleLiveDataStream()" title="开启/暂停实时动态推送">
+                            ▶
+                        </button>
+                        <button class="icon_btn" onclick="resetAreaChart()" title="重置图表视图">
+                            ↺
+                        </button>
+                    </div>
+                </header>
+
+                <div class="chart_container" id="areaChart"></div>
+
+                <footer class="card_footer_info">
+                    <div class="footer_indicator">
+                        <span class="indicator_dot"></span>
+                        <span id="areaStatusText">实时数据流已就绪 · 支持区域滚轮缩放与十字光标对齐</span>
+                    </div>
+                    <div>多路检索融合: 向量稠密 / 图谱多跳 / 稀疏SPLADE / LLM生成</div>
+                </footer>
+            </article>
+
+            <!-- ================= 图表二：南丁格尔玫瑰图 (pie-roseType) ================= -->
+            <article class="chart_card">
+                <header class="card_header">
+                    <div class="card_title_group">
+                        <div class="card_title">
+                            <span>🌹 业务领域工单分布与知识库命中玫瑰图</span>
+                        </div>
+                        <a class="card_source" href="https://echarts.apache.org/examples/zh/editor.html?c=pie-roseType" target="_blank" rel="noopener noreferrer">
+                            <span>🔗 官方样例: pie-roseType (南丁格尔玫瑰图)</span>
+                        </a>
+                    </div>
+                    <div class="card_actions">
+                        <div class="btn_group" role="group">
+                            <button class="btn_chip is-active" onclick="switchRoseMode('radius', this)">半径模式</button>
+                            <button class="btn_chip" onclick="switchRoseMode('area', this)">面积模式</button>
+                        </div>
+                        <button class="icon_btn" id="carouselToggleBtn" onclick="toggleRoseCarousel()" title="开启/暂停自动轮播高亮">
+                            ⟳
+                        </button>
+                        <button class="icon_btn" onclick="randomizeRoseData()" title="随机刷新样例数据">
+                            🎲
+                        </button>
+                    </div>
+                </header>
+
+                <div class="chart_container" id="roseChart"></div>
+
+                <footer class="card_footer_info">
+                    <div class="footer_indicator">
+                        <span class="indicator_dot" style="background: var(--purple);"></span>
+                        <span id="roseStatusText">自动轮播已激活 · 支持扇区圆角自适应展开</span>
+                    </div>
+                    <div>8 大核心业务领域 · 自动计算百分比与占比贡献率</div>
+                </footer>
+            </article>
+        </main>
+
+        <!-- 页面底部栏 -->
+        <footer class="footer">
+            <div class="footer_left">
+                <span>Apache ECharts 官方样例实现 · 本地离线引擎 <code>cdn/echarts.min.js</code> (v5.5.0)</span>
+            </div>
+            <div class="footer_links">
+                <span>参考官网: </span>
+                <a href="https://echarts.apache.org/examples/zh/index.html" target="_blank" rel="noopener noreferrer">Apache ECharts Examples</a>
+                <span> | 开发者: 王鹏宇 (2026-11-05)</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 图表构建与动态交互脚本 -->
+    <script>
+        // 检测 ECharts 库是否正确加载
+        if (typeof echarts === "undefined") {
+            alert("本地 ECharts 库未能成功加载，请确保 cdn/echarts.min.js 文件存在。");
+        }
+
+        // 全局图表实例
+        let areaChart = null;
+        let roseChart = null;
+
+        // 状态变量
+        let isStreaming = false;
+        let streamTimer = null;
+        let isCarousel = true;
+        let carouselTimer = null;
+        let currentHighlightIndex = -1;
+        let currentRoseMode = 'radius';
+
+        // 页面初始化
+        window.addEventListener("DOMContentLoaded", () => {
+            initAreaChart();
+            initRoseChart();
+            setupWindowResize();
+            startRoseCarousel();
+        });
+
+        /* =========================================================================
+           1. 图表一：渐变堆叠面积图 (area-stack-gradient)
+           官方样例参考: https://echarts.apache.org/examples/zh/editor.html?c=area-stack-gradient
+           ========================================================================= */
+        const areaDataSets = {
+            day: {
+                categories: ['00:00', '02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'],
+                series: [
+                    { name: '向量稠密检索 (Dense)', data: [140, 182, 101, 234, 490, 830, 910, 840, 890, 780, 620, 320] },
+                    { name: '图谱多跳推理 (GraphRAG)', data: [120, 132, 81, 134, 290, 530, 610, 520, 580, 490, 380, 210] },
+                    { name: '稀疏词项匹配 (SPLADE)', data: [220, 182, 191, 234, 390, 630, 710, 680, 720, 610, 430, 270] },
+                    { name: 'LLM 生成推理 (Inference)', data: [150, 232, 201, 154, 390, 730, 810, 790, 820, 700, 520, 300] },
+                    { name: 'ReAct 工具执行 (Tools)', data: [320, 332, 301, 334, 590, 930, 1020, 960, 990, 850, 640, 410] }
+                ]
+            },
+            week: {
+                categories: ['周一 (Mon)', '周二 (Tue)', '周三 (Wed)', '周四 (Thu)', '周五 (Fri)', '周六 (Sat)', '周日 (Sun)'],
+                series: [
+                    { name: '向量稠密检索 (Dense)', data: [1820, 2340, 2910, 3040, 3490, 2780, 2120] },
+                    { name: '图谱多跳推理 (GraphRAG)', data: [1320, 1540, 1910, 2120, 2580, 1890, 1410] },
+                    { name: '稀疏词项匹配 (SPLADE)', data: [1910, 2134, 2510, 2680, 2920, 2210, 1730] },
+                    { name: 'LLM 生成推理 (Inference)', data: [2010, 2454, 2810, 3190, 3620, 2800, 2200] },
+                    { name: 'ReAct 工具执行 (Tools)', data: [3010, 3534, 4020, 4260, 4890, 3750, 2940] }
+                ]
+            },
+            month: {
+                categories: ['第1周', '第2周', '第3周', '第4周'],
+                series: [
+                    { name: '向量稠密检索 (Dense)', data: [12400, 14900, 16800, 15300] },
+                    { name: '图谱多跳推理 (GraphRAG)', data: [8900, 10400, 12100, 11200] },
+                    { name: '稀疏词项匹配 (SPLADE)', data: [11200, 13100, 14500, 13800] },
+                    { name: 'LLM 生成推理 (Inference)', data: [13500, 15800, 17600, 16200] },
+                    { name: 'ReAct 工具执行 (Tools)', data: [18200, 21400, 23900, 22100] }
+                ]
+            }
+        };
+
+        function initAreaChart() {
+            const chartDom = document.getElementById('areaChart');
+            areaChart = echarts.init(chartDom);
+            renderAreaOption(areaDataSets.day);
+        }
+
+        function renderAreaOption(dataset) {
+            // 官方色系与渐变色 Stop 配置
+            const colorGradients = [
+                {
+                    line: '#38bdf8',
+                    gradTop: 'rgba(56, 189, 248, 0.75)',
+                    gradBottom: 'rgba(56, 189, 248, 0.05)'
+                },
+                {
+                    line: '#a855f7',
+                    gradTop: 'rgba(168, 85, 247, 0.75)',
+                    gradBottom: 'rgba(168, 85, 247, 0.05)'
+                },
+                {
+                    line: '#10b981',
+                    gradTop: 'rgba(16, 185, 129, 0.75)',
+                    gradBottom: 'rgba(16, 185, 129, 0.05)'
+                },
+                {
+                    line: '#f59e0b',
+                    gradTop: 'rgba(245, 158, 11, 0.75)',
+                    gradBottom: 'rgba(245, 158, 11, 0.05)'
+                },
+                {
+                    line: '#f43f5e',
+                    gradTop: 'rgba(244, 63, 94, 0.75)',
+                    gradBottom: 'rgba(244, 63, 94, 0.05)'
+                }
+            ];
+
+            const seriesConfigs = dataset.series.map((item, idx) => {
+                const colors = colorGradients[idx % colorGradients.length];
+                return {
+                    name: item.name,
+                    type: 'line',
+                    stack: 'Total',
+                    smooth: true,
+                    lineStyle: {
+                        width: 2.2,
+                        color: colors.line
+                    },
+                    showSymbol: false,
+                    areaStyle: {
+                        opacity: 0.85,
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: colors.gradTop },
+                            { offset: 1, color: colors.gradBottom }
+                        ])
+                    },
+                    emphasis: {
+                        focus: 'series'
+                    },
+                    data: [...item.data]
+                };
+            });
+
+            const option = {
+                backgroundColor: 'transparent',
+                color: colorGradients.map(c => c.line),
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(13, 23, 41, 0.92)',
+                    borderColor: 'rgba(148, 184, 220, 0.25)',
+                    borderWidth: 1,
+                    textStyle: { color: '#f0f6fc', fontSize: 12 },
+                    axisPointer: {
+                        type: 'cross',
+                        label: {
+                            backgroundColor: '#1e293b'
+                        }
+                    }
+                },
+                legend: {
+                    data: dataset.series.map(s => s.name),
+                    top: 10,
+                    textStyle: {
+                        color: '#94a3b8',
+                        fontSize: 11
+                    },
+                    itemWidth: 14,
+                    itemHeight: 8
+                },
+                grid: {
+                    top: 55,
+                    left: '3%',
+                    right: '4%',
+                    bottom: '8%',
+                    containLabel: true
+                },
+                toolbox: {
+                    right: 15,
+                    top: 8,
+                    feature: {
+                        magicType: { type: ['line', 'bar', 'stack'] },
+                        restore: {},
+                        saveAsImage: { name: 'ECharts_Gradient_Stacked_Area_Chart' }
+                    },
+                    iconStyle: {
+                        borderColor: '#64748b'
+                    },
+                    emphasis: {
+                        iconStyle: {
+                            borderColor: '#38bdf8'
+                        }
+                    }
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: dataset.categories,
+                        axisLine: { lineStyle: { color: 'rgba(148, 184, 220, 0.2)' } },
+                        axisLabel: { color: '#8b9eb7', fontSize: 11 },
+                        splitLine: { show: false }
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value',
+                        axisLine: { show: false },
+                        axisLabel: { color: '#8b9eb7', fontSize: 11 },
+                        splitLine: {
+                            lineStyle: {
+                                color: 'rgba(148, 184, 220, 0.08)',
+                                type: 'dashed'
+                            }
+                        }
+                    }
+                ],
+                dataZoom: [
+                    {
+                        type: 'inside',
+                        start: 0,
+                        end: 100
+                    }
+                ],
+                series: seriesConfigs
+            };
+
+            areaChart.setOption(option, true);
+        }
+
+        function switchAreaGranularity(type, btn) {
+            document.querySelectorAll('.card_header:nth-child(1) .btn_chip').forEach(b => b.classList.remove('is-active'));
+            btn.classList.add('is-active');
+            renderAreaOption(areaDataSets[type]);
+        }
+
+        function resetAreaChart() {
+            renderAreaOption(areaDataSets.day);
+        }
+
+        // 模拟实时数据流推进
+        function toggleLiveDataStream() {
+            isStreaming = !isStreaming;
+            const btn = document.getElementById('streamToggleBtn');
+            const status = document.getElementById('areaStatusText');
+
+            if (isStreaming) {
+                btn.textContent = '⏸';
+                btn.style.color = 'var(--cyan)';
+                status.textContent = '实时数据流正在高频推送中 (每 2 秒刷新)...';
+
+                streamTimer = setInterval(() => {
+                    const opt = areaChart.getOption();
+                    const now = new Date();
+                    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+
+                    // 追加新时间点，移除最旧点
+                    opt.xAxis[0].data.shift();
+                    opt.xAxis[0].data.push(timeStr);
+
+                    opt.series.forEach((s) => {
+                        const lastVal = s.data[s.data.length - 1] || 500;
+                        const delta = Math.floor(Math.random() * 160) - 75;
+                        const newVal = Math.max(120, lastVal + delta);
+                        s.data.shift();
+                        s.data.push(newVal);
+                    });
+
+                    areaChart.setOption({
+                        xAxis: opt.xAxis,
+                        series: opt.series
+                    });
+                }, 2000);
+            } else {
+                btn.textContent = '▶';
+                btn.style.color = '';
+                status.textContent = '实时数据流已暂停';
+                clearInterval(streamTimer);
+            }
+        }
+
+
+        /* =========================================================================
+           2. 图表二：南丁格尔玫瑰图 (pie-roseType)
+           官方样例参考: https://echarts.apache.org/examples/zh/editor.html?c=pie-roseType
+           ========================================================================= */
+        const roseRawData = [
+            { value: 42, name: '售后保修与配件更换' },
+            { value: 38, name: '账单纠纷与极速退款' },
+            { value: 32, name: '软件故障与协同排查' },
+            { value: 30, name: '物流轨迹与派件催促' },
+            { value: 28, name: '专家合规与政策条款' },
+            { value: 25, name: '账号注销与密保安全' },
+            { value: 20, name: '促销优惠与满减券核销' },
+            { value: 16, name: 'VIP 专属通道与人工交接' }
+        ];
+
+        function initRoseChart() {
+            const chartDom = document.getElementById('roseChart');
+            roseChart = echarts.init(chartDom);
+            renderRoseOption(currentRoseMode, roseRawData);
+
+            // 监听鼠标移入暂停轮播，移出继续
+            chartDom.addEventListener('mouseenter', () => {
+                if (isCarousel) clearInterval(carouselTimer);
+            });
+            chartDom.addEventListener('mouseleave', () => {
+                if (isCarousel) startRoseCarousel();
+            });
+        }
+
+        function renderRoseOption(roseMode, data) {
+            const option = {
+                backgroundColor: 'transparent',
+                // 优雅现代对比配色
+                color: [
+                    '#38bdf8', '#818cf8', '#a855f7', '#ec4899',
+                    '#f43f5e', '#f59e0b', '#10b981', '#14b8a6'
+                ],
+                title: {
+                    text: '工单领域占比',
+                    subtext: 'Nightingale Rose',
+                    left: 'center',
+                    top: '47%',
+                    textStyle: {
+                        color: '#f0f6fc',
+                        fontSize: 14,
+                        fontWeight: 700
+                    },
+                    subtextStyle: {
+                        color: '#64748b',
+                        fontSize: 10,
+                        fontFamily: 'monospace'
+                    }
+                },
+                tooltip: {
+                    trigger: 'item',
+                    backgroundColor: 'rgba(13, 23, 41, 0.94)',
+                    borderColor: 'rgba(148, 184, 220, 0.25)',
+                    borderWidth: 1,
+                    textStyle: { color: '#f0f6fc', fontSize: 12 },
+                    formatter: '{b}<br/><b>工单数量:</b> {c} k 件 ({d}%)'
+                },
+                legend: {
+                    top: 'bottom',
+                    type: 'scroll',
+                    textStyle: {
+                        color: '#94a3b8',
+                        fontSize: 10.5
+                    },
+                    itemWidth: 12,
+                    itemHeight: 12,
+                    itemGap: 10
+                },
+                toolbox: {
+                    show: true,
+                    right: 15,
+                    top: 10,
+                    feature: {
+                        mark: { show: true },
+                        dataView: { show: true, readOnly: true },
+                        saveAsImage: { show: true, name: 'ECharts_Nightingale_Rose_Chart' }
+                    },
+                    iconStyle: { borderColor: '#64748b' }
+                },
+                series: [
+                    {
+                        name: '业务领域工单',
+                        type: 'pie',
+                        radius: [38, 160],
+                        center: ['50%', '50%'],
+                        roseType: roseMode, // 'radius' 或 'area'
+                        itemStyle: {
+                            borderRadius: 8,
+                            borderColor: '#0d1729',
+                            borderWidth: 2
+                        },
+                        label: {
+                            show: true,
+                            color: '#94a3b8',
+                            fontSize: 11,
+                            formatter: '{b}: {d}%'
+                        },
+                        labelLine: {
+                            length: 10,
+                            length2: 12,
+                            smooth: true,
+                            lineStyle: {
+                                color: 'rgba(148, 184, 220, 0.3)'
+                            }
+                        },
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 18,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(56, 189, 248, 0.5)'
+                            },
+                            label: {
+                                show: true,
+                                fontSize: 13,
+                                fontWeight: 'bold',
+                                color: '#f0f6fc'
+                            }
+                        },
+                        data: data
+                    }
+                ]
+            };
+
+            roseChart.setOption(option, true);
+        }
+
+        function switchRoseMode(mode, btn) {
+            currentRoseMode = mode;
+            const container = btn.closest('.btn_group');
+            container.querySelectorAll('.btn_chip').forEach(b => b.classList.remove('is-active'));
+            btn.classList.add('is-active');
+            renderRoseOption(mode, roseRawData);
+        }
+
+        // 自动轮播高亮扇区
+        function startRoseCarousel() {
+            clearInterval(carouselTimer);
+            carouselTimer = setInterval(() => {
+                if (!roseChart) return;
+                const total = roseRawData.length;
+                if (currentHighlightIndex >= 0) {
+                    roseChart.dispatchAction({
+                        type: 'downplay',
+                        seriesIndex: 0,
+                        dataIndex: currentHighlightIndex
+                    });
+                }
+                currentHighlightIndex = (currentHighlightIndex + 1) % total;
+                roseChart.dispatchAction({
+                    type: 'highlight',
+                    seriesIndex: 0,
+                    dataIndex: currentHighlightIndex
+                });
+                roseChart.dispatchAction({
+                    type: 'showTip',
+                    seriesIndex: 0,
+                    dataIndex: currentHighlightIndex
+                });
+            }, 2600);
+        }
+
+        function toggleRoseCarousel() {
+            isCarousel = !isCarousel;
+            const btn = document.getElementById('carouselToggleBtn');
+            const status = document.getElementById('roseStatusText');
+
+            if (isCarousel) {
+                btn.style.color = 'var(--purple)';
+                status.textContent = '自动轮播高亮已启动';
+                startRoseCarousel();
+            } else {
+                btn.style.color = '';
+                status.textContent = '自动轮播已暂停，可手动 Hover 扇区探索';
+                clearInterval(carouselTimer);
+                if (currentHighlightIndex >= 0) {
+                    roseChart.dispatchAction({
+                        type: 'downplay',
+                        seriesIndex: 0,
+                        dataIndex: currentHighlightIndex
+                    });
+                }
+            }
+        }
+
+        function randomizeRoseData() {
+            const randomized = roseRawData.map(item => ({
+                name: item.name,
+                value: Math.floor(Math.random() * 40) + 12
+            })).sort((a, b) => b.value - a.value);
+
+            renderRoseOption(currentRoseMode, randomized);
+        }
+
+        // 窗口响应式重绘
+        function setupWindowResize() {
+            window.addEventListener('resize', () => {
+                if (areaChart) areaChart.resize();
+                if (roseChart) roseChart.resize();
+            });
+        }
+    </script>
+</body>
+</html>

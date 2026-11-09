@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>html表单from</h1>
+    <form>
+        <label for="username">用户名：</label>
+        <input type="text" id="username" name="username" required><br><br>
+
+        <label for="password">密码：</label>
+        <input type="password" id="password" name="password" required><br><br>
+
+        <label for="email">邮箱：</label>
+        <input type="email" id="email" name="email"><br><br>
+
+        <label for="age">年龄：</label>
+        <input type="number" id="age" name="age" min="1" max="120"><br><br>
+
+        <label for="gender">性别：</label>
+        <input type="radio" id="male" name="gender" value="male">
+        <label for="male">男</label>  
+        <input type="radio" id="female" name="gender" value="female">
+        <label for="female">女</label>
+        
+        籍贯：
+        <select name="province" id="province">
+            <option value="beijing">北京</option>
+            <option value="shanghai">上海</option>
+            <option value="guangdong">广东</option>
+            <option value="zhejiang">浙江</option>
+        </select> 
+        重置按钮
+    </form>
+</body>
+</html>

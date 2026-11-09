@@ -1,0 +1,2319 @@
+<!-- 姓名：王鹏宇，日期：2026-10-29，功能名称：JavaScript 对象核心概念与全景交互演示 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a192f">
+    <title>16-2 JavaScript 核心对象 · 角色工坊与属性控制台 - 王鹏宇</title>
+    <style>
+        /* ========== 基础变量与设计系统 ========== */
+        :root {
+            --ink: #0f172a;
+            --ink-soft: #334155;
+            --muted: #64748b;
+            --line: #e2e8f0;
+            --line-light: #f1f5f9;
+            --blue: #2563eb;
+            --blue-deep: #1d4ed8;
+            --cyan: #06b6d4;
+            --emerald: #10b981;
+            --amber: #f59e0b;
+            --orange: #f97316;
+            --rose: #f43f5e;
+            --purple: #8b5cf6;
+            --mono: Consolas, Monaco, "Cascadia Code", "Courier New", monospace;
+            --shadow-sm: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+            --shadow-md: 0 14px 34px -14px rgba(15, 23, 42, 0.18);
+            --shadow-lg: 0 24px 50px -18px rgba(15, 23, 42, 0.28);
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --radius-sm: 8px;
+            --ease: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-width: 320px;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 4% 3%, rgba(37, 99, 235, 0.10), transparent 28%),
+                radial-gradient(circle at 96% 12%, rgba(139, 92, 246, 0.12), transparent 32%),
+                radial-gradient(circle at 50% 98%, rgba(6, 182, 212, 0.08), transparent 30%),
+                #edf2f9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Roboto, Arial, sans-serif;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        button, input, select {
+            font-family: inherit;
+        }
+
+        code, pre {
+            font-family: var(--mono);
+        }
+
+        .crx_shell {
+            width: min(1280px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 24px 0 48px;
+        }
+
+        /* ========== 顶部 Hero 导航横幅 ========== */
+        .crx_hero {
+            position: relative;
+            overflow: hidden;
+            padding: 32px 36px;
+            border-radius: 26px;
+            color: #fff;
+            background: linear-gradient(125deg, #071530 0%, #153275 48%, #4f228d 100%);
+            box-shadow: 0 28px 70px -26px rgba(10, 25, 60, 0.7);
+        }
+
+        .crx_hero::before {
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.6;
+            content: "";
+            pointer-events: none;
+            -webkit-mask-image: linear-gradient(115deg, transparent 20%, #000 100%);
+            mask-image: linear-gradient(115deg, transparent 20%, #000 100%);
+        }
+
+        .crx_hero::after {
+            position: absolute;
+            right: 12px;
+            bottom: -80px;
+            color: rgba(255, 255, 255, 0.06);
+            font: 800 240px/1 Consolas, Monaco, monospace;
+            content: "{ ; }";
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .crx_hero_grid {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.9fr);
+            gap: 28px;
+            align-items: center;
+        }
+
+        .crx_tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 999px;
+            font-size: 12.5px;
+            font-weight: 500;
+            color: #bae6fd;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(4px);
+        }
+
+        .crx_tag_dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #38bdf8;
+            box-shadow: 0 0 10px #38bdf8;
+        }
+
+        .crx_hero h1 {
+            margin: 14px 0 10px;
+            font-size: clamp(26px, 3.2vw, 36px);
+            font-weight: 800;
+            letter-spacing: -0.01em;
+            line-height: 1.25;
+        }
+
+        .crx_hero h1 em {
+            color: #67e8f9;
+            font-style: normal;
+            background: linear-gradient(to right, #67e8f9, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .crx_hero_sub {
+            max-width: 620px;
+            margin: 0 0 16px;
+            color: rgba(226, 238, 255, 0.86);
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .crx_hero_meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .crx_hero_meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            color: #e0f2fe;
+            background: rgba(255, 255, 255, 0.11);
+        }
+
+        .crx_hero_card {
+            padding: 16px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .crx_hero_card_head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: rgba(226, 240, 255, 0.65);
+            font-family: var(--mono);
+            font-size: 11px;
+        }
+
+        .crx_hero_dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .crx_hero_dots i {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .crx_hero_dots i:nth-child(1) { background: #f87171; }
+        .crx_hero_dots i:nth-child(2) { background: #fbbf24; }
+        .crx_hero_dots i:nth-child(3) { background: #34d399; }
+
+        .crx_hero_code {
+            margin: 0;
+            color: #e0f2fe;
+            font-size: 12px;
+            line-height: 1.7;
+            white-space: pre;
+        }
+
+        .crx_hero_code .tk-kw { color: #c084fc; font-weight: 600; }
+        .crx_hero_code .tk-prop { color: #93c5fd; }
+        .crx_hero_code .tk-str { color: #86efac; }
+        .crx_hero_code .tk-num { color: #fde047; }
+        .crx_hero_code .tk-fn { color: #67e8f9; }
+
+        .crx_status_bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 18px 2px 20px;
+            padding: 12px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            border-radius: var(--radius-md);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .crx_status_group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            font-size: 13px;
+        }
+
+        .crx_status_item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--ink-soft);
+        }
+
+        .crx_status_badge {
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .crx_badge_active { background: #dcfce7; color: #15803d; }
+        .crx_badge_warn { background: #fef3c7; color: #b45309; }
+        .crx_badge_danger { background: #fee2e2; color: #b91c1c; }
+        .crx_badge_info { background: #e0f2fe; color: #0369a1; }
+
+        /* ========== 双栏主体布局 ========== */
+        .crx_layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.45fr) minmax(360px, 1.05fr);
+            gap: 24px;
+            align-items: start;
+        }
+
+        .crx_col_main,
+        .crx_col_side {
+            display: flex;
+            min-width: 0;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .crx_card {
+            padding: 22px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-lg);
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: var(--shadow-md);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .crx_card_head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .crx_card_title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .crx_icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            font-size: 17px;
+            background: #eff6ff;
+            color: var(--blue);
+        }
+
+        .crx_icon.purple { background: #f5f3ff; color: var(--purple); }
+        .crx_icon.emerald { background: #ecfdf5; color: var(--emerald); }
+        .crx_icon.amber { background: #fffbeb; color: var(--amber); }
+
+        .crx_card_title h2 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .crx_card_title span {
+            color: var(--muted);
+            font-size: 12.5px;
+            font-weight: normal;
+        }
+
+        .crx_actions_group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .crx_btn_pill {
+            padding: 5px 12px;
+            border: 1px solid #dbeafe;
+            border-radius: 999px;
+            color: var(--blue-deep);
+            background: #eff6ff;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+
+        .crx_btn_pill:hover {
+            border-color: #93c5fd;
+            background: #dbeafe;
+            transform: translateY(-1px);
+        }
+
+        /* ========== 实体角色可视展示台 ========== */
+        .crx_character_stage {
+            display: grid;
+            grid-template-columns: 140px minmax(0, 1fr);
+            gap: 20px;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid #e0e7ff;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, #f8faff 0%, #f1f5fd 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .crx_character_stage.is-attacked {
+            animation: crxFlashAttack 0.6s ease;
+        }
+
+        .crx_character_stage.is-healed {
+            animation: crxFlashHeal 0.6s ease;
+        }
+
+        @keyframes crxFlashAttack {
+            0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4); transform: scale(1); }
+            50% { box-shadow: 0 0 0 16px rgba(244, 63, 94, 0); transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes crxFlashHeal {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); transform: scale(1); }
+            50% { box-shadow: 0 0 0 16px rgba(16, 185, 129, 0); transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .crx_avatar_wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .crx_avatar {
+            width: 88px;
+            height: 88px;
+            border-radius: 24px;
+            display: grid;
+            place-items: center;
+            font-size: 46px;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            box-shadow: 0 12px 24px -6px rgba(99, 102, 241, 0.4);
+            color: #fff;
+            position: relative;
+            transition: transform 0.3s var(--ease);
+        }
+
+        .crx_avatar:hover {
+            transform: rotate(5deg) scale(1.05);
+        }
+
+        .crx_avatar_title {
+            margin-top: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .crx_avatar_guild {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .crx_vitals {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .crx_vital_row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12.5px;
+        }
+
+        .crx_hp_bar_bg {
+            position: relative;
+            width: 100%;
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .crx_hp_bar_fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #06b6d4);
+            border-radius: 999px;
+            transition: width 0.4s var(--ease), background 0.4s ease;
+        }
+
+        .crx_hp_bar_fill.low {
+            background: linear-gradient(90deg, #ef4444, #f97316);
+        }
+
+        .crx_badge_list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .crx_gear_badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 9px;
+            border-radius: 6px;
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            font-size: 11px;
+            color: var(--ink-soft);
+        }
+
+        /* ========== 对象属性透视矩阵 (Property Matrix) ========== */
+        .crx_props_matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .crx_prop_card {
+            position: relative;
+            padding: 12px 14px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-md);
+            background: #ffffff;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .crx_prop_card:hover {
+            transform: translateY(-2px);
+            border-color: #93c5fd;
+            box-shadow: 0 8px 18px -6px rgba(37, 99, 235, 0.15);
+        }
+
+        .crx_prop_card.is-new {
+            border-color: #38bdf8;
+            background: #f0f9ff;
+            animation: crxPulseNew 1.2s ease;
+        }
+
+        @keyframes crxPulseNew {
+            0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.5); }
+            70% { box-shadow: 0 0 0 8px rgba(56, 189, 248, 0); }
+            100% { box-shadow: none; }
+        }
+
+        .crx_prop_header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .crx_prop_key {
+            font-family: var(--mono);
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--blue-deep);
+        }
+
+        .crx_prop_type {
+            font-family: var(--mono);
+            font-size: 10px;
+            padding: 1px 6px;
+            border-radius: 4px;
+            background: #f1f5f9;
+            color: var(--muted);
+            text-transform: uppercase;
+        }
+
+        .crx_prop_val {
+            font-size: 12px;
+            color: var(--ink);
+            word-break: break-all;
+            line-height: 1.45;
+        }
+
+        .crx_prop_val code {
+            color: #047857;
+            font-weight: 600;
+        }
+
+        /* ========== 实时 JSON 与语法树视图 ========== */
+        .crx_json_viewer {
+            position: relative;
+            background: #090d16;
+            border-radius: var(--radius-md);
+            padding: 16px;
+            border: 1px solid #1e293b;
+            color: #e2e8f0;
+            font-size: 12px;
+            max-height: 290px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #334155 transparent;
+        }
+
+        .crx_json_viewer::-webkit-scrollbar {
+            width: 6px;
+        }
+        .crx_json_viewer::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 999px;
+        }
+
+        .crx_copy_btn {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid #334155;
+            background: rgba(30, 41, 59, 0.8);
+            color: #94a3b8;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .crx_copy_btn:hover {
+            color: #fff;
+            background: #334155;
+        }
+
+        /* ========== 属性操练沙盒 (Quick Custom Property Editor) ========== */
+        .crx_sandbox_box {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto auto;
+            gap: 10px;
+            align-items: center;
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            border: 1px dashed #cbd5e1;
+        }
+
+        .crx_input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: var(--radius-sm);
+            font-size: 12.5px;
+            outline: none;
+            background: #fff;
+            transition: border-color 0.18s ease;
+        }
+
+        .crx_input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .crx_btn {
+            padding: 8px 14px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            white-space: nowrap;
+        }
+
+        .crx_btn_primary {
+            background: var(--blue);
+            color: #fff;
+        }
+
+        .crx_btn_primary:hover {
+            background: var(--blue-deep);
+            transform: translateY(-1px);
+        }
+
+        .crx_btn_danger {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
+        }
+
+        .crx_btn_danger:hover {
+            background: #fecaca;
+        }
+
+        /* ========== 右侧：选项卡与操作矩阵 ========== */
+        .crx_tabs {
+            display: flex;
+            gap: 6px;
+            border-bottom: 2px solid var(--line-light);
+            padding-bottom: 2px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .crx_tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .crx_tab {
+            padding: 8px 14px;
+            border: none;
+            border-bottom: 2px solid transparent;
+            background: transparent;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px 6px 0 0;
+            transition: all 0.18s ease;
+            white-space: nowrap;
+        }
+
+        .crx_tab:hover {
+            color: var(--blue);
+            background: #f1f5f9;
+        }
+
+        .crx_tab.is-active {
+            color: var(--blue);
+            border-bottom-color: var(--blue);
+            background: rgba(37, 99, 235, 0.06);
+        }
+
+        .crx_method_grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .crx_method_btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-md);
+            background: #ffffff;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.18s ease;
+        }
+
+        .crx_method_btn:hover {
+            border-color: #93c5fd;
+            background: #f8fbff;
+            transform: translateX(3px);
+            box-shadow: 0 6px 14px -4px rgba(37, 99, 235, 0.12);
+        }
+
+        .crx_method_info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .crx_method_name {
+            font-family: var(--mono);
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .crx_method_desc {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .crx_method_tag {
+            font-family: var(--mono);
+            font-size: 10px;
+            padding: 2px 7px;
+            border-radius: 999px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .tag-mut { background: #ffedd5; color: #c2410c; }
+        .tag-read { background: #e0f2fe; color: #0284c7; }
+        .tag-meta { background: #f3e8ff; color: #7e22ce; }
+        .tag-safe { background: #dcfce7; color: #166534; }
+
+        /* ========== 代码运行与结果输出区 ========== */
+        .crx_run_display {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .crx_code_box {
+            background: #0b1120;
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            border: 1px solid #1e293b;
+        }
+
+        .crx_code_box_head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #64748b;
+            font-size: 11px;
+            font-family: var(--mono);
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 6px;
+        }
+
+        .crx_code_box pre {
+            margin: 0;
+            color: #e2e8f0;
+            font-size: 12.5px;
+            line-height: 1.65;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .crx_result_box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
+        }
+
+        .crx_result_title {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+
+        .crx_result_content {
+            font-family: var(--mono);
+            font-size: 12.5px;
+            color: var(--ink);
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .crx_explain_box {
+            font-size: 12.5px;
+            line-height: 1.6;
+            color: #334155;
+            background: #eff6ff;
+            border-left: 4px solid var(--blue);
+            padding: 10px 14px;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+
+        /* ========== 操作日志记录流 ========== */
+        .crx_log_list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 220px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        .crx_log_item {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            background: #f8fafc;
+            border: 1px solid #edf2f7;
+            font-size: 12px;
+        }
+
+        .crx_log_time {
+            font-family: var(--mono);
+            color: #94a3b8;
+            font-size: 11px;
+            flex: none;
+        }
+
+        .crx_log_msg {
+            flex: 1;
+            color: var(--ink-soft);
+        }
+
+        /* ========== 知识速查对比表格 ========== */
+        .crx_table_section {
+            margin-top: 24px;
+        }
+
+        .crx_table_wrap {
+            overflow-x: auto;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-md);
+            background: #fff;
+        }
+
+        .crx_table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        .crx_table th {
+            background: #f8fafc;
+            color: var(--ink);
+            font-weight: 700;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--line);
+            white-space: nowrap;
+        }
+
+        .crx_table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            color: var(--ink-soft);
+            vertical-align: top;
+        }
+
+        .crx_table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .crx_table tr:hover td {
+            background: #fbfcfe;
+        }
+
+        .crx_table code {
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #eff6ff;
+            color: var(--blue-deep);
+            font-weight: 600;
+        }
+
+        /* ========== 页脚署名 ========== */
+        .crx_footer {
+            margin-top: 36px;
+            padding-top: 20px;
+            border-top: 1px solid #cbd5e1;
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .crx_footer strong {
+            color: var(--ink);
+        }
+
+        /* ========== 响应式断点适配 ========== */
+        @media (max-width: 960px) {
+            .crx_hero_grid {
+                grid-template-columns: 1fr;
+            }
+            .crx_layout {
+                grid-template-columns: 1fr;
+            }
+            .crx_sandbox_box {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .crx_hero {
+                padding: 22px 20px;
+            }
+            .crx_character_stage {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .crx_avatar_wrap {
+                margin: 0 auto;
+            }
+            .crx_sandbox_box {
+                grid-template-columns: 1fr;
+            }
+            .crx_actions_group {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="crx_shell">
+
+    <!-- 顶部横幅 -->
+    <header class="crx_hero">
+        <div class="crx_hero_grid">
+            <div>
+                <span class="crx_tag">
+                    <span class="crx_tag_dot"></span>
+                    ECMAScript 核心机制 · 引用数据类型探索
+                </span>
+                <h1>JavaScript <em>对象 (Object)</em> 全景工坊</h1>
+                <p class="crx_hero_sub">
+                    对象是 JavaScript 最核心的数据组织形态。本项目通过赛博角色实体（Hero Entity）与属性透视控制台，全方位交互演示对象的 <strong>创建范式、属性与方法增删改查 (CRUD)、Object 静态工具函数、原型链、this 绑定、访问器属性与防篡改机制</strong>。
+                </p>
+                <div class="crx_hero_meta">
+                    <span>👤 作者：王鹏宇</span>
+                    <span>📅 实验日期：2026-10-29</span>
+                    <span>📑 课程作业：16-2 JavaScript 对象</span>
+                </div>
+            </div>
+
+            <div class="crx_hero_card">
+                <div class="crx_hero_card_head">
+                    <div class="crx_hero_dots">
+                        <i></i><i></i><i></i>
+                    </div>
+                    <span>Object Definition Quickview</span>
+                </div>
+                <pre class="crx_hero_code"><span class="tk-kw">const</span> hero = {
+  <span class="tk-prop">name</span>: <span class="tk-str">'幻影游侠'</span>,
+  <span class="tk-prop">level</span>: <span class="tk-num">12</span>,
+  <span class="tk-prop">hp</span>: <span class="tk-num">850</span>,
+  <span class="tk-prop">skills</span>: [<span class="tk-str">'相位闪现'</span>, <span class="tk-str">'雷霆一击'</span>],
+  <span class="tk-fn">attack</span>() {
+    <span class="tk-kw">return</span> <span class="tk-str">`<span class="tk-kw">${</span><span class="tk-kw">this</span>.<span class="tk-prop">name</span><span class="tk-kw">}</span> 触发暴击!`</span>;
+  }
+};</pre>
+            </div>
+        </div>
+    </header>
+
+    <!-- 全局状态指示栏 -->
+    <div class="crx_status_bar">
+        <div class="crx_status_group">
+            <span class="crx_status_item">
+                <strong>属性总数：</strong>
+                <span id="crxPropCount" class="crx_status_badge crx_badge_info">0</span>
+            </span>
+            <span class="crx_status_item">
+                <strong>可扩展性 (Extensible)：</strong>
+                <span id="crxIsExtensible" class="crx_status_badge crx_badge_active">true</span>
+            </span>
+            <span class="crx_status_item">
+                <strong>密封状态 (Sealed)：</strong>
+                <span id="crxIsSealed" class="crx_status_badge crx_badge_active">false</span>
+            </span>
+            <span class="crx_status_item">
+                <strong>冻结状态 (Frozen)：</strong>
+                <span id="crxIsFrozen" class="crx_status_badge crx_badge_active">false</span>
+            </span>
+        </div>
+        <div class="crx_actions_group">
+            <button id="crxBtnUndo" class="crx_btn_pill" title="撤销上一次对象变更">↩ 撤销操作</button>
+            <button id="crxBtnReset" class="crx_btn_pill" title="恢复默认角色对象初始值">🔄 重置对象</button>
+        </div>
+    </div>
+
+    <!-- 主展示与交互区 -->
+    <main class="crx_layout">
+
+        <!-- 左栏：角色实体舞台、属性透视阵列、实时 JSON 视图、自定义属性添加器 -->
+        <section class="crx_col_main">
+
+            <!-- 1. 角色实体舞台 -->
+            <div class="crx_card">
+                <div class="crx_card_head">
+                    <div class="crx_card_title">
+                        <span class="crx_icon">🎮</span>
+                        <div>
+                            <h2>实体角色实例 (Live Instance Stage)</h2>
+                            <span>展示对象内部属性在界面上的实时响应映射</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="crxHeroStage" class="crx_character_stage">
+                    <div class="crx_avatar_wrap">
+                        <div id="crxHeroAvatar" class="crx_avatar">⚡</div>
+                        <div id="crxHeroName" class="crx_avatar_title">幻影游侠</div>
+                        <div id="crxHeroGuild" class="crx_avatar_guild">公会：暗影极客盟</div>
+                    </div>
+
+                    <div class="crx_vitals">
+                        <div class="crx_vital_row">
+                            <span><strong>生命值 (HP):</strong> <span id="crxHpText">850 / 1000</span></span>
+                            <span id="crxHeroLevel" class="crx_status_badge crx_badge_warn">Lv.12</span>
+                        </div>
+                        <div class="crx_hp_bar_bg">
+                            <div id="crxHpFill" class="crx_hp_bar_fill" style="width: 85%;"></div>
+                        </div>
+
+                        <div class="crx_vital_row" style="margin-top: 6px;">
+                            <span><strong>计算战力 (Getter):</strong> <code id="crxPowerRating" style="color: #7c3aed; font-weight: bold;">--</code></span>
+                            <span><strong>当前状态:</strong> <span id="crxHeroAlive" class="crx_status_badge crx_badge_active">存活</span></span>
+                        </div>
+
+                        <div>
+                            <strong style="font-size: 12px; color: var(--muted);">核心技能 (Array Property):</strong>
+                            <div id="crxSkillsList" class="crx_badge_list"></div>
+                        </div>
+
+                        <div>
+                            <strong style="font-size: 12px; color: var(--muted);">穿戴装备 (Nested Object):</strong>
+                            <div id="crxEquipmentList" class="crx_badge_list"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 属性透视矩阵 -->
+                <div style="margin-top: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="margin: 0; font-size: 14px; font-weight: 700; color: var(--ink);">
+                            属性透视矩阵 (Properties Inspector)
+                        </h3>
+                        <span style="font-size: 11.5px; color: var(--muted);">含自身属性、类型及键值</span>
+                    </div>
+                    <div id="crxPropsMatrix" class="crx_props_matrix"></div>
+                </div>
+            </div>
+
+            <!-- 2. 实时序列化 JSON 结构 -->
+            <div class="crx_card">
+                <div class="crx_card_head">
+                    <div class="crx_card_title">
+                        <span class="crx_icon emerald">📦</span>
+                        <div>
+                            <h2>对象 JSON 序列化视图 (JSON.stringify)</h2>
+                            <span>用于网络传输与存储的标准格式（注意：方法属性在序列化时会被忽略）</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="crx_json_viewer">
+                    <button id="crxBtnCopyJson" class="crx_copy_btn" title="复制格式化 JSON 到剪贴板">复制 JSON</button>
+                    <pre id="crxJsonDisplay" style="margin: 0;"></pre>
+                </div>
+            </div>
+
+            <!-- 3. 自定义属性操练沙盒 -->
+            <div class="crx_card">
+                <div class="crx_card_head">
+                    <div class="crx_card_title">
+                        <span class="crx_icon amber">🧪</span>
+                        <div>
+                            <h2>动态增删沙盒 (Custom Property Sandbox)</h2>
+                            <span>手动为对象写入或移除自定义键值对</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="crx_sandbox_box">
+                    <input type="text" id="crxCustomKey" class="crx_input" placeholder="属性名 (如: title, pet, armor)" />
+                    <input type="text" id="crxCustomVal" class="crx_input" placeholder="属性值 (如: 极速战隼, 999)" />
+                    <button id="crxBtnSetProp" class="crx_btn crx_btn_primary">写入属性 (hero[key] = val)</button>
+                    <button id="crxBtnDelProp" class="crx_btn crx_btn_danger">删除 (delete)</button>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- 右栏：方法选项卡、交互指令列表、实时代码与日志 -->
+        <section class="crx_col_side">
+
+            <!-- 1. 交互操作控制台 -->
+            <div class="crx_card">
+                <div class="crx_card_head">
+                    <div class="crx_card_title">
+                        <span class="crx_icon purple">⚡</span>
+                        <div>
+                            <h2>对象操作与方法控制台</h2>
+                            <span>选择分类点击触发各种原生对象操作</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 分类 Tabs -->
+                <nav class="crx_tabs" id="crxTabs">
+                    <button class="crx_tab is-active" data-group="crud">1. 基础增删改查</button>
+                    <button class="crx_tab" data-group="static">2. Object 静态方法</button>
+                    <button class="crx_tab" data-group="copy">3. 合并与拷贝</button>
+                    <button class="crx_tab" data-group="protect">4. 防篡改与描述符</button>
+                    <button class="crx_tab" data-group="create">5. 对象的创建范式</button>
+                </nav>
+
+                <!-- 操作按钮列表 -->
+                <div id="crxMethodGrid" class="crx_method_grid"></div>
+            </div>
+
+            <!-- 2. 执行追踪与原理解析看板 -->
+            <div class="crx_card">
+                <div class="crx_card_head">
+                    <div class="crx_card_title">
+                        <span class="crx_icon">💻</span>
+                        <div>
+                            <h2>执行代码与返回值追踪</h2>
+                            <span>观察底层 JavaScript 语句与运行反馈</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="crx_run_display">
+                    <!-- 执行代码预览 -->
+                    <div class="crx_code_box">
+                        <div class="crx_code_box_head">
+                            <span>EXECUTED JAVASCRIPT CODE</span>
+                            <span id="crxCodeStatus">READY</span>
+                        </div>
+                        <pre id="crxCodeDisplay">// 点击上方任意操作按钮查看实时代码与状态变化</pre>
+                    </div>
+
+                    <!-- 返回值显示 -->
+                    <div class="crx_result_box">
+                        <div class="crx_result_title">OPERATION RETURN VALUE (返回值)</div>
+                        <div id="crxResultDisplay" class="crx_result_content">undefined</div>
+                    </div>
+
+                    <!-- 原理解释说明 -->
+                    <div id="crxExplainDisplay" class="crx_explain_box">
+                        💡 提示：JavaScript 对象是名值对（Key-Value）的集合。支持随时动态添加、读取、修改或删除属性。请在上方选择各种操作来亲自体会！
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. 操作审计历史日志 -->
+            <div class="crx_card">
+                <div class="crx_card_head">
+                    <div class="crx_card_title">
+                        <span class="crx_icon">📜</span>
+                        <div>
+                            <h2>控制台历史日志 (Console Log)</h2>
+                            <span>按时序记录最近 8 次操作及状态变化</span>
+                        </div>
+                    </div>
+                    <button id="crxBtnClearLog" class="crx_btn_pill">清空日志</button>
+                </div>
+
+                <div id="crxLogList" class="crx_log_list">
+                    <div class="crx_log_item">
+                        <span class="crx_log_time">--:--:--</span>
+                        <span class="crx_log_msg">控制台初始化完毕，准备就绪。</span>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- 底部知识矩阵对比表格 -->
+    <section class="crx_table_section">
+        <div class="crx_card">
+            <div class="crx_card_head">
+                <div class="crx_card_title">
+                    <span class="crx_icon purple">📖</span>
+                    <div>
+                        <h2>JavaScript 对象核心概念与避坑速查表</h2>
+                        <span>系统化梳理面试高频考点与开发核心规则</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="crx_table_wrap">
+                <table class="crx_table">
+                    <thead>
+                        <tr>
+                            <th>对比维度 / 概念</th>
+                            <th>核心语法 / API</th>
+                            <th>行为特性与工作原理</th>
+                            <th>典型应用场景 / 注意事项</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>属性访问方式</strong></td>
+                            <td><code>obj.prop</code> vs <code>obj['prop']</code></td>
+                            <td>点语法简洁直接；中括号语法支持动态变量键名、包含连字符或空格等特殊字符的键名。</td>
+                            <td>当属性名保存在变量中时，必须使用中括号语法，例如 <code>obj[dynamicKey]</code>。</td>
+                        </tr>
+                        <tr>
+                            <td><strong>属性遍历机制</strong></td>
+                            <td><code>Object.keys()</code> vs <code>for...in</code></td>
+                            <td><code>Object.keys()</code> 仅返回对象<strong>自身可枚举</strong>属性；<code>for...in</code> 会沿着<strong>原型链</strong>向上查找原型上的可枚举属性。</td>
+                            <td>遍历普通对象属性强烈推荐使用 <code>Object.keys(obj).forEach()</code> 或 <code>Object.entries()</code>。</td>
+                        </tr>
+                        <tr>
+                            <td><strong>属性存在性判断</strong></td>
+                            <td><code>Object.hasOwn()</code> vs <code>in</code> 操作符</td>
+                            <td><code>Object.hasOwn(obj, k)</code> 仅检查自身属性；<code>k in obj</code> 会检索自身及原型链继承属性。</td>
+                            <td>ES2022 推荐使用 <code>Object.hasOwn()</code> 替代过往的 <code>obj.hasOwnProperty()</code>。</td>
+                        </tr>
+                        <tr>
+                            <td><strong>对象浅拷贝与合并</strong></td>
+                            <td><code>Object.assign()</code> 与 <code>{ ...obj }</code></td>
+                            <td>将源对象的所有自身可枚举属性复制到目标对象。注意：只拷贝第一层，嵌套对象仅复制引用地址。</td>
+                            <td>若修改复制品中的嵌套对象，原对象的对应嵌套属性也会被改变。</td>
+                        </tr>
+                        <tr>
+                            <td><strong>对象深拷贝</strong></td>
+                            <td><code>structuredClone(obj)</code></td>
+                            <td>现代浏览器原生深拷贝 API，完全递归复制所有层级对象与数组，彻底隔离原对象引用。</td>
+                            <td>传统 <code>JSON.parse(JSON.stringify(obj))</code> 会丢失方法、undefined、Symbol 等。</td>
+                        </tr>
+                        <tr>
+                            <td><strong>对象锁定保护</strong></td>
+                            <td><code>freeze()</code> vs <code>seal()</code> vs <code>preventExtensions()</code></td>
+                            <td>
+                                <strong>preventExtensions</strong>：不可加，可删可改。<br>
+                                <strong>seal (密封)</strong>：不可加不可删，可改已有值。<br>
+                                <strong>freeze (冻结)</strong>：不可加、不可删、不可改（全锁定）。
+                            </td>
+                            <td>注意它们都是浅层保护；如需深冻结需编写递归冻结函数。严格模式下违反保护会抛出 TypeError。</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="crx_footer">
+        <p>
+            <strong>网页设计与开发实验室</strong> · 作业 16-2 JavaScript 对象展示系统<br>
+            姓名：<strong>王鹏宇</strong> · 完成日期：2026年10月29日 · 纯原生 JavaScript / CSS 实现
+        </p>
+    </footer>
+
+</div>
+
+<script>
+/**
+ * 姓名：王鹏宇
+ * 日期：2026-10-29
+ * 功能：JavaScript 对象核心概念与全景交互演示系统
+ */
+(function () {
+    'use strict';
+
+    /* ============================================================
+       1. 默认角色对象数据与初始状态
+       ============================================================ */
+    function createInitialHero() {
+        return {
+            name: '幻影游侠',
+            avatar: '⚡',
+            level: 12,
+            hp: 850,
+            maxHp: 1000,
+            isAlive: true,
+            guild: '暗影极客盟',
+            skills: ['相位闪现', '雷霆一击', '过载脉冲'],
+            equipment: {
+                weapon: '离子光刃',
+                armor: '纳米护甲'
+            },
+            // 对象方法：演示 this 关键字绑定
+            attack: function () {
+                return this.name + ' 挥舞 ' + this.equipment.weapon + ' 发动猛攻，造成暴击物理与能量双重伤害！';
+            },
+            heal: function (amount) {
+                var recover = amount || 150;
+                this.hp = Math.min(this.maxHp, this.hp + recover);
+                return this.name + ' 使用纳米修复包，恢复了 ' + recover + ' 点生命，当前 HP 为 ' + this.hp + '/' + this.maxHp + '。';
+            },
+            // 访问器属性 (getter)
+            get combatPower() {
+                return Math.floor(this.level * 105 + this.hp * 1.2 + this.skills.length * 90);
+            }
+        };
+    }
+
+    var hero = createInitialHero();
+    var undoStack = [];
+    var logHistory = [];
+    var activeTab = 'crud';
+
+    /* ============================================================
+       2. 操作定义字典 (Operation Registry)
+       ============================================================ */
+    var OPERATIONS = {
+        crud: [
+            {
+                id: 'dot_read',
+                name: '点语法读取 (hero.name)',
+                desc: '使用点语法访问已有属性',
+                tag: 'read',
+                run: function () {
+                    var val = hero.name;
+                    return {
+                        code: "// 1. 点语法读取属性值\nconst heroName = hero.name;\nconsole.log(heroName);",
+                        result: val,
+                        explain: "点语法是读取属性最直观的方式，只要属性名是合法的 JavaScript 标识符且不含特殊符号即可使用。"
+                    };
+                }
+            },
+            {
+                id: 'bracket_read',
+                name: '中括号动态读取 (hero["skills"][0])',
+                desc: '使用方括号通过字符串或变量名访问',
+                tag: 'read',
+                run: function () {
+                    var propName = 'skills';
+                    var val = hero[propName][0];
+                    return {
+                        code: "// 2. 中括号语法读取（支持动态变量与数组嵌套）\nconst prop = 'skills';\nconst firstSkill = hero[prop][0];\nconsole.log(firstSkill);",
+                        result: val,
+                        explain: "中括号语法接受计算表达式。当属性名为变量、包含空格或中划线时，必须使用中括号语法。"
+                    };
+                }
+            },
+            {
+                id: 'add_prop',
+                name: '动态添加属性 (hero.pet = "机械战隼")',
+                desc: '随时为对象赋予新属性',
+                tag: 'mut',
+                run: function () {
+                    saveUndo('添加 pet 属性');
+                    hero.pet = '机械战隼';
+                    return {
+                        code: "// 3. 为对象动态添加新属性\nhero.pet = '机械战隼';\nconsole.log(hero.pet);",
+                        result: hero.pet,
+                        explain: "JavaScript 对象是动态哈希表，无需提前声明模型字段，直接通过赋值即可随时扩展新属性。"
+                    };
+                }
+            },
+            {
+                id: 'modify_prop',
+                name: '修改现有属性 (hero.level += 1, hp 满血)',
+                desc: '对现有属性赋予新值',
+                tag: 'mut',
+                run: function () {
+                    saveUndo('升级角色并回满 HP');
+                    hero.level += 1;
+                    hero.hp = hero.maxHp;
+                    return {
+                        code: "// 4. 修改现有属性值\nhero.level += 1;\nhero.hp = hero.maxHp;\nconsole.log({ level: hero.level, hp: hero.hp });",
+                        result: { level: hero.level, hp: hero.hp },
+                        explain: "直接修改属性会覆盖原有值，并触发 getter/页面视图的相应联动重新渲染。"
+                    };
+                }
+            },
+            {
+                id: 'delete_prop',
+                name: '删除属性 (delete hero.guild)',
+                desc: '使用 delete 操作符彻底移除键值对',
+                tag: 'mut',
+                run: function () {
+                    if (!('guild' in hero)) {
+                        return {
+                            code: "// guild 属性已不存在\ndelete hero.guild;",
+                            result: false,
+                            explain: "如果尝试删除一个不存在的属性，delete 操作符会返回 true，但实际上无任何改变。"
+                        };
+                    }
+                    saveUndo('删除 guild 属性');
+                    var delSuccess = delete hero.guild;
+                    return {
+                        code: "// 5. 使用 delete 关键字删除属性\nconst isDeleted = delete hero.guild;\nconsole.log('删除是否成功:', isDeleted);",
+                        result: delSuccess,
+                        explain: "delete 会将属性从哈希结构中移除，之后通过 'guild' in hero 检测将返回 false。"
+                    };
+                }
+            },
+            {
+                id: 'call_attack',
+                name: '调用对象方法 hero.attack()',
+                desc: '演示方法内部 this 指向当前对象实例',
+                tag: 'read',
+                run: function () {
+                    triggerStageAnimation('attack');
+                    var msg = hero.attack();
+                    return {
+                        code: "// 6. 执行对象内的方法\nconst combatLog = hero.attack();\nconsole.log(combatLog);",
+                        result: msg,
+                        explain: "在对象方法内，this 默认隐式绑定到调用该方法的对象实例（即 hero）。"
+                    };
+                }
+            },
+            {
+                id: 'call_heal',
+                name: '调用回复方法 hero.heal(180)',
+                desc: '演示方法内部通过 this 改变自身数据',
+                tag: 'mut',
+                run: function () {
+                    saveUndo('执行治疗回血');
+                    triggerStageAnimation('heal');
+                    var msg = hero.heal(180);
+                    return {
+                        code: "// 7. 方法内部通过 this.hp 修改对象属性\nconst healLog = hero.heal(180);\nconsole.log(healLog);",
+                        result: msg,
+                        explain: "通过方法封装对对象状态的修改，是面向对象编程高内聚的基础体现。"
+                    };
+                }
+            }
+        ],
+
+        static: [
+            {
+                id: 'obj_keys',
+                name: 'Object.keys(hero)',
+                desc: '获取对象所有自身可枚举属性名数组',
+                tag: 'read',
+                run: function () {
+                    var keys = Object.keys(hero);
+                    return {
+                        code: "// 1. 提取所有自身可枚举键名\nconst keys = Object.keys(hero);\nconsole.log(keys);",
+                        result: keys,
+                        explain: "返回一个由键名字符串组成的数组。它不会遍历原型链上的属性，非常适合用于对象属性的遍历与计数。"
+                    };
+                }
+            },
+            {
+                id: 'obj_values',
+                name: 'Object.values(hero)',
+                desc: '获取对象所有自身属性值数组',
+                tag: 'read',
+                run: function () {
+                    var values = Object.values(hero).map(function (v) {
+                        return typeof v === 'function' ? '[Function]' : v;
+                    });
+                    return {
+                        code: "// 2. 提取所有自身属性值\nconst values = Object.values(hero);\nconsole.log(values);",
+                        result: values,
+                        explain: "以数组形式返回对象所有属性的值，顺序与通过循环遍历对象的顺序一致。"
+                    };
+                }
+            },
+            {
+                id: 'obj_entries',
+                name: 'Object.entries(hero)',
+                desc: '返回键值对组成的二维数组 [ [key, val], ... ]',
+                tag: 'read',
+                run: function () {
+                    var entries = Object.entries(hero).map(function (item) {
+                        var k = item[0], v = item[1];
+                        return [k, typeof v === 'function' ? '[Function]' : v];
+                    });
+                    return {
+                        code: "// 3. 提取键值对键值对元组\nconst entries = Object.entries(hero);\nfor (const [key, value] of entries) {\n  console.log(`${key}:`, value);\n}",
+                        result: entries,
+                        explain: "Object.entries 极其便利，可直接结合 for...of 解构，或用于将普通对象转成 Map。"
+                    };
+                }
+            },
+            {
+                id: 'has_own',
+                name: 'Object.hasOwn(hero, "skills")',
+                desc: '现代安全检测：属性是否为自身所有',
+                tag: 'read',
+                run: function () {
+                    var hasSkills = Object.hasOwn ? Object.hasOwn(hero, 'skills') : Object.prototype.hasOwnProperty.call(hero, 'skills');
+                    var hasToString = Object.hasOwn ? Object.hasOwn(hero, 'toString') : Object.prototype.hasOwnProperty.call(hero, 'toString');
+                    return {
+                        code: "// 4. 检测自身是否拥有特定属性（排除原型链）\nconst hasSkills = Object.hasOwn(hero, 'skills'); // true\nconst hasToString = Object.hasOwn(hero, 'toString'); // false（toString 在原型链上）",
+                        result: { hasSkills: hasSkills, hasToString: hasToString },
+                        explain: "Object.hasOwn 是 ES2022 推荐的标准 API，安全替代直接调用 obj.hasOwnProperty()（防止被恶意同名覆盖）。"
+                    };
+                }
+            },
+            {
+                id: 'in_vs_has',
+                name: '"toString" in hero 对比',
+                desc: '演示 in 操作符沿原型链向上查找特性',
+                tag: 'read',
+                run: function () {
+                    var inResult = 'toString' in hero;
+                    var ownResult = Object.prototype.hasOwnProperty.call(hero, 'toString');
+                    return {
+                        code: "// 5. in 操作符 vs hasOwnProperty\nconsole.log('toString' in hero); // true (原型链继承而来)\nconsole.log(Object.hasOwn(hero, 'toString')); // false (非自身属性)",
+                        result: {
+                            "'toString' in hero": inResult,
+                            "Object.hasOwn(hero, 'toString')": ownResult
+                        },
+                        explain: "in 操作符会沿着整个原型链一路往上查找，只要存在就为 true；而 hasOwn 严格限制在对象自身。"
+                    };
+                }
+            }
+        ],
+
+        copy: [
+            {
+                id: 'obj_assign',
+                name: 'Object.assign() 合并 Buff 增益',
+                desc: '浅拷贝并将源对象属性合并到当前 hero',
+                tag: 'mut',
+                run: function () {
+                    saveUndo('合并 Buff 增益');
+                    var buff = {
+                        buffName: '等离子过载',
+                        attackBonus: '+45%',
+                        duration: 60
+                    };
+                    Object.assign(hero, buff);
+                    return {
+                        code: "// 1. Object.assign 目标对象合并\nconst buff = { buffName: '等离子过载', attackBonus: '+45%', duration: 60 };\nObject.assign(hero, buff);\nconsole.log(hero);",
+                        result: { buffName: hero.buffName, attackBonus: hero.attackBonus, duration: hero.duration },
+                        explain: "Object.assign(target, ...sources) 将源对象属性浅拷贝到目标对象上，若有重名键则后置覆盖前置。"
+                    };
+                }
+            },
+            {
+                id: 'spread_copy',
+                name: 'ES6 展开运算符 ({ ...hero })',
+                desc: '现代解构合并并生成新头衔角色',
+                tag: 'read',
+                run: function () {
+                    var upgradedHero = Object.assign({}, hero, { title: '星域先锋', level: hero.level + 5 });
+                    return {
+                        code: "// 2. 对象展开运算符浅拷贝与属性重载\nconst upgraded = {\n  ...hero,\n  title: '星域先锋',\n  level: hero.level + 5\n};\nconsole.log(upgraded);",
+                        result: { name: upgradedHero.name, title: upgradedHero.title, level: upgradedHero.level },
+                        explain: "展开运算符 { ...obj } 语法极其优雅，是现代 React / Vue 状态管理中推崇的不变性（Immutability）更新基石。"
+                    };
+                }
+            },
+            {
+                id: 'deep_clone_demo',
+                name: '原生深拷贝 structuredClone(hero)',
+                desc: '完全隔离深层嵌套对象的独立克隆',
+                tag: 'read',
+                run: function () {
+                    var clone = structuredClone ? structuredClone({
+                        name: hero.name,
+                        equipment: hero.equipment,
+                        skills: hero.skills
+                    }) : JSON.parse(JSON.stringify(hero));
+
+                    // 尝试修改克隆副本的嵌套属性，不影响原对象
+                    clone.equipment.weapon = '虚空灭世剑 (已改)';
+
+                    return {
+                        code: "// 3. 原生深拷贝 structuredClone API\nconst clone = structuredClone(hero);\nclone.equipment.weapon = '虚空灭世剑 (已改)';\n\n// 验证原对象保持独立未变：\nconsole.log('原对象武器:', hero.equipment.weapon);\nconsole.log('克隆武器:', clone.equipment.weapon);",
+                        result: {
+                            "原对象武器 (hero.equipment.weapon)": hero.equipment.weapon,
+                            "克隆副本武器 (clone.equipment.weapon)": clone.equipment.weapon,
+                            "两者引用相同?": hero.equipment === clone.equipment
+                        },
+                        explain: "原生 structuredClone 递归拷贝所有嵌套层级，克隆副本的任何修改绝不影响原对象，彻底杜绝引用共享隐患。"
+                    };
+                }
+            },
+            {
+                id: 'json_caveat',
+                name: 'JSON 序列化克隆的副作用演示',
+                desc: 'JSON.parse(JSON.stringify) 丢失函数与 getter',
+                tag: 'read',
+                run: function () {
+                    var jsonStr = JSON.stringify(hero);
+                    var jsonCopy = JSON.parse(jsonStr);
+
+                    return {
+                        code: "// 4. JSON 序列化深拷贝陷阱：\nconst copy = JSON.parse(JSON.stringify(hero));\nconsole.log(typeof copy.attack); // undefined! 函数丢失\nconsole.log(copy.combatPower);   // 计算属性转成了静态死值",
+                        result: {
+                            "copy.attack 函数是否存在": typeof jsonCopy.attack,
+                            "原 hero.attack 类型": typeof hero.attack,
+                            "提示": "函数、Symbol、undefined 均被丢弃"
+                        },
+                        explain: "JSON 规范中没有函数和未定义类型。因此 JSON 序列化会无情丢弃所有方法与原型信息！"
+                    };
+                }
+            }
+        ],
+
+        protect: [
+            {
+                id: 'freeze_obj',
+                name: 'Object.freeze(hero) 彻底冻结',
+                desc: '禁止添加、删除或修改任何属性（防篡改）',
+                tag: 'safe',
+                run: function () {
+                    saveUndo('冻结对象');
+                    Object.freeze(hero);
+                    var testChange = '尝试写入新武器';
+                    try {
+                        hero.equipment_weapon = '非法注入';
+                    } catch (e) {
+                        testChange = '写入被严格拦截: ' + e.message;
+                    }
+                    return {
+                        code: "// 1. 深度保护：Object.freeze(hero)\nObject.freeze(hero);\n\n// 尝试修改冻结后的对象：\nhero.name = '黑客入侵'; // 静默失败（严格模式下抛 TypeError）\nconsole.log(Object.isFrozen(hero)); // true",
+                        result: {
+                            isFrozen: Object.isFrozen(hero),
+                            resultMsg: "对象已完全冻结！任何增删改操作均已失效。"
+                        },
+                        explain: "Object.freeze() 是最强保护等级。属性变成不可配置（configurable: false）且不可写（writable: false）。"
+                    };
+                }
+            },
+            {
+                id: 'seal_obj',
+                name: 'Object.seal(hero) 密封对象',
+                desc: '禁止新增和删除属性，但允许修改现有属性值',
+                tag: 'safe',
+                run: function () {
+                    saveUndo('密封对象');
+                    Object.seal(hero);
+                    return {
+                        code: "// 2. 结构锁定：Object.seal(hero)\nObject.seal(hero);\n\n// 现有属性依然可以修改：\nhero.hp = 999; // 成功！\n// 但是不能新增或删除属性：\ndelete hero.name; // 失败！\nhero.newProp = 1; // 失败！",
+                        result: {
+                            isSealed: Object.isSealed(hero),
+                            isExtensible: Object.isExtensible(hero),
+                            desc: "不能增删属性，但现有可写属性依然可以赋值修改。"
+                        },
+                        explain: "密封（Seal）将所有现有属性的 configurable 设为 false，禁止结构变动，保留数据可变性。"
+                    };
+                }
+            },
+            {
+                id: 'prevent_ext',
+                name: 'Object.preventExtensions(hero) 禁止扩展',
+                desc: '仅禁止添加新属性，允许修改和删除旧属性',
+                tag: 'safe',
+                run: function () {
+                    saveUndo('禁止对象扩展');
+                    Object.preventExtensions(hero);
+                    return {
+                        code: "// 3. 禁止扩展：Object.preventExtensions(hero)\nObject.preventExtensions(hero);\nconsole.log(Object.isExtensible(hero)); // false\n\nhero.extraSkill = '禁咒'; // 无法写入",
+                        result: {
+                            isExtensible: Object.isExtensible(hero)
+                        },
+                        explain: "阻止未来向该对象添加任何新属性，已有的属性仍可正常修改或通过 delete 删除。"
+                    };
+                }
+            },
+            {
+                id: 'define_property',
+                name: 'Object.defineProperty 定义只读属性',
+                desc: '精细化控制属性描述符 (writable: false)',
+                tag: 'meta',
+                run: function () {
+                    saveUndo('定义只读属性 coreId');
+                    try {
+                        Object.defineProperty(hero, 'coreId', {
+                            value: 'CORE-AX99',
+                            writable: false,     // 不可修改
+                            enumerable: true,    // 可被枚举遍历
+                            configurable: false  // 不可被再次配置或删除
+                        });
+                    } catch (e) {
+                        return {
+                            code: "// 属性定义异常\n// " + e.message,
+                            result: e.message,
+                            explain: "若对象已被冻结或属性已不可配置，defineProperty 将无法执行。"
+                        };
+                    }
+                    return {
+                        code: "// 4. Object.defineProperty 精准设置元属性\nObject.defineProperty(hero, 'coreId', {\n  value: 'CORE-AX99',\n  writable: false,    // 只读！不可写入赋值\n  enumerable: true,   // 可枚举出现在 keys 中\n  configurable: false // 不可被 delete 删除\n});",
+                        result: {
+                            coreId: hero.coreId,
+                            descriptor: Object.getOwnPropertyDescriptor(hero, 'coreId')
+                        },
+                        explain: "Vue 2 响应式原理与各种底层库大量依赖 defineProperty，用于对字段做精确拦截与保护。"
+                    };
+                }
+            }
+        ],
+
+        create: [
+            {
+                id: 'demo_literal',
+                name: '1. 对象字面量语法 ({ })',
+                desc: '最常用、最直观的语法糖声明方式',
+                tag: 'read',
+                run: function () {
+                    return {
+                        code: "// 方式一：对象字面量（推荐首选）\nconst companion = {\n  species: '智能浮游炮',\n  energy: 100,\n  fire() {\n    return '发射高能光束！';\n  }\n};\nconsole.log(companion);",
+                        result: { species: '智能浮游炮', energy: 100, type: 'Object Literal' },
+                        explain: "对象字面量不仅简洁高效，而且在 JavaScript 引擎中具有极致的性能优化。"
+                    };
+                }
+            },
+            {
+                id: 'demo_factory',
+                name: '2. 工厂函数模式 (Factory Function)',
+                desc: '函数包装返回全新独立的对象结构',
+                tag: 'read',
+                run: function () {
+                    function createSoldier(name, rank) {
+                        return {
+                            name: name,
+                            rank: rank,
+                            report: function () {
+                                return rank + ' ' + name + ' 已就位！';
+                            }
+                        };
+                    }
+                    var soldier = createSoldier('泰坦哨兵', '中尉');
+                    return {
+                        code: "// 方式二：工厂函数模式\nfunction createSoldier(name, rank) {\n  return {\n    name,\n    rank,\n    report() { return `${rank} ${name} 已就位！`; }\n  };\n}\nconst s1 = createSoldier('泰坦哨兵', '中尉');\nconsole.log(s1.report());",
+                        result: { name: soldier.name, rank: soldier.rank, call: soldier.report() },
+                        explain: "工厂函数解决了重复编写字面量的问题，无需 new 关键字即可批量产出对象。"
+                    };
+                }
+            },
+            {
+                id: 'demo_constructor',
+                name: '3. 构造函数与 new 关键字',
+                desc: '经典构造器，通过 this 和 prototype 共享方法',
+                tag: 'read',
+                run: function () {
+                    function MechUnit(model, armor) {
+                        this.model = model;
+                        this.armor = armor;
+                    }
+                    MechUnit.prototype.scan = function () {
+                        return this.model + ' 雷达雷达全频段扫描完成。';
+                    };
+                    var unit = new MechUnit('Gundam-RX78', '高达尼姆合金');
+                    return {
+                        code: "// 方式三：构造函数与原型对象\nfunction MechUnit(model, armor) {\n  this.model = model;\n  this.armor = armor;\n}\nMechUnit.prototype.scan = function() {\n  return `${this.model} 扫描完毕`;\n};\n\nconst unit = new MechUnit('Gundam-RX78', '合金');\nconsole.log(unit instanceof MechUnit); // true",
+                        result: {
+                            model: unit.model,
+                            armor: unit.armor,
+                            isMech: unit instanceof MechUnit,
+                            scanResult: unit.scan()
+                        },
+                        explain: "new 操作符经历了 4 步：①创建空对象 ②原型指向 Constructor.prototype ③绑定 this 执行构造 ④返回新对象。"
+                    };
+                }
+            },
+            {
+                id: 'demo_class',
+                name: '4. ES6 Class 类声明',
+                desc: '现代面向对象标准类语法与方法定义',
+                tag: 'read',
+                run: function () {
+                    class Starship {
+                        constructor(name, warpSpeed) {
+                            this.name = name;
+                            this.warpSpeed = warpSpeed;
+                        }
+                        jump() {
+                            return `${this.name} 开启 ${this.warpSpeed} 级曲速跃迁！`;
+                        }
+                    }
+                    const enterprise = new Starship('企业号', 9.9);
+                    return {
+                        code: "// 方式四：ES6 Class 语法糖\nclass Starship {\n  constructor(name, warpSpeed) {\n    this.name = name;\n    this.warpSpeed = warpSpeed;\n  }\n  jump() {\n    return `${this.name} 开启 ${this.warpSpeed} 级曲速跃迁！`;\n  }\n}\nconst ship = new Starship('企业号', 9.9);\nconsole.log(ship.jump());",
+                        result: {
+                            name: enterprise.name,
+                            warpSpeed: enterprise.warpSpeed,
+                            message: enterprise.jump()
+                        },
+                        explain: "Class 本质上是构造函数与原型继承的语法糖，语法更贴近传统面向对象，支持 extends 继承与 super。"
+                    };
+                }
+            },
+            {
+                id: 'demo_object_create',
+                name: '5. Object.create(proto) 原型继承',
+                desc: '指定原型对象创建纯净后代对象',
+                tag: 'read',
+                run: function () {
+                    var baseRobot = {
+                        series: 'T-800',
+                        greet: function () {
+                            return '我是终结者系列 ' + this.series;
+                        }
+                    };
+                    var subRobot = Object.create(baseRobot);
+                    subRobot.customSkin = '仿生皮肤';
+
+                    return {
+                        code: "// 方式五：Object.create(prototype)\nconst baseRobot = {\n  series: 'T-800',\n  greet() { return `我是 ${this.series}`; }\n};\n\nconst subRobot = Object.create(baseRobot);\nsubRobot.customSkin = '仿生皮肤';\n\nconsole.log(subRobot.series); // 'T-800' (源自原型)\nconsole.log(Object.getPrototypeOf(subRobot) === baseRobot); // true",
+                        result: {
+                            "自身属性 customSkin": subRobot.customSkin,
+                            "继承属性 series": subRobot.series,
+                            "方法调用": subRobot.greet(),
+                            "原型是否指向 baseRobot": Object.getPrototypeOf(subRobot) === baseRobot
+                        },
+                        explain: "Object.create 提供了一种最纯粹的原型委托方式，无需编写任何构造函数即可实现对象继承。"
+                    };
+                }
+            }
+        ]
+    };
+
+    /* ============================================================
+       3. DOM 元素缓存
+       ============================================================ */
+    var el = {
+        propCount: document.getElementById('crxPropCount'),
+        isExtensible: document.getElementById('crxIsExtensible'),
+        isSealed: document.getElementById('crxIsSealed'),
+        isFrozen: document.getElementById('crxIsFrozen'),
+        btnUndo: document.getElementById('crxBtnUndo'),
+        btnReset: document.getElementById('crxBtnReset'),
+
+        heroStage: document.getElementById('crxHeroStage'),
+        heroAvatar: document.getElementById('crxHeroAvatar'),
+        heroName: document.getElementById('crxHeroName'),
+        heroGuild: document.getElementById('crxHeroGuild'),
+        hpText: document.getElementById('crxHpText'),
+        hpFill: document.getElementById('crxHpFill'),
+        heroLevel: document.getElementById('crxHeroLevel'),
+        powerRating: document.getElementById('crxPowerRating'),
+        heroAlive: document.getElementById('crxHeroAlive'),
+        skillsList: document.getElementById('crxSkillsList'),
+        equipmentList: document.getElementById('crxEquipmentList'),
+
+        propsMatrix: document.getElementById('crxPropsMatrix'),
+        jsonDisplay: document.getElementById('crxJsonDisplay'),
+        btnCopyJson: document.getElementById('crxBtnCopyJson'),
+
+        customKey: document.getElementById('crxCustomKey'),
+        customVal: document.getElementById('crxCustomVal'),
+        btnSetProp: document.getElementById('crxBtnSetProp'),
+        btnDelProp: document.getElementById('crxBtnDelProp'),
+
+        tabs: document.getElementById('crxTabs'),
+        methodGrid: document.getElementById('crxMethodGrid'),
+
+        codeStatus: document.getElementById('crxCodeStatus'),
+        codeDisplay: document.getElementById('crxCodeDisplay'),
+        resultDisplay: document.getElementById('crxResultDisplay'),
+        explainDisplay: document.getElementById('crxExplainDisplay'),
+
+        logList: document.getElementById('crxLogList'),
+        btnClearLog: document.getElementById('crxBtnClearLog')
+    };
+
+    /* ============================================================
+       4. 撤销机制与快照管理
+       ============================================================ */
+    function saveUndo(actionLabel) {
+        // 保存深层快照
+        var snapshot = {
+            label: actionLabel,
+            hero: copyHeroState(hero)
+        };
+        undoStack.push(snapshot);
+        if (undoStack.length > 10) {
+            undoStack.shift();
+        }
+    }
+
+    function copyHeroState(source) {
+        var target = {};
+        for (var key in source) {
+            if (Object.prototype.hasOwnProperty.call(source, key)) {
+                var val = source[key];
+                if (Array.isArray(val)) {
+                    target[key] = val.slice();
+                } else if (val && typeof val === 'object') {
+                    target[key] = Object.assign({}, val);
+                } else {
+                    target[key] = val;
+                }
+            }
+        }
+        // 挂载方法与 getter
+        target.attack = source.attack;
+        target.heal = source.heal;
+        Object.defineProperty(target, 'combatPower', {
+            get: function () {
+                return Math.floor((this.level || 1) * 105 + (this.hp || 0) * 1.2 + (this.skills ? this.skills.length : 0) * 90);
+            },
+            enumerable: false,
+            configurable: true
+        });
+        return target;
+    }
+
+    /* ============================================================
+       5. 界面综合渲染系统
+       ============================================================ */
+    function render() {
+        renderHeroVitals();
+        renderPropsMatrix();
+        renderJsonView();
+        renderStatusIndicators();
+    }
+
+    function renderHeroVitals() {
+        el.heroName.textContent = hero.name || '(无名实体)';
+        el.heroAvatar.textContent = hero.avatar || '🤖';
+        el.heroGuild.textContent = hero.guild ? ('公会：' + hero.guild) : '公会：(已离会/未加入)';
+        el.heroLevel.textContent = 'Lv.' + (hero.level || 1);
+
+        var currentHp = typeof hero.hp === 'number' ? hero.hp : 0;
+        var maxHp = typeof hero.maxHp === 'number' ? hero.maxHp : 1000;
+        var pct = Math.max(0, Math.min(100, Math.round((currentHp / maxHp) * 100)));
+
+        el.hpText.textContent = currentHp + ' / ' + maxHp + ' (' + pct + '%)';
+        el.hpFill.style.width = pct + '%';
+
+        if (pct < 30) {
+            el.hpFill.classList.add('low');
+        } else {
+            el.hpFill.classList.remove('low');
+        }
+
+        // 存活状态
+        var isAlive = hero.isAlive !== false && currentHp > 0;
+        el.heroAlive.textContent = isAlive ? '存活' : '失去战力';
+        el.heroAlive.className = 'crx_status_badge ' + (isAlive ? 'crx_badge_active' : 'crx_badge_danger');
+
+        // 计算战力属性
+        var power = hero.combatPower;
+        el.powerRating.textContent = typeof power === 'number' ? power.toLocaleString() + ' 战力' : '--';
+
+        // 渲染技能列表 (Array)
+        el.skillsList.innerHTML = '';
+        if (Array.isArray(hero.skills) && hero.skills.length) {
+            hero.skills.forEach(function (skill) {
+                var span = document.createElement('span');
+                span.className = 'crx_gear_badge';
+                span.innerHTML = '🔮 ' + skill;
+                el.skillsList.appendChild(span);
+            });
+        } else {
+            el.skillsList.innerHTML = '<span style="color:#94a3b8; font-size:11px;">(暂无技能)</span>';
+        }
+
+        // 渲染装备 (Nested Object)
+        el.equipmentList.innerHTML = '';
+        if (hero.equipment && typeof hero.equipment === 'object') {
+            for (var eq in hero.equipment) {
+                if (Object.prototype.hasOwnProperty.call(hero.equipment, eq)) {
+                    var span = document.createElement('span');
+                    span.className = 'crx_gear_badge';
+                    span.innerHTML = '🛡️ ' + eq + ': <strong>' + hero.equipment[eq] + '</strong>';
+                    el.equipmentList.appendChild(span);
+                }
+            }
+        } else {
+            el.equipmentList.innerHTML = '<span style="color:#94a3b8; font-size:11px;">(赤手空拳)</span>';
+        }
+    }
+
+    function renderPropsMatrix() {
+        el.propsMatrix.innerHTML = '';
+        var ownKeys = Object.getOwnPropertyNames(hero);
+
+        ownKeys.forEach(function (key) {
+            var val = hero[key];
+            var typeName = typeof val;
+            if (Array.isArray(val)) typeName = 'array';
+            if (val === null) typeName = 'null';
+
+            var card = document.createElement('div');
+            card.className = 'crx_prop_card';
+
+            var displayVal = '';
+            if (typeName === 'function') {
+                displayVal = '<code>ƒ ' + key + '()</code>';
+            } else if (typeName === 'object' && val !== null) {
+                displayVal = '<code>' + JSON.stringify(val) + '</code>';
+            } else if (typeName === 'array') {
+                displayVal = '<code>[' + val.join(', ') + ']</code>';
+            } else if (typeName === 'string') {
+                displayVal = '"' + val + '"';
+            } else {
+                displayVal = String(val);
+            }
+
+            card.innerHTML =
+                '<div class="crx_prop_header">' +
+                    '<span class="crx_prop_key">.' + key + '</span>' +
+                    '<span class="crx_prop_type">' + typeName + '</span>' +
+                '</div>' +
+                '<div class="crx_prop_val">' + displayVal + '</div>';
+
+            el.propsMatrix.appendChild(card);
+        });
+    }
+
+    function renderJsonView() {
+        var cleanObj = {};
+        for (var k in hero) {
+            if (Object.prototype.hasOwnProperty.call(hero, k)) {
+                cleanObj[k] = hero[k];
+            }
+        }
+        var jsonText = JSON.stringify(cleanObj, null, 2);
+        el.jsonDisplay.textContent = jsonText;
+    }
+
+    function renderStatusIndicators() {
+        var ownKeys = Object.getOwnPropertyNames(hero);
+        el.propCount.textContent = ownKeys.length;
+
+        var isExt = Object.isExtensible(hero);
+        var isSealed = Object.isSealed(hero);
+        var isFrozen = Object.isFrozen(hero);
+
+        el.isExtensible.textContent = isExt ? 'true (允许新增)' : 'false (禁止扩展)';
+        el.isExtensible.className = 'crx_status_badge ' + (isExt ? 'crx_badge_active' : 'crx_badge_warn');
+
+        el.isSealed.textContent = isSealed ? 'true (密封锁定)' : 'false (开放)';
+        el.isSealed.className = 'crx_status_badge ' + (isSealed ? 'crx_badge_danger' : 'crx_badge_active');
+
+        el.isFrozen.textContent = isFrozen ? 'true (完全冻结)' : 'false (未冻结)';
+        el.isFrozen.className = 'crx_status_badge ' + (isFrozen ? 'crx_badge_danger' : 'crx_badge_active');
+    }
+
+    /* ============================================================
+       6. 选项卡与操作网格渲染
+       ============================================================ */
+    function renderTabs() {
+        var buttons = el.tabs.querySelectorAll('.crx_tab');
+        buttons.forEach(function (btn) {
+            btn.classList.toggle('is-active', btn.dataset.group === activeTab);
+        });
+    }
+
+    function renderMethodGrid() {
+        el.methodGrid.innerHTML = '';
+        var ops = OPERATIONS[activeTab] || [];
+
+        ops.forEach(function (op) {
+            var btn = document.createElement('button');
+            btn.className = 'crx_method_btn';
+            btn.type = 'button';
+            btn.dataset.id = op.id;
+
+            var tagClass = 'tag-read';
+            var tagText = 'READ';
+            if (op.tag === 'mut') { tagClass = 'tag-mut'; tagText = 'MUTATE'; }
+            if (op.tag === 'safe') { tagClass = 'tag-safe'; tagText = 'PROTECT'; }
+            if (op.tag === 'meta') { tagClass = 'tag-meta'; tagText = 'METADATA'; }
+
+            btn.innerHTML =
+                '<div class="crx_method_info">' +
+                    '<span class="crx_method_name">' + op.name + '</span>' +
+                    '<span class="crx_method_desc">' + op.desc + '</span>' +
+                '</div>' +
+                '<span class="crx_method_tag ' + tagClass + '">' + tagText + '</span>';
+
+            btn.addEventListener('click', function () {
+                executeOperation(op);
+            });
+
+            el.methodGrid.appendChild(btn);
+        });
+    }
+
+    /* ============================================================
+       7. 操作执行分发器与追踪
+       ============================================================ */
+    function executeOperation(op) {
+        try {
+            var execution = op.run();
+
+            // 更新代码显示
+            el.codeDisplay.textContent = execution.code;
+            el.codeStatus.textContent = 'SUCCESS (' + op.tag.toUpperCase() + ')';
+
+            // 格式化返回值
+            var ret = execution.result;
+            if (typeof ret === 'object' && ret !== null) {
+                el.resultDisplay.textContent = JSON.stringify(ret, null, 2);
+            } else if (typeof ret === 'string') {
+                el.resultDisplay.textContent = '"' + ret + '"';
+            } else {
+                el.resultDisplay.textContent = String(ret);
+            }
+
+            // 更新原理解释
+            el.explainDisplay.innerHTML = '<strong>' + op.name + ' 解析：</strong> ' + execution.explain;
+
+            // 重新刷新界面
+            render();
+
+            // 写入日志
+            addLog(op.name, '执行成功');
+        } catch (err) {
+            el.codeStatus.textContent = 'ERROR: ' + err.name;
+            el.resultDisplay.textContent = err.message;
+            el.explainDisplay.innerHTML = '⚠️ <strong>异常捕获：</strong>' + err.message + '（例如在冻结对象上尝试增删属性在严格模式下会触发此错误）';
+            addLog(op.name, '执行异常: ' + err.message);
+        }
+    }
+
+    function triggerStageAnimation(type) {
+        if (type === 'attack') {
+            el.heroStage.classList.remove('is-attacked');
+            void el.heroStage.offsetWidth; // 触发 reflow
+            el.heroStage.classList.add('is-attacked');
+        } else if (type === 'heal') {
+            el.heroStage.classList.remove('is-healed');
+            void el.heroStage.offsetWidth;
+            el.heroStage.classList.add('is-healed');
+        }
+    }
+
+    /* ============================================================
+       8. 控制台日志系统
+       ============================================================ */
+    function addLog(actionName, detail) {
+        var now = new Date();
+        var timeStr = now.toTimeString().split(' ')[0];
+
+        logHistory.unshift({
+            time: timeStr,
+            action: actionName,
+            detail: detail
+        });
+
+        if (logHistory.length > 8) {
+            logHistory.pop();
+        }
+
+        renderLogs();
+    }
+
+    function renderLogs() {
+        el.logList.innerHTML = '';
+        logHistory.forEach(function (item) {
+            var div = document.createElement('div');
+            div.className = 'crx_log_item';
+            div.innerHTML =
+                '<span class="crx_log_time">' + item.time + '</span>' +
+                '<span class="crx_log_msg"><strong>' + item.action + ':</strong> ' + item.detail + '</span>';
+            el.logList.appendChild(div);
+        });
+    }
+
+    /* ============================================================
+       9. 事件监听绑定
+       ============================================================ */
+    // 选项卡切换
+    el.tabs.addEventListener('click', function (e) {
+        var target = e.target.closest('.crx_tab');
+        if (!target) return;
+        activeTab = target.dataset.group;
+        renderTabs();
+        renderMethodGrid();
+    });
+
+    // 撤销操作
+    el.btnUndo.addEventListener('click', function () {
+        if (!undoStack.length) {
+            alert('没有可撤销的操作！');
+            return;
+        }
+        var last = undoStack.pop();
+        hero = last.hero;
+        render();
+        el.codeDisplay.textContent = '// 已撤销操作: ' + last.label;
+        el.resultDisplay.textContent = '对象已还原至上一步状态。';
+        el.explainDisplay.innerHTML = '已通过撤销堆栈恢复前序角色快照。';
+        addLog('撤销 (Undo)', last.label);
+    });
+
+    // 重置操作
+    el.btnReset.addEventListener('click', function () {
+        saveUndo('重置前快照');
+        hero = createInitialHero();
+        render();
+        el.codeDisplay.textContent = '// 角色对象已重置恢复初始状态\nhero = createInitialHero();';
+        el.resultDisplay.textContent = '初始状态加载成功';
+        el.explainDisplay.innerHTML = '已重置对象所有属性、生命值与装备，锁状态均已解除。';
+        addLog('全局重置', '恢复出厂状态');
+    });
+
+    // 清空日志
+    el.btnClearLog.addEventListener('click', function () {
+        logHistory = [];
+        renderLogs();
+    });
+
+    // 复制 JSON
+    el.btnCopyJson.addEventListener('click', function () {
+        var text = el.jsonDisplay.textContent;
+        navigator.clipboard.writeText(text).then(function () {
+            el.btnCopyJson.textContent = '已复制！';
+            setTimeout(function () {
+                el.btnCopyJson.textContent = '复制 JSON';
+            }, 1800);
+        }).catch(function () {
+            alert('复制失败，请手动选择复制');
+        });
+    });
+
+    // 自定义添加属性
+    el.btnSetProp.addEventListener('click', function () {
+        var key = el.customKey.value.trim();
+        var val = el.customVal.value.trim();
+
+        if (!key) {
+            alert('请输入要写入的属性名！');
+            el.customKey.focus();
+            return;
+        }
+
+        saveUndo('自定义写入 ' + key);
+
+        // 类型自适配转换
+        var parsedVal = val;
+        if (val === 'true') parsedVal = true;
+        else if (val === 'false') parsedVal = false;
+        else if (!isNaN(Number(val)) && val !== '') parsedVal = Number(val);
+
+        try {
+            hero[key] = parsedVal;
+            el.codeDisplay.textContent = '// 动态写入属性\nhero["' + key + '"] = ' + JSON.stringify(parsedVal) + ';';
+            el.resultDisplay.textContent = JSON.stringify(hero[key]);
+            el.explainDisplay.innerHTML = '成功使用中括号动态表达式给 hero 添加/更新了 <code>.' + key + '</code> 属性。';
+            addLog('动态写入', key + ' = ' + JSON.stringify(parsedVal));
+            render();
+            el.customKey.value = '';
+            el.customVal.value = '';
+        } catch (e) {
+            alert('写入失败: ' + e.message);
+        }
+    });
+
+    // 自定义删除属性
+    el.btnDelProp.addEventListener('click', function () {
+        var key = el.customKey.value.trim();
+        if (!key) {
+            alert('请输入要删除的属性名！');
+            el.customKey.focus();
+            return;
+        }
+
+        if (!(key in hero)) {
+            alert('属性 "' + key + '" 不存在于当前对象中！');
+            return;
+        }
+
+        saveUndo('自定义删除 ' + key);
+        try {
+            var delOk = delete hero[key];
+            el.codeDisplay.textContent = '// 动态删除属性\ndelete hero["' + key + '"];';
+            el.resultDisplay.textContent = '删除结果: ' + delOk;
+            el.explainDisplay.innerHTML = '已使用 delete 运算符移除属性 <code>.' + key + '</code>。';
+            addLog('动态删除', 'delete hero.' + key);
+            render();
+            el.customKey.value = '';
+            el.customVal.value = '';
+        } catch (e) {
+            alert('删除失败: ' + e.message);
+        }
+    });
+
+    /* ============================================================
+       10. 初始化系统启动
+       ============================================================ */
+    renderTabs();
+    renderMethodGrid();
+    render();
+    addLog('系统初始化', '角色工坊已加载就绪');
+
+})();
+</script>
+
+</body>
+</html>

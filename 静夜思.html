@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>静夜思</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      margin: 0;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 32px 20px;
+      color: #f4f1e8;
+      background: radial-gradient(circle at 50% 20%, #293c62, #101827 48%, #070b12);
+      font-family: "KaiTi", "STKaiti", serif;
+    }
+
+    .poem {
+      width: min(100%, 420px);
+      padding: 42px 28px;
+      text-align: center;
+      border: 1px solid rgba(244, 241, 232, 0.3);
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      background: rgba(8, 14, 26, 0.58);
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(2rem, 8vw, 3rem);
+      font-weight: 400;
+      letter-spacing: 0.18em;
+    }
+
+    .author {
+      margin: 0 0 32px;
+      color: rgba(244, 241, 232, 0.68);
+      font-family: sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.16em;
+    }
+
+    .verse {
+      margin: 0;
+      font-size: clamp(1.45rem, 6vw, 2rem);
+      line-height: 2.1;
+      letter-spacing: 0.16em;
+    }
+  </style>
+</head>
+<body>
+  <main class="poem">
+    <h1>静夜思</h1>
+    <p class="author">唐 · 李白</p>
+    <p class="verse">床前明月光<br>疑是地上霜<br>举头望明月<br>低头思故乡</p>
+  </main>
+</body>
+</html>

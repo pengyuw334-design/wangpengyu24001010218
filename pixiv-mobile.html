@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>pixiv</title>
+    <style>
+        /* ========== CSS Reset & Base ========== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --pixiv-blue: #0096fa;
+            --pixiv-blue-dark: #0073cc;
+            --pixiv-bg: #f5f5f5;
+            --pixiv-white: #ffffff;
+            --pixiv-text: #1f1f1f;
+            --pixiv-text-secondary: #999;
+            --pixiv-like: #ff4060;
+            --pixiv-border: #e8e8e8;
+            --pixiv-premium: #f5c71a;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        html { font-size: 16px; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN",
+                         "Noto Sans JP", "Yu Gothic", "Segoe UI", Roboto, sans-serif;
+            background: var(--pixiv-bg);
+            color: var(--pixiv-text);
+            max-width: 430px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        a { text-decoration: none; color: inherit; }
+        img { display: block; }
+        button { border: none; background: none; cursor: pointer; font-family: inherit; }
+        ::-webkit-scrollbar { display: none; }
+
+        /* ========== Status Bar ========== */
+        .status-bar {
+            height: 44px;
+            background: var(--pixiv-white);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            font-size: 14px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .status-bar .time { font-weight: 700; }
+        .status-icons { display: flex; gap: 6px; align-items: center; }
+        .status-icons svg { width: 16px; height: 16px; }
+
+        /* ========== Header / Top Nav ========== */
+        .header {
+            background: var(--pixiv-white);
+            padding: 8px 16px 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: sticky;
+            top: 44px;
+            z-index: 99;
+            border-bottom: 1px solid var(--pixiv-border);
+        }
+        .pixiv-logo {
+            flex-shrink: 0;
+        }
+        .pixiv-logo svg { height: 24px; width: auto; }
+        .search-bar {
+            flex: 1;
+            background: #f0f0f0;
+            border-radius: 20px;
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--pixiv-text-secondary);
+        }
+        .search-bar svg { width: 16px; height: 16px; flex-shrink: 0; opacity: .5; }
+        .header-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .header-actions button { padding: 4px; }
+        .header-actions svg { width: 24px; height: 24px; }
+
+        /* ========== Tab Navigation ========== */
+        .tab-nav {
+            background: var(--pixiv-white);
+            display: flex;
+            border-bottom: 1px solid var(--pixiv-border);
+            overflow-x: auto;
+            position: sticky;
+            top: 98px;
+            z-index: 98;
+        }
+        .tab-nav .tab {
+            padding: 10px 16px;
+            font-size: 14px;
+            white-space: nowrap;
+            color: var(--pixiv-text-secondary);
+            position: relative;
+            transition: color .2s;
+            flex-shrink: 0;
+        }
+        .tab-nav .tab.active {
+            color: var(--pixiv-text);
+            font-weight: 700;
+        }
+        .tab-nav .tab.active::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 16px;
+            right: 16px;
+            height: 3px;
+            background: var(--pixiv-blue);
+            border-radius: 2px 2px 0 0;
+        }
+
+        /* ========== Main Content ========== */
+        .main-content {
+            padding-bottom: calc(60px + var(--safe-bottom));
+        }
+
+        /* ========== Banner Carousel ========== */
+        .banner-carousel {
+            padding: 12px 0;
+            position: relative;
+        }
+        .banner-track {
+            display: flex;
+            gap: 10px;
+            padding: 0 16px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+        }
+        .banner-item {
+            flex-shrink: 0;
+            width: calc(100% - 32px);
+            aspect-ratio: 16/7;
+            border-radius: 12px;
+            overflow: hidden;
+            scroll-snap-align: start;
+            position: relative;
+        }
+        .banner-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .banner-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 16px 12px;
+            background: linear-gradient(transparent, rgba(0,0,0,.6));
+            color: white;
+        }
+        .banner-overlay .banner-title {
+            font-size: 15px;
+            font-weight: 700;
+            text-shadow: 0 1px 3px rgba(0,0,0,.3);
+        }
+        .banner-overlay .banner-sub {
+            font-size: 12px;
+            opacity: .85;
+            margin-top: 2px;
+        }
+        .banner-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            padding-top: 8px;
+        }
+        .banner-dots .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ccc;
+            transition: all .3s;
+        }
+        .banner-dots .dot.active {
+            background: var(--pixiv-blue);
+            width: 18px;
+            border-radius: 3px;
+        }
+
+        /* ========== Section Headers ========== */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 16px 10px;
+        }
+        .section-header h2 {
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .section-header .more {
+            font-size: 13px;
+            color: var(--pixiv-blue);
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .section-header .more svg { width: 14px; height: 14px; }
+
+        /* ========== Ranking Section ========== */
+        .ranking-scroll {
+            display: flex;
+            gap: 10px;
+            padding: 0 16px 4px;
+            overflow-x: auto;
+        }
+        .ranking-card {
+            flex-shrink: 0;
+            width: 150px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: var(--pixiv-white);
+            box-shadow: 0 1px 4px rgba(0,0,0,.08);
+            position: relative;
+        }
+        .ranking-card .rank-badge {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            color: white;
+            z-index: 2;
+        }
+        .rank-1 { background: linear-gradient(135deg, #FFD700, #FFA500); }
+        .rank-2 { background: linear-gradient(135deg, #C0C0C0, #A0A0A0); }
+        .rank-3 { background: linear-gradient(135deg, #CD7F32, #A0522D); }
+        .rank-other { background: rgba(0,0,0,.5); }
+        .ranking-card .card-thumb {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+        }
+        .ranking-card .card-info {
+            padding: 8px;
+        }
+        .ranking-card .card-title {
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .ranking-card .card-author {
+            font-size: 11px;
+            color: var(--pixiv-text-secondary);
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .ranking-card .card-author .avatar-tiny {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* ========== Illustration Grid ========== */
+        .illust-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 4px;
+            padding: 0 4px;
+        }
+        .illust-card {
+            position: relative;
+            border-radius: 6px;
+            overflow: hidden;
+            background: var(--pixiv-white);
+        }
+        .illust-card .thumb-wrap {
+            position: relative;
+            aspect-ratio: 1;
+            overflow: hidden;
+        }
+        .illust-card .thumb-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .3s;
+        }
+        .illust-card:active .thumb-wrap img { transform: scale(1.03); }
+        .illust-card .page-count {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(0,0,0,.6);
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .illust-card .page-count svg { width: 12px; height: 12px; }
+        .illust-card .r18-badge {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            background: rgba(255,64,96,.9);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        .illust-card .like-btn {
+            position: absolute;
+            bottom: 6px;
+            right: 6px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(0,0,0,.3);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .2s;
+        }
+        .illust-card .like-btn.liked {
+            background: var(--pixiv-like);
+        }
+        .illust-card .like-btn svg { width: 18px; height: 18px; fill: white; }
+        .illust-card .illust-info {
+            padding: 8px;
+        }
+        .illust-card .illust-title {
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .illust-card .illust-author {
+            font-size: 12px;
+            color: var(--pixiv-text-secondary);
+            margin-top: 3px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .illust-card .illust-author .avatar-sm {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* ========== Spotlight / Pixivision ========== */
+        .spotlight-scroll {
+            display: flex;
+            gap: 10px;
+            padding: 0 16px 4px;
+            overflow-x: auto;
+        }
+        .spotlight-card {
+            flex-shrink: 0;
+            width: 260px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: var(--pixiv-white);
+            box-shadow: 0 1px 4px rgba(0,0,0,.08);
+        }
+        .spotlight-card .spot-img {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+        }
+        .spotlight-card .spot-info {
+            padding: 10px 12px;
+        }
+        .spotlight-card .spot-tag {
+            font-size: 11px;
+            color: var(--pixiv-blue);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .spotlight-card .spot-title {
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* ========== Users Recommend ========== */
+        .users-scroll {
+            display: flex;
+            gap: 10px;
+            padding: 0 16px 4px;
+            overflow-x: auto;
+        }
+        .user-card {
+            flex-shrink: 0;
+            width: 160px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--pixiv-white);
+            box-shadow: 0 1px 4px rgba(0,0,0,.08);
+            text-align: center;
+        }
+        .user-card .user-banner {
+            height: 60px;
+            width: 100%;
+            object-fit: cover;
+        }
+        .user-card .user-avatar-wrap {
+            margin-top: -28px;
+            position: relative;
+            z-index: 1;
+        }
+        .user-card .user-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 3px solid white;
+            margin: 0 auto;
+            object-fit: cover;
+        }
+        .user-card .user-name {
+            font-size: 13px;
+            font-weight: 700;
+            margin-top: 6px;
+            padding: 0 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .user-card .user-works {
+            display: flex;
+            gap: 2px;
+            padding: 8px 6px;
+        }
+        .user-card .user-works img {
+            flex: 1;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .user-card .follow-btn {
+            margin: 0 12px 10px;
+            padding: 6px 0;
+            border-radius: 20px;
+            background: var(--pixiv-blue);
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            width: calc(100% - 24px);
+            transition: background .2s;
+        }
+        .user-card .follow-btn:active { background: var(--pixiv-blue-dark); }
+        .user-card .follow-btn.following {
+            background: transparent;
+            color: var(--pixiv-blue);
+            border: 1px solid var(--pixiv-blue);
+        }
+
+        /* ========== Tags Section ========== */
+        .tags-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 0 16px 12px;
+        }
+        .tag-pill {
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: var(--pixiv-white);
+            font-size: 13px;
+            color: var(--pixiv-text);
+            box-shadow: 0 1px 3px rgba(0,0,0,.06);
+            border: 1px solid var(--pixiv-border);
+            transition: all .2s;
+        }
+        .tag-pill:active {
+            background: var(--pixiv-blue);
+            color: white;
+            border-color: var(--pixiv-blue);
+        }
+        .tag-pill .tag-hash { color: var(--pixiv-blue); margin-right: 2px; }
+
+        /* ========== Bottom Nav ========== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            background: var(--pixiv-white);
+            border-top: 1px solid var(--pixiv-border);
+            display: flex;
+            padding: 6px 0 calc(6px + var(--safe-bottom));
+            z-index: 200;
+        }
+        .bottom-nav .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            padding: 4px 0;
+            color: var(--pixiv-text-secondary);
+            font-size: 10px;
+            transition: color .2s;
+        }
+        .bottom-nav .nav-item.active { color: var(--pixiv-blue); }
+        .bottom-nav .nav-item svg { width: 24px; height: 24px; }
+        .bottom-nav .nav-item .nav-badge {
+            position: absolute;
+            top: 0;
+            right: 50%;
+            margin-right: -16px;
+            background: var(--pixiv-like);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+        .bottom-nav .nav-icon-wrap { position: relative; }
+
+        /* ========== Placeholder Images (CSS art) ========== */
+        .placeholder-img {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .p1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .p2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .p3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .p4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .p5 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .p6 { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); }
+        .p7 { background: linear-gradient(135deg, #fccb90 0%, #d57eeb 100%); }
+        .p8 { background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); }
+        .p9 { background: linear-gradient(135deg, #f5576c 0%, #ff8a56 100%); }
+        .p10 { background: linear-gradient(135deg, #0250c5 0%, #d43f8d 100%); }
+        .p11 { background: linear-gradient(135deg, #70e1f5 0%, #ffd194 100%); }
+        .p12 { background: linear-gradient(135deg, #7028e4 0%, #e5b2ca 100%); }
+
+        /* ========== Avatar Placeholders ========== */
+        .avatar-placeholder {
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 10px;
+        }
+
+        /* ========== Animations ========== */
+        @keyframes heartPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        .like-btn.animate svg { animation: heartPop .3s ease; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .illust-card { animation: fadeInUp .4s ease backwards; }
+        .illust-card:nth-child(1) { animation-delay: .05s; }
+        .illust-card:nth-child(2) { animation-delay: .1s; }
+        .illust-card:nth-child(3) { animation-delay: .15s; }
+        .illust-card:nth-child(4) { animation-delay: .2s; }
+        .illust-card:nth-child(5) { animation-delay: .25s; }
+        .illust-card:nth-child(6) { animation-delay: .3s; }
+
+        /* ========== Loading Shimmer ========== */
+        .shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* ========== Pull to Refresh indicator ========== */
+        .refresh-indicator {
+            text-align: center;
+            padding: 12px;
+            font-size: 12px;
+            color: var(--pixiv-text-secondary);
+            display: none;
+        }
+
+        /* ========== Misc ========== */
+        .divider {
+            height: 8px;
+            background: var(--pixiv-bg);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <span class="time" id="statusTime">14:54</span>
+        <div class="status-icons">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4zM13 18h-2v-2h2v2zm0-4h-2V9h2v5z"/></svg>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="pixiv-logo">
+            <svg viewBox="0 0 63 18" xmlns="http://www.w3.org/2000/svg" height="22">
+                <path d="M4.02 14.867V10.34h3.05c3.2 0 5.26-2.07 5.26-5.17S10.27 0 7.07 0H0v14.867h4.02zM7.07 3.12c1.12 0 1.81.77 1.81 2.05s-.69 2.05-1.81 2.05H4.02V3.12h3.05zm6.57-3.12h4.02v14.867h-4.02V0zm15.32 0l-4.4 7.39L20.16 0h-4.5l6.68 10.28v4.587h4.02V10.28L33.04 0h-4.08zm4.46 0h4.02v14.867h-4.02V0zm17.04 0l-4.4 7.39L41.66 0h-4.5l6.68 10.28v4.587h4.02V10.28L54.54 0h-4.08z" fill="#0096fa"/>
+            </svg>
+        </div>
+        <div class="search-bar" id="searchBar">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <span>検索</span>
+        </div>
+        <div class="header-actions">
+            <button aria-label="お知らせ">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tab-nav" id="tabNav">
+        <div class="tab active" data-tab="home">ホーム</div>
+        <div class="tab" data-tab="follow">フォロー新着</div>
+        <div class="tab" data-tab="discover">見つける</div>
+        <div class="tab" data-tab="novel">小説</div>
+        <div class="tab" data-tab="live">ライブ</div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+
+        <!-- Banner Carousel -->
+        <div class="banner-carousel">
+            <div class="banner-track" id="bannerTrack">
+                <div class="banner-item">
+                    <div class="placeholder-img p10"></div>
+                    <div class="banner-overlay">
+                        <div class="banner-title">🎃 ハロウィンイラストコンテスト 2026</div>
+                        <div class="banner-sub">開催中 · 応募受付中</div>
+                    </div>
+                </div>
+                <div class="banner-item">
+                    <div class="placeholder-img p5"></div>
+                    <div class="banner-overlay">
+                        <div class="banner-title">✨ pixiv Premium 限定特典</div>
+                        <div class="banner-sub">今だけ初月無料キャンペーン</div>
+                    </div>
+                </div>
+                <div class="banner-item">
+                    <div class="placeholder-img p3"></div>
+                    <div class="banner-overlay">
+                        <div class="banner-title">🎨 今週の注目クリエイター</div>
+                        <div class="banner-sub">新進気鋭のアーティストをチェック</div>
+                    </div>
+                </div>
+            </div>
+            <div class="banner-dots" id="bannerDots">
+                <div class="dot active"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+
+        <!-- Trending Tags -->
+        <div class="section-header">
+            <h2>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--pixiv-blue)"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+                トレンドタグ
+            </h2>
+        </div>
+        <div class="tags-wrap">
+            <div class="tag-pill"><span class="tag-hash">#</span>オリジナル</div>
+            <div class="tag-pill"><span class="tag-hash">#</span>ブルーアーカイブ</div>
+            <div class="tag-pill"><span class="tag-hash">#</span>原神</div>
+            <div class="tag-pill"><span class="tag-hash">#</span>ハロウィン</div>
+            <div class="tag-pill"><span class="tag-hash">#</span>女の子</div>
+            <div class="tag-pill"><span class="tag-hash">#</span>初音ミク</div>
+            <div class="tag-pill"><span class="tag-hash">#</span>呪術廻戦</div>
+            <div class="tag-pill"><span class="tag-hash">#</span>FGO</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Ranking -->
+        <div class="section-header">
+            <h2>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#f5c71a"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24l-7.19-.61z"/></svg>
+                ランキング
+            </h2>
+            <a class="more">
+                もっと見る
+                <svg viewBox="0 0 24 24" fill="var(--pixiv-blue)"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+            </a>
+        </div>
+        <div class="ranking-scroll" id="rankingScroll">
+            <!-- Ranking cards generated by JS -->
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- pixivision / Spotlight -->
+        <div class="section-header">
+            <h2>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#ff6f61"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                pixivision
+            </h2>
+            <a class="more">
+                もっと見る
+                <svg viewBox="0 0 24 24" fill="var(--pixiv-blue)"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+            </a>
+        </div>
+        <div class="spotlight-scroll">
+            <div class="spotlight-card">
+                <div class="placeholder-img p6 spot-img" style="aspect-ratio:16/9"></div>
+                <div class="spot-info">
+                    <div class="spot-tag">イラスト</div>
+                    <div class="spot-title">秋の夕暮れを描く！ 紅葉イラスト特集</div>
+                </div>
+            </div>
+            <div class="spotlight-card">
+                <div class="placeholder-img p9 spot-img" style="aspect-ratio:16/9"></div>
+                <div class="spot-info">
+                    <div class="spot-tag">メイキング</div>
+                    <div class="spot-title">プロが教える！ デジタル水彩テクニック</div>
+                </div>
+            </div>
+            <div class="spotlight-card">
+                <div class="placeholder-img p4 spot-img" style="aspect-ratio:16/9"></div>
+                <div class="spot-info">
+                    <div class="spot-tag">インタビュー</div>
+                    <div class="spot-title">大人気イラストレーターの制作環境に迫る</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Recommended Illustrations -->
+        <div class="section-header">
+            <h2>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--pixiv-blue)"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                おすすめイラスト
+            </h2>
+        </div>
+        <div class="illust-grid" id="illustGrid">
+            <!-- Illustration cards generated by JS -->
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Recommended Users -->
+        <div class="section-header">
+            <h2>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#7c4dff"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                おすすめユーザー
+            </h2>
+            <a class="more">
+                もっと見る
+                <svg viewBox="0 0 24 24" fill="var(--pixiv-blue)"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+            </a>
+        </div>
+        <div class="users-scroll" id="usersScroll">
+            <!-- User cards generated by JS -->
+        </div>
+
+        <div style="height: 20px;"></div>
+
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active">
+            <div class="nav-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            </div>
+            <span>ホーム</span>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+            <span>検索</span>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </div>
+            <span>投稿</span>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                <span class="nav-badge">3</span>
+            </div>
+            <span>通知</span>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <span>マイページ</span>
+        </div>
+    </div>
+
+<script>
+// ========== Data ==========
+const gradients = ['p1','p2','p3','p4','p5','p6','p7','p8','p9','p10','p11','p12'];
+const authorNames = [
+    '桜花あいり', '蒼月にゃん', '紅葉まどか', '雪見だいふく',
+    '星野みらい', '風鈴ゆうき', '月影そら', '花園ことは',
+    '白雪ひなた', '藍沢りん', '千歳あき', '朝凪ゆい'
+];
+const illustTitles = [
+    '秋の少女', '月夜の魔女', 'ハロウィンの夜', '放課後の教室',
+    '星空の下で', '雨上がりの街', '桜舞い散る', '海辺の約束',
+    '魔法少女☆', '黄昏の丘', '冬の訪れ', '花火大会',
+    '制服デート', '猫耳メイド', '天使と悪魔', '幻想の庭'
+];
+const rankingTitles = [
+    '月光に舞う蝶', 'ハロウィンパーティー', '秋桜畑の少女',
+    '夕焼けの帰り道', '星降る夜に', '魔女の森', 
+    '異世界の城', '海底の神殿'
+];
+
+// ========== Helpers ==========
+function randomGradient(exclude) {
+    let g;
+    do { g = gradients[Math.floor(Math.random() * gradients.length)]; } while (g === exclude);
+    return g;
+}
+
+function createPlaceholderDiv(cls, extra = '') {
+    return `<div class="placeholder-img ${cls}" ${extra}></div>`;
+}
+
+function randomAvatar(seed) {
+    const colors = ['#667eea','#f093fb','#43e97b','#fa709a','#a18cd1','#fccb90','#4facfe','#f5576c'];
+    const color = colors[seed % colors.length];
+    const initial = authorNames[seed % authorNames.length].charAt(0);
+    return `<div class="avatar-placeholder" style="width:20px;height:20px;background:${color};font-size:10px;">${initial}</div>`;
+}
+
+function randomAvatarLg(seed) {
+    const colors = ['#667eea','#f093fb','#43e97b','#fa709a','#a18cd1','#fccb90','#4facfe','#f5576c'];
+    const color = colors[seed % colors.length];
+    const initial = authorNames[seed % authorNames.length].charAt(0);
+    return `<div class="avatar-placeholder user-avatar" style="background:${color};font-size:18px;">${initial}</div>`;
+}
+
+// ========== Render Ranking Cards ==========
+function renderRanking() {
+    const container = document.getElementById('rankingScroll');
+    let html = '';
+    for (let i = 0; i < 8; i++) {
+        const g = gradients[i % gradients.length];
+        const rankClass = i < 3 ? `rank-${i+1}` : 'rank-other';
+        html += `
+        <div class="ranking-card">
+            <div class="rank-badge ${rankClass}">${i+1}</div>
+            ${createPlaceholderDiv(g, 'style="aspect-ratio:1"')}
+            <div class="card-info">
+                <div class="card-title">${rankingTitles[i]}</div>
+                <div class="card-author">
+                    ${randomAvatar(i)}
+                    ${authorNames[i % authorNames.length]}
+                </div>
+            </div>
+        </div>`;
+    }
+    container.innerHTML = html;
+}
+
+// ========== Render Illustration Grid ==========
+function renderIllustrations() {
+    const container = document.getElementById('illustGrid');
+    let html = '';
+    for (let i = 0; i < 12; i++) {
+        const g = gradients[i % gradients.length];
+        const pages = Math.random() > 0.6 ? Math.floor(Math.random() * 8) + 2 : 0;
+        const liked = Math.random() > 0.7;
+        html += `
+        <div class="illust-card">
+            <div class="thumb-wrap">
+                ${createPlaceholderDiv(g)}
+                ${pages > 0 ? `<div class="page-count">
+                    <svg viewBox="0 0 24 24" fill="white"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+                    ${pages}
+                </div>` : ''}
+                <button class="like-btn ${liked ? 'liked' : ''}" onclick="toggleLike(this, event)">
+                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                </button>
+            </div>
+            <div class="illust-info">
+                <div class="illust-title">${illustTitles[i % illustTitles.length]}</div>
+                <div class="illust-author">
+                    ${randomAvatar(i + 3)}
+                    ${authorNames[(i + 3) % authorNames.length]}
+                </div>
+            </div>
+        </div>`;
+    }
+    container.innerHTML = html;
+}
+
+// ========== Render Recommended Users ==========
+function renderUsers() {
+    const container = document.getElementById('usersScroll');
+    let html = '';
+    for (let i = 0; i < 6; i++) {
+        const g1 = gradients[(i * 2) % gradients.length];
+        const g2 = gradients[(i * 2 + 1) % gradients.length];
+        const g3 = gradients[(i * 2 + 2) % gradients.length];
+        const bannerG = gradients[(i * 3) % gradients.length];
+        html += `
+        <div class="user-card">
+            <div class="placeholder-img ${bannerG} user-banner"></div>
+            <div class="user-avatar-wrap">
+                ${randomAvatarLg(i + 5)}
+            </div>
+            <div class="user-name">${authorNames[(i + 5) % authorNames.length]}</div>
+            <div class="user-works">
+                ${createPlaceholderDiv(g1, 'style="aspect-ratio:1;border-radius:4px"')}
+                ${createPlaceholderDiv(g2, 'style="aspect-ratio:1;border-radius:4px"')}
+                ${createPlaceholderDiv(g3, 'style="aspect-ratio:1;border-radius:4px"')}
+            </div>
+            <button class="follow-btn" onclick="toggleFollow(this)">フォロー</button>
+        </div>`;
+    }
+    container.innerHTML = html;
+}
+
+// ========== Like Toggle ==========
+function toggleLike(btn, e) {
+    e.preventDefault();
+    e.stopPropagation();
+    btn.classList.toggle('liked');
+    btn.classList.add('animate');
+    setTimeout(() => btn.classList.remove('animate'), 300);
+}
+
+// ========== Follow Toggle ==========
+function toggleFollow(btn) {
+    if (btn.classList.contains('following')) {
+        btn.classList.remove('following');
+        btn.textContent = 'フォロー';
+    } else {
+        btn.classList.add('following');
+        btn.textContent = 'フォロー中';
+    }
+}
+
+// ========== Tab Switching ==========
+document.querySelectorAll('.tab-nav .tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelector('.tab-nav .tab.active').classList.remove('active');
+        tab.classList.add('active');
+    });
+});
+
+// ========== Banner Auto-scroll ==========
+let currentBanner = 0;
+const bannerTrack = document.getElementById('bannerTrack');
+const dots = document.querySelectorAll('.banner-dots .dot');
+
+function scrollBanner() {
+    currentBanner = (currentBanner + 1) % 3;
+    const bannerItems = bannerTrack.querySelectorAll('.banner-item');
+    if (bannerItems[currentBanner]) {
+        bannerItems[currentBanner].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+    }
+    dots.forEach((d, i) => d.classList.toggle('active', i === currentBanner));
+}
+setInterval(scrollBanner, 4000);
+
+// ========== Update Status Bar Time ==========
+function updateTime() {
+    const now = new Date();
+    document.getElementById('statusTime').textContent = 
+        now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+}
+setInterval(updateTime, 1000);
+updateTime();
+
+// ========== Bottom Nav Active State ==========
+document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+        document.querySelector('.bottom-nav .nav-item.active').classList.remove('active');
+        item.classList.add('active');
+    });
+});
+
+// ========== Search Bar Interaction ==========
+document.getElementById('searchBar').addEventListener('click', () => {
+    const bar = document.getElementById('searchBar');
+    bar.style.border = '2px solid var(--pixiv-blue)';
+    bar.style.background = 'white';
+    setTimeout(() => {
+        bar.style.border = 'none';
+        bar.style.background = '#f0f0f0';
+    }, 2000);
+});
+
+// ========== Init ==========
+renderRanking();
+renderIllustrations();
+renderUsers();
+</script>
+
+</body>
+</html>

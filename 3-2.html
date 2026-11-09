@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            background-color: #ffffff;
+            color: white;
+        }
+
+        h2 {
+            background-color: black;
+            color: #b13636;
+        }
+
+        #box {
+            width: 300px;
+            height: 300px;
+            background-color: black;
+        }
+
+        #box p:first-child {
+            color: rgb(180, 58, 58);
+        }
+
+        #box p:first-child span {
+            color: white;
+        }
+
+        #box p:nth-child(2) span {
+            display: inline;
+        }
+
+        #box p:nth-child(2) span:nth-child(1) {
+            color: #ff4d4d;
+        }
+
+        #box p:nth-child(2) span:nth-child(2) {
+            color: #4da6ff;
+        }
+
+        #box p:nth-child(2) span:nth-child(3) {
+            color: #ffd24d;
+        }
+    </style>
+</head>
+<body>
+    <h2>层叠样式表</h2>
+    <div id="box">
+        <p>css<span>选择器</span></p>
+        <p><span>王</span><span>鹏</span><span>宇</span></p>
+        <p>css属性</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{margin: 0; padding: 0;}
+        .box{
+            width: 300px;
+            height: 300px;
+            margin: 50px auto;
+            line-height: 300px;
+            text-align: center;
+            color: #fff;
+            font-size: 24px;
+            /* 多个动画用逗号叠加：变色 + 旋转缩放 + 形状变化 */
+            animation:
+                changeColor 4s ease-in-out infinite,
+                transformAni 4s ease-in-out infinite,
+                borderAni 4s ease-in-out infinite;
+        }
+        /* 动画1：背景颜色在4种颜色之间循环变化 */
+        @keyframes changeColor{
+            0%   { background-color: red; }
+            25%  { background-color: orange; }
+            50%  { background-color: blue; }
+            75%  { background-color: green; }
+            100% { background-color: red; }
+        }
+        /* 动画2：旋转 + 缩放（transform 相关写在一起，避免互相覆盖） */
+        @keyframes transformAni{
+            0%   { transform: rotate(0deg) scale(1); }
+            25%  { transform: rotate(90deg) scale(1.2); }
+            50%  { transform: rotate(180deg) scale(0.8); }
+            75%  { transform: rotate(270deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+        /* 动画3：形状变化，正方形变圆形再变回 */
+        @keyframes borderAni{
+            0%, 100% { border-radius: 0; }
+            50%      { border-radius: 50%; }
+        }
+    </style>
+</head>
+<body>
+    <h2>王鹏宇的animation动画</h2>
+    <div class="box"></div>
+</body>
+</html>

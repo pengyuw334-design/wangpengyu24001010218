@@ -1,0 +1,2574 @@
+<!-- 姓名：王鹏宇，日期：2026-10-29，功能名称：JavaScript 数组主要方法交互演示 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1d4d">
+    <title>16-1 JavaScript 数组主要方法 · 购物车实验室 - 王鹏宇</title>
+    <style>
+        /* ========== 基础重置与主题变量 ========== */
+        :root {
+            --ink: #0f172a;
+            --ink-soft: #334155;
+            --muted: #64748b;
+            --line: #e3ebf5;
+            --blue: #2563eb;
+            --blue-deep: #1d4ed8;
+            --sky: #0ea5e9;
+            --amber: #f59e0b;
+            --orange: #f97316;
+            --orange-deep: #c2410c;
+            --mono: Consolas, Monaco, "Cascadia Code", "Courier New", monospace;
+            --shadow: 0 14px 40px -24px rgba(15, 23, 42, 0.35);
+            --ease: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-width: 320px;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 6% 2%, rgba(37, 99, 235, 0.10), transparent 30%),
+                radial-gradient(circle at 94% 8%, rgba(14, 165, 233, 0.10), transparent 28%),
+                radial-gradient(circle at 72% 96%, rgba(249, 115, 22, 0.07), transparent 32%),
+                #eef3f9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "PingFang SC", Roboto, Arial, sans-serif;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        button {
+            font-family: inherit;
+        }
+
+        code,
+        pre {
+            font-family: var(--mono);
+        }
+
+        .crx_shell {
+            width: min(1240px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 28px 0 34px;
+        }
+
+        /* ========== 顶部横幅 ========== */
+        .crx_hero {
+            position: relative;
+            overflow: hidden;
+            padding: 30px 34px;
+            border-radius: 26px;
+            color: #fff;
+            background: linear-gradient(118deg, #081737 0%, #14399a 46%, #0b74c4 100%);
+            box-shadow: 0 28px 70px -28px rgba(11, 29, 77, 0.75);
+        }
+
+        .crx_hero::before {
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.18) 1px, transparent 1px);
+            background-size: 22px 22px;
+            opacity: 0.55;
+            content: "";
+            pointer-events: none;
+            -webkit-mask-image: linear-gradient(115deg, transparent 25%, #000 100%);
+            mask-image: linear-gradient(115deg, transparent 25%, #000 100%);
+        }
+
+        .crx_hero::after {
+            position: absolute;
+            right: -14px;
+            bottom: -96px;
+            color: rgba(255, 255, 255, 0.07);
+            font: 700 250px/1 Georgia, "Times New Roman", serif;
+            letter-spacing: -18px;
+            content: "[ ]";
+            pointer-events: none;
+        }
+
+        .crx_hero_grid {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 350px;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .crx_tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 5px 13px;
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            border-radius: 999px;
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            color: #dbeafe;
+            background: rgba(255, 255, 255, 0.11);
+        }
+
+        .crx_tag::before {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #7dd3fc;
+            content: "";
+        }
+
+        .crx_hero h1 {
+            margin: 14px 0 12px;
+            font-size: clamp(26px, 3.1vw, 36px);
+            font-weight: 800;
+            line-height: 1.24;
+            letter-spacing: 0.01em;
+        }
+
+        .crx_hero h1 em {
+            color: #8bdcff;
+            font-style: normal;
+        }
+
+        .crx_hero_sub {
+            max-width: 580px;
+            margin: 0 0 16px;
+            color: rgba(226, 240, 255, 0.82);
+            font-size: 14px;
+            line-height: 1.85;
+        }
+
+        .crx_hero_meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 12.5px;
+        }
+
+        .crx_hero_meta span {
+            padding: 4px 11px;
+            border-radius: 999px;
+            color: #e0f2fe;
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        .crx_hero_card {
+            padding: 14px 16px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.075);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+        }
+
+        .crx_hero_card_head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: rgba(226, 240, 255, 0.55);
+            font-family: var(--mono);
+            font-size: 11px;
+        }
+
+        .crx_hero_dots {
+            display: flex;
+            gap: 5px;
+        }
+
+        .crx_hero_dots i {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .crx_hero_dots i:first-child { background: #f87171; }
+        .crx_hero_dots i:nth-child(2) { background: #fbbf24; }
+        .crx_hero_dots i:nth-child(3) { background: #34d399; }
+
+        .crx_hero_code {
+            margin: 0;
+            color: #dbeafe;
+            font-size: 12px;
+            line-height: 1.72;
+            white-space: pre;
+        }
+
+        .crx_hero_code .tk-str { color: #86efac; }
+        .crx_hero_code .tk-fn { color: #7dd3fc; }
+        .crx_hero_code .tk-kw { color: #c4b5fd; }
+        .crx_hero_code .tk-com { color: #94a3b8; }
+
+        .crx_hero_fruits {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.16);
+            font-size: 20px;
+        }
+
+        .crx_hero_fruits span {
+            display: grid;
+            width: 34px;
+            height: 34px;
+            place-items: center;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.10);
+            animation: crxFruitFloat 3.6s var(--ease) infinite;
+        }
+
+        .crx_hero_fruits span:nth-child(2) { animation-delay: 0.35s; }
+        .crx_hero_fruits span:nth-child(3) { animation-delay: 0.7s; }
+        .crx_hero_fruits span:nth-child(5) { animation-delay: 1.05s; background: rgba(134, 239, 172, 0.16); }
+        .crx_hero_fruits em { color: rgba(255, 255, 255, 0.45); font-style: normal; }
+
+        @keyframes crxFruitFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
+        /* ========== 图例与提示条 ========== */
+        .crx_legendbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px 20px;
+            margin: 16px 4px 18px;
+        }
+
+        .crx_legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            color: #475569;
+            font-size: 12.5px;
+        }
+
+        .crx_legend_item {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .crx_swatch {
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+        }
+
+        .crx_swatch.mut { background: var(--orange); }
+        .crx_swatch.new { background: var(--sky); }
+        .crx_swatch.none { background: #94a3b8; }
+
+        .crx_legend_tip {
+            margin: 0;
+            color: #94a3b8;
+            font-size: 12.5px;
+        }
+
+        /* ========== 整体两栏布局 ========== */
+        .crx_lab {
+            display: grid;
+            grid-template-columns: minmax(0, 1.55fr) minmax(360px, 0.85fr);
+            gap: 20px;
+            align-items: start;
+        }
+
+        .crx_col_main,
+        .crx_col_side {
+            display: flex;
+            min-width: 0;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .crx_card {
+            padding: 20px;
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.93);
+            box-shadow: var(--shadow);
+        }
+
+        .crx_card_head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .crx_card_title {
+            display: flex;
+            min-width: 0;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .crx_icon {
+            font-size: 19px;
+            line-height: 1;
+        }
+
+        .crx_card_title h2 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            white-space: nowrap;
+        }
+
+        .crx_card_title code {
+            padding: 1px 7px;
+            border-radius: 6px;
+            color: var(--blue);
+            background: #eff6ff;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .crx_len {
+            flex: none;
+            padding: 3px 9px;
+            border-radius: 999px;
+            color: #e2e8f0;
+            background: #0f172a;
+            font-family: var(--mono);
+            font-size: 11px;
+        }
+
+        .crx_actions {
+            display: flex;
+            flex: none;
+            gap: 8px;
+        }
+
+        .crx_btn_ghost {
+            padding: 6px 11px;
+            border: 1px solid #dbe5f0;
+            border-radius: 9px;
+            color: #475569;
+            background: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+        }
+
+        .crx_btn_ghost:hover:not(:disabled) {
+            border-color: #93c5fd;
+            color: var(--blue-deep);
+            background: #f8fbff;
+            transform: translateY(-1px);
+        }
+
+        .crx_btn_ghost:disabled {
+            color: #cbd5e1;
+            background: #f8fafc;
+            cursor: not-allowed;
+        }
+
+        .crx_btn_ghost:focus-visible,
+        .crx_method:focus-visible,
+        .crx_tab:focus-visible {
+            outline: 2px solid var(--blue);
+            outline-offset: 2px;
+        }
+
+        .crx_count {
+            flex: none;
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        /* ========== 购物车舞台 ========== */
+        .crx_stage {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .crx_stage.is-flash-mut {
+            border-color: #fdba74;
+            animation: crxFlashMut 0.7s ease-out;
+        }
+
+        .crx_stage.is-flash-new {
+            border-color: #7dd3fc;
+            animation: crxFlashNew 0.7s ease-out;
+        }
+
+        @keyframes crxFlashMut {
+            0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.38); }
+            100% { box-shadow: 0 0 0 16px rgba(249, 115, 22, 0); }
+        }
+
+        @keyframes crxFlashNew {
+            0% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.35); }
+            100% { box-shadow: 0 0 0 16px rgba(14, 165, 233, 0); }
+        }
+
+        .crx_track_wrap {
+            position: relative;
+            display: flex;
+            min-height: 172px;
+            align-items: center;
+            padding: 24px 14px 20px;
+            border: 1px solid #e6eef8;
+            border-radius: 16px;
+            background: linear-gradient(180deg, #f9fcff 0%, #f1f7fe 100%);
+        }
+
+        .crx_track_wrap::after {
+            position: absolute;
+            right: 18px;
+            bottom: 15px;
+            left: 18px;
+            border-bottom: 2px dashed #d8e4f2;
+            content: "";
+            pointer-events: none;
+        }
+
+        .crx_track {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            width: 100%;
+            gap: 16px;
+            align-items: stretch;
+            overflow-x: auto;
+            padding: 8px 2px 14px;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 transparent;
+        }
+
+        .crx_track::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .crx_track::-webkit-scrollbar-thumb {
+            border-radius: 999px;
+            background: #cbd5e1;
+        }
+
+        .crx_item {
+            position: relative;
+            flex: 0 0 auto;
+            width: 108px;
+            padding: 18px 8px 13px;
+            border: 1px solid #e3ebf5;
+            border-radius: 14px;
+            background: #fff;
+            box-shadow: 0 10px 20px -14px rgba(15, 23, 42, 0.55);
+            text-align: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .crx_item:hover {
+            box-shadow: 0 16px 24px -14px rgba(15, 23, 42, 0.5);
+            transform: translateY(-3px);
+        }
+
+        .crx_item_idx {
+            position: absolute;
+            top: -11px;
+            left: 50%;
+            min-width: 24px;
+            padding: 2px 7px;
+            border-radius: 999px;
+            color: #fff;
+            background: #0f172a;
+            box-shadow: 0 3px 8px rgba(15, 23, 42, 0.28);
+            font-family: var(--mono);
+            font-size: 10.5px;
+            line-height: 15px;
+            transform: translateX(-50%);
+        }
+
+        .crx_item_emoji {
+            display: block;
+            font-size: 38px;
+            line-height: 1.15;
+        }
+
+        .crx_item_name {
+            display: block;
+            margin-top: 4px;
+            color: var(--ink-soft);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .crx_item_price {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 1px 8px;
+            border-radius: 999px;
+            color: var(--orange-deep);
+            background: #fff7ed;
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .crx_empty {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            color: #94a3b8;
+            text-align: center;
+        }
+
+        .crx_empty span {
+            font-size: 30px;
+            opacity: 0.7;
+        }
+
+        .crx_empty p {
+            margin: 0;
+            font-size: 13px;
+        }
+
+        .crx_empty code {
+            padding: 1px 7px;
+            border-radius: 5px;
+            color: var(--blue);
+            background: #e8f1fe;
+        }
+
+        .crx_cart_meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin-top: 14px;
+        }
+
+        .crx_literal_box {
+            display: flex;
+            min-width: 0;
+            flex: 1 1 300px;
+            gap: 10px;
+            align-items: center;
+            padding: 8px 12px;
+            border: 1px dashed #cbd5e1;
+            border-radius: 11px;
+            background: #f8fafc;
+        }
+
+        .crx_literal_label {
+            flex: none;
+            color: #94a3b8;
+            font-size: 10px;
+            letter-spacing: 0.08em;
+        }
+
+        .crx_literal_box code {
+            flex: 1;
+            min-width: 0;
+            color: var(--ink-soft);
+            font-size: 12px;
+            line-height: 1.75;
+            white-space: normal;
+            word-break: break-word;
+        }
+
+        .crx_literal_box .tk-kw { color: #7c3aed; }
+        .crx_literal_box .tk-str { color: #0f766e; }
+
+        .crx_total {
+            flex: none;
+            padding: 7px 14px;
+            border: 1px solid #fed7aa;
+            border-radius: 999px;
+            color: var(--ink);
+            background: #fff7ed;
+            font-size: 12.5px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        /* ========== 新数组 / 小票 / 累加过程面板 ========== */
+        .crx_newpanel {
+            margin-top: 16px;
+            padding: 13px 15px;
+            border: 1px dashed #7dd3fc;
+            border-radius: 14px;
+            background: linear-gradient(180deg, #f0f9ff, #e8f5ff);
+        }
+
+        .crx_newpanel[data-tone="new"] {
+            border-color: #7dd3fc;
+            background: linear-gradient(180deg, #f0f9ff, #e8f5ff);
+        }
+
+        .crx_newpanel[data-tone="mut"] {
+            border-color: #fdba74;
+            background: linear-gradient(180deg, #fff7ed, #fff2e3);
+        }
+
+        .crx_newpanel[data-tone="mut"] .crx_newpanel_title { color: #c2410c; }
+        .crx_newpanel[data-tone="mut"] .crx_newpanel_sub { color: #9a6b4a; }
+
+        .crx_newpanel[data-tone="plain"] {
+            border-color: #cbd5e1;
+            background: linear-gradient(180deg, #f8fafc, #f1f5f9);
+        }
+
+        .crx_newpanel[data-tone="plain"] .crx_newpanel_title { color: #475569; }
+
+        .crx_newpanel_head {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 10px;
+            align-items: baseline;
+            margin-bottom: 10px;
+        }
+
+        .crx_newpanel_title {
+            color: #0369a1;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .crx_newpanel_sub {
+            color: #64748b;
+            font-size: 11.5px;
+        }
+
+        .crx_newpanel_body {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .crx_chip {
+            display: inline-flex;
+            gap: 5px;
+            align-items: center;
+            padding: 4px 8px;
+            border: 1px solid #dbeafe;
+            border-radius: 9px;
+            color: var(--ink-soft);
+            background: #fff;
+            box-shadow: 0 2px 8px -5px rgba(15, 23, 42, 0.45);
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .crx_chip b {
+            font-size: 15px;
+            font-weight: 400;
+            line-height: 1;
+        }
+
+        .crx_chip em {
+            color: var(--orange-deep);
+            font-size: 10.5px;
+            font-style: normal;
+            font-weight: 700;
+        }
+
+        .crx_coin {
+            display: inline-flex;
+            min-width: 48px;
+            align-items: center;
+            justify-content: center;
+            padding: 5px 9px;
+            border: 1px solid #fde68a;
+            border-radius: 999px;
+            color: #b45309;
+            background: #fffbeb;
+            font-family: var(--mono);
+            font-size: 12.5px;
+            font-weight: 700;
+        }
+
+        .crx_arr_empty {
+            color: #94a3b8;
+            font-family: var(--mono);
+            font-size: 12px;
+        }
+
+        .crx_receipt {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px dashed #e2d3b4;
+            border-radius: 10px;
+            background: #fffdf7;
+            font-family: var(--mono);
+            font-size: 12px;
+        }
+
+        .crx_receipt_line {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            padding: 2px 0;
+            color: #475569;
+        }
+
+        .crx_receipt_line span { color: #a8a29e; }
+        .crx_receipt_line b { flex: 1; color: var(--ink-soft); font-weight: 600; }
+        .crx_receipt_line em { color: #b45309; font-style: normal; }
+
+        .crx_step_line {
+            width: 100%;
+            padding: 2px 0;
+            color: #475569;
+            font-family: var(--mono);
+            font-size: 12px;
+        }
+
+        .crx_step_line b { color: var(--ink); }
+
+        .crx_join_text {
+            margin: 0;
+            color: var(--ink);
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            word-break: break-all;
+        }
+
+        /* ========== 操作日志 ========== */
+        .crx_logcard {
+            padding-bottom: 14px;
+        }
+
+        .crx_log {
+            display: flex;
+            max-height: 208px;
+            flex-direction: column;
+            margin: 0;
+            padding: 0;
+            overflow-y: auto;
+            list-style: none;
+        }
+
+        .crx_log_item {
+            display: flex;
+            gap: 9px;
+            align-items: center;
+            padding: 8px 4px;
+            border-bottom: 1px dashed #eef2f7;
+            font-size: 12.5px;
+        }
+
+        .crx_log_item:last-child {
+            border-bottom: 0;
+        }
+
+        .crx_log_time {
+            flex: none;
+            color: #a8b3c4;
+            font-family: var(--mono);
+            font-size: 11px;
+        }
+
+        .crx_log_item code {
+            flex: none;
+            padding: 1px 6px;
+            border-radius: 5px;
+            color: var(--blue-deep);
+            background: #eff6ff;
+            font-size: 11.5px;
+            font-weight: 700;
+        }
+
+        .crx_log_text {
+            overflow: hidden;
+            color: var(--muted);
+            font-size: 12px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .crx_log_empty {
+            padding: 22px 4px;
+            color: #94a3b8;
+            font-size: 12.5px;
+            text-align: center;
+        }
+
+        /* ========== 方法货架 ========== */
+        .crx_tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+            margin-bottom: 14px;
+            padding: 4px;
+            border-radius: 11px;
+            background: #f1f5f9;
+        }
+
+        .crx_tab {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            justify-content: center;
+            padding: 7px 2px;
+            border: 0;
+            border-radius: 8px;
+            color: var(--muted);
+            background: transparent;
+            font-size: 12px;
+            cursor: pointer;
+            transition: color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .crx_tab_icon {
+            font-size: 12px;
+            line-height: 1;
+            filter: grayscale(0.25);
+        }
+
+        .crx_tab:hover {
+            color: var(--blue-deep);
+        }
+
+        .crx_tab.is-active {
+            color: var(--blue-deep);
+            background: #fff;
+            box-shadow: 0 3px 10px -4px rgba(15, 23, 42, 0.3);
+            font-weight: 700;
+        }
+
+        .crx_method_grid {
+            display: grid;
+            min-height: 240px;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            align-content: start;
+        }
+
+        .crx_method {
+            display: flex;
+            min-height: 72px;
+            flex-direction: column;
+            gap: 4px;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 10px 12px;
+            border: 1px solid #e5ebf4;
+            border-radius: 11px;
+            background: #fff;
+            cursor: pointer;
+            text-align: left;
+            transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease, background 0.16s ease;
+        }
+
+        .crx_method:hover {
+            border-color: #93c5fd;
+            background: #fbfdff;
+            box-shadow: 0 10px 22px -14px rgba(37, 99, 235, 0.55);
+            transform: translateY(-2px);
+        }
+
+        .crx_method:active {
+            transform: translateY(0) scale(0.985);
+        }
+
+        .crx_method.is-hit {
+            border-color: var(--blue);
+            background: #eff6ff;
+        }
+
+        .crx_method_top {
+            display: flex;
+            width: 100%;
+            gap: 6px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .crx_method code {
+            color: #1e293b;
+            font-size: 13.5px;
+            font-weight: 700;
+        }
+
+        .crx_method_short {
+            color: var(--muted);
+            font-size: 11.5px;
+        }
+
+        .crx_mut_dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            flex: none;
+            border-radius: 50%;
+        }
+
+        .crx_mut_dot.mut {
+            background: var(--orange);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.14);
+        }
+
+        .crx_mut_dot.new {
+            background: var(--sky);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.14);
+        }
+
+        .crx_mut_dot.none {
+            background: #cbd5e1;
+        }
+
+        .crx_method_tip {
+            margin: 12px 0 0;
+            color: #94a3b8;
+            font-size: 11.5px;
+        }
+
+        .crx_method_tip .crx_mut_dot {
+            width: 7px;
+            height: 7px;
+            vertical-align: 1px;
+        }
+
+        /* ========== 深色运行结果面板 ========== */
+        .crx_console {
+            padding: 18px;
+            border: 1px solid #1e293b;
+            border-radius: 20px;
+            color: #e2e8f0;
+            background: linear-gradient(180deg, #0d1730, #0a1120);
+            box-shadow: 0 24px 50px -26px rgba(8, 15, 35, 0.9);
+        }
+
+        .crx_console_head {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .crx_console_dots {
+            display: flex;
+            gap: 5px;
+        }
+
+        .crx_console_dots i {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+        }
+
+        .crx_console_dots i:first-child { background: #ef4444; }
+        .crx_console_dots i:nth-child(2) { background: #f59e0b; }
+        .crx_console_dots i:nth-child(3) { background: #10b981; }
+
+        .crx_console_title {
+            color: #94a3b8;
+            font-size: 12px;
+            letter-spacing: 0.04em;
+        }
+
+        .crx_console_title code {
+            color: #64748b;
+            font-size: 10.5px;
+        }
+
+        .crx_changed {
+            margin-left: auto;
+            padding: 3px 9px;
+            border-radius: 999px;
+            font-size: 10.5px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .crx_changed.is-mut {
+            border: 1px solid rgba(249, 115, 22, 0.35);
+            color: #fdba74;
+            background: rgba(249, 115, 22, 0.15);
+        }
+
+        .crx_changed.is-new {
+            border: 1px solid rgba(14, 165, 233, 0.35);
+            color: #7dd3fc;
+            background: rgba(14, 165, 233, 0.15);
+        }
+
+        .crx_changed.is-none {
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            color: #cbd5e1;
+            background: rgba(148, 163, 184, 0.12);
+        }
+
+        .crx_code {
+            min-height: 64px;
+            margin: 0 0 14px;
+            padding: 12px 14px;
+            overflow-x: auto;
+            border: 1px solid #1e2a44;
+            border-radius: 10px;
+            color: #e2e8f0;
+            background: #060b16;
+            font-size: 11.5px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .tk-kw { color: #c084fc; }
+        .tk-fn { color: #7dd3fc; }
+        .tk-str { color: #86efac; }
+        .tk-num { color: #fbbf24; }
+        .tk-bool { color: #fbbf24; }
+        .tk-com { color: #64748b; font-style: italic; }
+        .tk-punc { color: #94a3b8; }
+
+        .crx_ret {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 11px 14px;
+            border: 1px solid #1e2a44;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .crx_ret_label {
+            color: #64748b;
+            font-size: 10px;
+            letter-spacing: 0.12em;
+        }
+
+        .crx_ret_type {
+            padding: 1px 7px;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            border-radius: 4px;
+            color: #7dd3fc;
+            background: rgba(56, 189, 248, 0.12);
+            font-family: var(--mono);
+            font-size: 10px;
+        }
+
+        .crx_ret_value {
+            display: inline-flex;
+            min-width: 56px;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            color: #f8fafc;
+            font-family: var(--mono);
+            font-size: 14px;
+            word-break: break-all;
+        }
+
+        .crx_ret_value .crx_chip {
+            border-color: #334155;
+            color: #e2e8f0;
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: none;
+        }
+
+        .crx_ret_value .crx_chip em { color: #fbbf24; }
+
+        .crx_ret_num {
+            color: #fbbf24;
+            font-size: 19px;
+            font-weight: 700;
+        }
+
+        .crx_ret_undef {
+            color: #94a3b8;
+            font-size: 12.5px;
+            font-style: italic;
+        }
+
+        .crx_ret_literal {
+            color: #a5f3fc;
+            font-family: var(--mono);
+            font-size: 12px;
+            line-height: 1.65;
+            word-break: break-all;
+        }
+
+        .crx_bool {
+            font-family: var(--mono);
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .crx_bool_true { color: #4ade80; }
+        .crx_bool_false { color: #fb923c; }
+
+        .crx_note {
+            min-height: 45px;
+            margin: 0;
+            padding-left: 11px;
+            border-left: 2px solid var(--blue);
+            color: #94a3b8;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .crx_note strong {
+            color: #e2e8f0;
+            font-weight: 600;
+        }
+
+        .crx_note code {
+            padding: 1px 5px;
+            border-radius: 4px;
+            color: #7dd3fc;
+            background: rgba(125, 211, 252, 0.10);
+            font-size: 11px;
+        }
+
+        /* ========== 速查表 ========== */
+        .crx_table_card {
+            margin-top: 20px;
+        }
+
+        .crx_table_hint {
+            display: none;
+            margin: 0 0 10px;
+            color: #94a3b8;
+            font-size: 11.5px;
+        }
+
+        .crx_table_wrap {
+            overflow-x: auto;
+            border: 1px solid #e8eef7;
+            border-radius: 14px;
+        }
+
+        .crx_table {
+            width: 100%;
+            min-width: 700px;
+            border-collapse: collapse;
+            font-size: 12.5px;
+            text-align: left;
+        }
+
+        .crx_table thead th {
+            padding: 11px 14px;
+            color: #e2e8f0;
+            background: #0f172a;
+            font-size: 11.5px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            white-space: nowrap;
+        }
+
+        .crx_table td {
+            padding: 10px 14px;
+            vertical-align: top;
+            border-top: 1px solid #eef2f7;
+            color: #475569;
+        }
+
+        .crx_table tbody tr:hover td {
+            background: #f8fbff;
+        }
+
+        .crx_table_group td {
+            padding: 8px 14px;
+            border-top: 1px solid #e2e8f0;
+            background: #f1f5f9;
+        }
+
+        .crx_table_group span {
+            color: var(--ink-soft);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .crx_table_group em {
+            float: right;
+            color: #94a3b8;
+            font-size: 11px;
+            font-style: normal;
+        }
+
+        .crx_table_name {
+            padding: 2px 7px;
+            border-radius: 6px;
+            color: var(--blue-deep);
+            background: #eff6ff;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .crx_table_sig {
+            color: #94a3b8;
+            font-family: var(--mono);
+            font-size: 10.5px;
+            white-space: nowrap;
+        }
+
+        .crx_pill {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .crx_pill.is-mut {
+            color: var(--orange-deep);
+            background: #fff1e6;
+        }
+
+        .crx_pill.is-keep {
+            color: #475569;
+            background: #f1f5f9;
+        }
+
+        .crx_ret_desc {
+            color: #64748b;
+            font-size: 11.5px;
+        }
+
+        /* ========== 易错点卡片 ========== */
+        .crx_section_head {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 14px;
+            align-items: baseline;
+            margin: 32px 4px 14px;
+        }
+
+        .crx_section_head h2 {
+            margin: 0;
+            font-size: 19px;
+            font-weight: 800;
+        }
+
+        .crx_section_head p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 12.5px;
+        }
+
+        .crx_tips {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 14px;
+        }
+
+        .crx_tip {
+            padding: 16px;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: #fff;
+            box-shadow: 0 12px 30px -26px rgba(15, 23, 42, 0.5);
+        }
+
+        .crx_tip_icon {
+            font-size: 19px;
+            line-height: 1;
+        }
+
+        .crx_tip h3 {
+            margin: 8px 0 6px;
+            font-size: 13.5px;
+            font-weight: 700;
+        }
+
+        .crx_tip p {
+            margin: 0 0 9px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.75;
+        }
+
+        .crx_tip code {
+            display: block;
+            padding: 7px 9px;
+            border-radius: 7px;
+            color: #a5f3fc;
+            background: #0f172a;
+            font-size: 11px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* ========== 底部口诀 ========== */
+        .crx_mnemonic {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 18px;
+            align-items: center;
+            margin-top: 22px;
+            padding: 18px 22px;
+            border-radius: 18px;
+            color: #cbd5e1;
+            background: linear-gradient(120deg, #0f172a, #1e293b);
+        }
+
+        .crx_mnemonic strong {
+            flex: none;
+            color: var(--amber);
+            font-size: 12px;
+            letter-spacing: 0.08em;
+        }
+
+        .crx_mnemonic p {
+            margin: 0;
+            font-size: 12.5px;
+            line-height: 2;
+        }
+
+        .crx_mnemonic code {
+            padding: 1px 6px;
+            border-radius: 4px;
+            color: #7dd3fc;
+            background: rgba(56, 189, 248, 0.1);
+            font-size: 11.5px;
+        }
+
+        .crx_mnemonic .crx_mark {
+            display: inline-block;
+            margin-right: 6px;
+            padding: 1px 7px;
+            border-radius: 999px;
+            font-size: 10.5px;
+            font-weight: 700;
+        }
+
+        .crx_mark.is-mut { color: #fdba74; background: rgba(249, 115, 22, 0.18); }
+        .crx_mark.is-new { color: #7dd3fc; background: rgba(14, 165, 233, 0.18); }
+        .crx_mark.is-none { color: #cbd5e1; background: rgba(148, 163, 184, 0.16); }
+
+        .crx_footer {
+            padding: 26px 0 6px;
+            color: #94a3b8;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        /* ========== 响应式 ========== */
+        @media (max-width: 1080px) {
+            .crx_hero_grid {
+                grid-template-columns: 1fr;
+            }
+
+            .crx_hero_card {
+                display: none;
+            }
+
+            .crx_lab {
+                grid-template-columns: 1fr;
+            }
+
+            .crx_col_side {
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .crx_shell {
+                width: calc(100% - 20px);
+                padding-top: 16px;
+            }
+
+            .crx_hero {
+                padding: 24px 20px;
+                border-radius: 20px;
+            }
+
+            .crx_hero::after {
+                display: none;
+            }
+
+            .crx_legendbar {
+                margin-top: 14px;
+            }
+
+            .crx_card {
+                padding: 16px;
+                border-radius: 16px;
+            }
+
+            .crx_card_head {
+                align-items: flex-start;
+            }
+
+            .crx_card_title h2 {
+                font-size: 15.5px;
+            }
+
+            .crx_tabs {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .crx_method_grid {
+                grid-template-columns: 1fr 1fr;
+                min-height: 0;
+            }
+
+            .crx_cart_meta {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .crx_literal_box {
+                flex: 0 0 auto;
+            }
+
+            .crx_total {
+                align-self: flex-start;
+            }
+
+            .crx_table_hint {
+                display: block;
+            }
+
+            .crx_lab {
+                gap: 14px;
+            }
+
+            .crx_col_main,
+            .crx_col_side {
+                gap: 14px;
+            }
+
+            .crx_table_card {
+                margin-top: 14px;
+            }
+
+            .crx_tip code {
+                white-space: pre-wrap;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.001ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="crx_shell">
+
+    <!-- ============ 顶部横幅 ============ -->
+    <header class="crx_hero">
+        <div class="crx_hero_grid">
+            <div class="crx_hero_text">
+                <span class="crx_tag">Web 前端开发实验 16-1</span>
+                <h1>JavaScript 数组方法<br><em>购物车实验室</em></h1>
+                <p class="crx_hero_sub">
+                    把数组想成一列购物车：push 从车尾加、pop 从车尾拿、unshift 往车头挤、map 把每件商品换一种标签、filter 只留下符合条件的……点一个方法，看它现场变形。
+                </p>
+                <div class="crx_hero_meta">
+                    <span>姓名：王鹏宇</span>
+                    <span>日期：2026-10-29</span>
+                    <span>20 个高频数组方法</span>
+                    <span>可交互演示</span>
+                </div>
+            </div>
+            <div class="crx_hero_card" aria-hidden="true">
+                <div class="crx_hero_card_head">
+                    <span class="crx_hero_dots"><i></i><i></i><i></i></span>
+                    <span>cart.js</span>
+                </div>
+                <pre class="crx_hero_code"><span class="tk-kw">const</span> cart = [
+  <span class="tk-str">'🍎苹果'</span>,
+  <span class="tk-str">'🍌香蕉'</span>,
+  <span class="tk-str">'🍇葡萄'</span>
+];
+
+cart.<span class="tk-fn">push</span>(<span class="tk-str">'🍓草莓'</span>); <span class="tk-com">// 4</span></pre>
+                <div class="crx_hero_fruits">
+                    <span>🍎</span><span>🍌</span><span>🍇</span><em>＋</em><span>🍓</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ============ 图例 ============ -->
+    <div class="crx_legendbar">
+        <div class="crx_legend">
+            <span class="crx_legend_item"><i class="crx_swatch mut"></i>原地修改原数组</span>
+            <span class="crx_legend_item"><i class="crx_swatch new"></i>返回一个新数组</span>
+            <span class="crx_legend_item"><i class="crx_swatch none"></i>只读 · 不改变数组</span>
+        </div>
+        <p class="crx_legend_tip">先挑一个方法，再看购物车、代码和返回值。</p>
+    </div>
+
+    <!-- ============ 实验室主区域 ============ -->
+    <main class="crx_lab">
+        <div class="crx_col_main">
+            <!-- 购物车舞台 -->
+            <section class="crx_card crx_stage" id="crx_stage" aria-label="购物车数组可视化">
+                <div class="crx_card_head">
+                    <div class="crx_card_title">
+                        <span class="crx_icon">🛒</span>
+                        <h2>购物车 <code>cart</code></h2>
+                        <span class="crx_len" id="crx_len">length 3</span>
+                    </div>
+                    <div class="crx_actions">
+                        <button class="crx_btn_ghost" id="crx_undo" type="button" disabled>↩ 撤销</button>
+                        <button class="crx_btn_ghost" id="crx_reset" type="button">⟳ 重置</button>
+                    </div>
+                </div>
+
+                <div class="crx_track_wrap">
+                    <div class="crx_track" id="crx_track"></div>
+                    <div class="crx_empty" id="crx_empty" hidden>
+                        <span>🛒</span>
+                        <p>购物车空空的，试试 <code>push</code> 加一件商品</p>
+                    </div>
+                </div>
+
+                <div class="crx_cart_meta">
+                    <div class="crx_literal_box">
+                        <span class="crx_literal_label">数组本身</span>
+                        <code id="crx_literal">const cart = [];</code>
+                    </div>
+                    <div class="crx_total" id="crx_total">3 件 · 合计 ¥20</div>
+                </div>
+
+                <div class="crx_newpanel" id="crx_newpanel" data-tone="new" hidden>
+                    <div class="crx_newpanel_head">
+                        <span class="crx_newpanel_title" id="crx_new_title">新数组</span>
+                        <span class="crx_newpanel_sub" id="crx_new_sub"></span>
+                    </div>
+                    <div class="crx_newpanel_body" id="crx_new_body"></div>
+                </div>
+            </section>
+
+            <!-- 操作日志 -->
+            <section class="crx_card crx_logcard" aria-label="操作日志">
+                <div class="crx_card_head">
+                    <div class="crx_card_title">
+                        <span class="crx_icon">🧾</span>
+                        <h2>操作日志</h2>
+                    </div>
+                    <span class="crx_count" id="crx_log_count">0 次</span>
+                </div>
+                <ul class="crx_log" id="crx_log">
+                    <li class="crx_log_empty">还没有操作，先挑一个方法试试。</li>
+                </ul>
+            </section>
+        </div>
+
+        <div class="crx_col_side">
+            <!-- 方法货架 -->
+            <section class="crx_card crx_methods" aria-label="数组方法选择">
+                <div class="crx_card_head">
+                    <div class="crx_card_title">
+                        <span class="crx_icon">🧰</span>
+                        <h2>方法货架</h2>
+                    </div>
+                    <span class="crx_count">20 个方法</span>
+                </div>
+                <div class="crx_tabs" id="crx_tabs" role="tablist" aria-label="方法分类"></div>
+                <div class="crx_method_grid" id="crx_method_grid"></div>
+                <p class="crx_method_tip">
+                    小圆点：<i class="crx_mut_dot mut"></i> 改原数组 ·
+                    <i class="crx_mut_dot new"></i> 新数组 ·
+                    <i class="crx_mut_dot none"></i> 只读
+                </p>
+            </section>
+
+            <!-- 运行结果 -->
+            <section class="crx_console" aria-live="polite" aria-label="运行结果">
+                <div class="crx_console_head">
+                    <span class="crx_console_dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                    <span class="crx_console_title">运行结果 <code>console</code></span>
+                    <span class="crx_changed" id="crx_changed" hidden>原地修改</span>
+                </div>
+                <pre class="crx_code" id="crx_code"></pre>
+                <div class="crx_ret">
+                    <span class="crx_ret_label">返回值</span>
+                    <span class="crx_ret_type" id="crx_ret_type" hidden></span>
+                    <span class="crx_ret_value" id="crx_ret_value">—</span>
+                </div>
+                <p class="crx_note" id="crx_note">点击任意方法，这里会显示对应的代码、返回值和方法说明。</p>
+            </section>
+        </div>
+    </main>
+
+    <!-- ============ 方法速查表 ============ -->
+    <section class="crx_card crx_table_card" aria-label="数组方法速查表">
+        <div class="crx_card_head">
+            <div class="crx_card_title">
+                <span class="crx_icon">📋</span>
+                <h2>20 个方法速查表</h2>
+            </div>
+            <span class="crx_count">会不会改原数组，一眼看清</span>
+        </div>
+        <p class="crx_table_hint">左右滑动表格，查看完整的方法说明 →</p>
+        <div class="crx_table_wrap">
+            <table class="crx_table">
+                <thead>
+                    <tr>
+                        <th>方法</th>
+                        <th>作用</th>
+                        <th>原数组</th>
+                        <th>返回值</th>
+                    </tr>
+                </thead>
+                <tbody id="crx_table_body"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ============ 易错点 ============ -->
+    <section aria-label="易错点">
+        <div class="crx_section_head">
+            <h2>容易踩的 5 个坑</h2>
+            <p>名字很像，行为差很远。</p>
+        </div>
+        <div class="crx_tips">
+            <article class="crx_tip">
+                <span class="crx_tip_icon">🪓</span>
+                <h3>slice 与 splice，一字之差</h3>
+                <p>slice 是“切一段出来”，返回新数组；splice 是“在原数组上剪接”，会改变原数组。</p>
+                <code>cart.slice(0, 2)   // 新数组，原数组不变
+cart.splice(0, 2)  // 原数组被剪掉 2 件</code>
+            </article>
+            <article class="crx_tip">
+                <span class="crx_tip_icon">⚠️</span>
+                <h3>sort() 默认按字符串排</h3>
+                <p>不传比较函数时，元素会先转成字符串再比较，所以 10 会排在 2 前面。</p>
+                <code>[10, 2, 1].sort()              // [1, 10, 2]
+[10, 2, 1].sort((a, b) =&gt; a - b)  // [1, 2, 10]</code>
+            </article>
+            <article class="crx_tip">
+                <span class="crx_tip_icon">🔁</span>
+                <h3>forEach 不是 map</h3>
+                <p>forEach 只负责遍历，返回 undefined；map 会把每个元素的加工结果装进新数组。</p>
+                <code>cart.forEach(item =&gt; console.log(item)) // undefined
+cart.map(item =&gt; CATALOG[item].price)   // 新数组</code>
+            </article>
+            <article class="crx_tip">
+                <span class="crx_tip_icon">🎯</span>
+                <h3>find 与 filter</h3>
+                <p>find 只返回第一个匹配的元素，找不到是 undefined；filter 返回所有匹配元素组成的新数组，找不到是空数组。</p>
+                <code>cart.find(item =&gt; price &lt; 10)   // 一个元素
+cart.filter(item =&gt; price &lt; 10) // 一个数组</code>
+            </article>
+            <article class="crx_tip">
+                <span class="crx_tip_icon">🧩</span>
+                <h3>空数组的 some / every</h3>
+                <p>空数组里找不到任何反例：some 返回 false，every 反而返回 true。</p>
+                <code>[].some(item =&gt; item &gt; 0)  // false
+[].every(item =&gt; item &gt; 0) // true</code>
+            </article>
+        </div>
+    </section>
+
+    <!-- ============ 口诀 ============ -->
+    <div class="crx_mnemonic">
+        <strong>一句话记住</strong>
+        <p>
+            <span class="crx_mark is-mut">改原数组</span><code>push</code> <code>pop</code> <code>shift</code> <code>unshift</code> <code>splice</code> <code>sort</code> <code>reverse</code>
+            　<span class="crx_mark is-new">返回新数组</span><code>map</code> <code>filter</code> <code>slice</code> <code>concat</code>
+            　<span class="crx_mark is-none">只读</span>其余方法都不动原数组
+        </p>
+    </div>
+
+    <footer class="crx_footer">
+        网页设计与制作实验课件 · 实验 16-1 · 学生：王鹏宇 · 2026-10-29
+    </footer>
+</div>
+
+<script>
+(function () {
+    'use strict';
+
+    /* ============================================================
+       1. 基础数据：购物车里的商品与价目表
+       ============================================================ */
+    const CATALOG = {
+        '🍎苹果': { emoji: '🍎', name: '苹果', price: 5 },
+        '🍌香蕉': { emoji: '🍌', name: '香蕉', price: 3 },
+        '🍇葡萄': { emoji: '🍇', name: '葡萄', price: 12 },
+        '🍊橙子': { emoji: '🍊', name: '橙子', price: 6 },
+        '🍉西瓜': { emoji: '🍉', name: '西瓜', price: 18 },
+        '🍓草莓': { emoji: '🍓', name: '草莓', price: 25 },
+        '🍑桃子': { emoji: '🍑', name: '桃子', price: 9 },
+        '🍒樱桃': { emoji: '🍒', name: '樱桃', price: 30 },
+        '🍋柠檬': { emoji: '🍋', name: '柠檬', price: 4 },
+        '🥝猕猴桃': { emoji: '🥝', name: '猕猴桃', price: 8 }
+    };
+    const ALL_FRUITS = Object.keys(CATALOG);
+    const INITIAL = ['🍎苹果', '🍌香蕉', '🍇葡萄'];
+    const PUSH_POOL = ['🍓草莓', '🍉西瓜', '🍑桃子', '🍒樱桃', '🥝猕猴桃', '🍊橙子', '🍋柠檬'];
+    const HEAD_POOL = ['🍋柠檬', '🍊橙子', '🥝猕猴桃', '🍒樱桃', '🍑桃子'];
+    const SPLICE_POOL = ['🍑桃子', '🥝猕猴桃', '🍉西瓜', '🍒樱桃', '🍊橙子', '🍓草莓'];
+
+    const GROUPS = [
+        { id: 'add', label: '增删', icon: '✂️' },
+        { id: 'query', label: '查找判断', icon: '🔍' },
+        { id: 'transform', label: '转换加工', icon: '⚙️' },
+        { id: 'order', label: '排序拼接', icon: '🔀' }
+    ];
+
+    /* 每个方法的说明，同时用于“方法货架”和“速查表” */
+    const METHODS = [
+        { id: 'push', name: 'push', group: 'add', mut: 'mut', sig: '(item)', short: '末尾追加', ret: '新长度', desc: '在数组末尾追加元素，返回新长度。' },
+        { id: 'pop', name: 'pop', group: 'add', mut: 'mut', sig: '()', short: '末尾删除', ret: '被删的元素', desc: '移除并返回最后一个元素。' },
+        { id: 'unshift', name: 'unshift', group: 'add', mut: 'mut', sig: '(item)', short: '头部插入', ret: '新长度', desc: '在数组头部插入元素，返回新长度。' },
+        { id: 'shift', name: 'shift', group: 'add', mut: 'mut', sig: '()', short: '头部删除', ret: '被删的元素', desc: '移除并返回第一个元素。' },
+        { id: 'splice', name: 'splice', group: 'add', mut: 'mut', sig: '(start, deleteCount, ...items)', short: '任意位置增删', ret: '被删元素数组', desc: '在原数组上删除或插入元素，返回被删除的元素数组。' },
+
+        { id: 'indexOf', name: 'indexOf', group: 'query', mut: 'none', sig: '(item)', short: '查下标', ret: '下标或 -1', desc: '从左往右查找元素，返回下标，找不到返回 -1。' },
+        { id: 'includes', name: 'includes', group: 'query', mut: 'none', sig: '(item)', short: '判断是否存在', ret: 'true / false', desc: '判断数组里有没有这个元素，返回布尔值。' },
+        { id: 'find', name: 'find', group: 'query', mut: 'none', sig: '(fn)', short: '找第一个元素', ret: '元素或 undefined', desc: '返回第一个满足条件的元素。' },
+        { id: 'findIndex', name: 'findIndex', group: 'query', mut: 'none', sig: '(fn)', short: '找第一个下标', ret: '下标或 -1', desc: '返回第一个满足条件的元素下标。' },
+        { id: 'some', name: 'some', group: 'query', mut: 'none', sig: '(fn)', short: '是否有一个满足', ret: 'true / false', desc: '只要有一个元素满足条件就返回 true。' },
+        { id: 'every', name: 'every', group: 'query', mut: 'none', sig: '(fn)', short: '是否全部满足', ret: 'true / false', desc: '所有元素都满足条件才返回 true。' },
+
+        { id: 'forEach', name: 'forEach', group: 'transform', mut: 'none', sig: '(fn)', short: '逐件遍历', ret: 'undefined', desc: '遍历每个元素执行回调，没有返回值。' },
+        { id: 'map', name: 'map', group: 'transform', mut: 'new', sig: '(fn)', short: '逐件加工', ret: '新数组', desc: '把每个元素加工后装进新数组，长度不变。' },
+        { id: 'filter', name: 'filter', group: 'transform', mut: 'new', sig: '(fn)', short: '筛选留下', ret: '新数组', desc: '把满足条件的元素筛出来组成新数组。' },
+        { id: 'reduce', name: 'reduce', group: 'transform', mut: 'none', sig: '(fn, initialValue)', short: '收敛成一个值', ret: '汇总值', desc: '从头到尾累积计算，把数组收敛成一个值。' },
+        { id: 'join', name: 'join', group: 'transform', mut: 'none', sig: '(separator)', short: '拼成字符串', ret: '字符串', desc: '用分隔符把元素拼成一个字符串。' },
+
+        { id: 'sort', name: 'sort', group: 'order', mut: 'mut', sig: '(compareFn)', short: '原地排序', ret: '同一个数组', desc: '在原数组上排序，并返回这个数组本身。' },
+        { id: 'reverse', name: 'reverse', group: 'order', mut: 'mut', sig: '()', short: '原地反转', ret: '同一个数组', desc: '在原数组上把元素顺序倒过来。' },
+        { id: 'slice', name: 'slice', group: 'order', mut: 'new', sig: '(start, end)', short: '截取一段', ret: '新数组', desc: '截取一段元素组成新数组，原数组不变。' },
+        { id: 'concat', name: 'concat', group: 'order', mut: 'new', sig: '(otherArray)', short: '合并数组', ret: '新数组', desc: '把两个数组接在一起，返回新数组。' }
+    ];
+
+    const CHANGED_TEXT = {
+        mut: '原地修改原数组',
+        new: '返回新数组',
+        none: '只读 · 不改数组'
+    };
+
+    /* ============================================================
+       2. 运行时状态
+       ============================================================ */
+    let cart = INITIAL.slice();   // 当前购物车：字符串数组就是页面里的“数组”
+    let undoStack = [];           // 撤销栈：保存每次修改前的快照
+    let logItems = [];            // 操作日志（最多 8 条）
+    let activeGroup = 'add';      // 当前选中的方法分组
+
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ============================================================
+       3. DOM 引用
+       ============================================================ */
+    const $ = function (id) { return document.getElementById(id); };
+
+    const el = {
+        stage: $('crx_stage'),
+        track: $('crx_track'),
+        empty: $('crx_empty'),
+        len: $('crx_len'),
+        literal: $('crx_literal'),
+        total: $('crx_total'),
+        undo: $('crx_undo'),
+        reset: $('crx_reset'),
+        panel: $('crx_newpanel'),
+        panelTitle: $('crx_new_title'),
+        panelSub: $('crx_new_sub'),
+        panelBody: $('crx_new_body'),
+        tabs: $('crx_tabs'),
+        grid: $('crx_method_grid'),
+        code: $('crx_code'),
+        retType: $('crx_ret_type'),
+        retValue: $('crx_ret_value'),
+        note: $('crx_note'),
+        changed: $('crx_changed'),
+        log: $('crx_log'),
+        logCount: $('crx_log_count'),
+        table: $('crx_table_body')
+    };
+
+    /* ============================================================
+       4. 小工具函数
+       ============================================================ */
+    const info = function (name) { return CATALOG[name]; };
+    const priceOf = function (name) { return info(name).price; };
+    const emojiOf = function (name) { return info(name).emoji; };
+    const nameOf = function (name) { return info(name).name; };
+
+    const totalOf = function () {
+        return cart.reduce(function (sum, name) { return sum + priceOf(name); }, 0);
+    };
+
+    const escapeHtml = function (text) {
+        return String(text).replace(/[&<>"]/g, function (ch) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch];
+        });
+    };
+
+    const stripTags = function (html) {
+        return html.replace(/<[^>]*>/g, '').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&amp;/g, '&');
+    };
+
+    const pickAbsent = function (pool) {
+        const list = pool || ALL_FRUITS;
+        return list.find(function (name) { return cart.indexOf(name) === -1; }) || null;
+    };
+
+    const arrayLiteral = function (values) {
+        return '[' + values.map(function (value) {
+            return typeof value === 'string' ? "'" + value + "'" : value;
+        }).join(', ') + ']';
+    };
+
+    const arrayHTML = function (values) {
+        return '<code class="crx_ret_literal">' + escapeHtml(arrayLiteral(values)) + '</code>';
+    };
+
+    const chip = function (name) {
+        return '<span class="crx_chip"><b>' + emojiOf(name) + '</b>' + nameOf(name) +
+            '<em>¥' + priceOf(name) + '</em></span>';
+    };
+
+    const chipList = function (list) {
+        return list.length
+            ? list.map(chip).join('')
+            : '<span class="crx_arr_empty">[] 空数组</span>';
+    };
+
+    const coinList = function (list) {
+        return list.length
+            ? list.map(function (price) { return '<span class="crx_coin">¥' + price + '</span>'; }).join('')
+            : '<span class="crx_arr_empty">[] 空数组</span>';
+    };
+
+    const numberHTML = function (value) {
+        return '<span class="crx_ret_num">' + value + '</span>';
+    };
+
+    const boolHTML = function (value) {
+        return '<span class="crx_bool ' + (value ? 'crx_bool_true' : 'crx_bool_false') + '">' + value + '</span>';
+    };
+
+    /* 代码高亮的几个小助手 */
+    const K = function (text) { return '<span class="tk-kw">' + text + '</span>'; };
+    const F = function (text) { return '<span class="tk-fn">' + text + '</span>'; };
+    const S = function (text) { return '<span class="tk-str">' + text + '</span>'; };
+    const N = function (text) { return '<span class="tk-num">' + text + '</span>'; };
+    const C = function (text) { return '<span class="tk-com">' + text + '</span>'; };
+    const P = function (text) { return '<span class="tk-punc">' + text + '</span>'; };
+    const STR = function (text) { return S("'" + text + "'"); };
+
+    const noop = function (code, note) {
+        return {
+            code: code,
+            ret: '<span class="crx_ret_undef">—</span>',
+            retType: 'none',
+            note: note,
+            changed: 'none'
+        };
+    };
+
+    /* ============================================================
+       5. 每个方法的具体演示（核心）
+       ============================================================ */
+    const DEMOS = {
+        /* ---------- 增删 ---------- */
+        push: function () {
+            const fruit = pickAbsent(PUSH_POOL);
+            if (!fruit) {
+                return noop(
+                    'cart.' + F('push') + '(???);',
+                    '购物车里已经集齐 10 种水果，没有新商品可以追加了。点「重置」可以恢复成 3 件商品。'
+                );
+            }
+            cart.push(fruit);
+            return {
+                code: 'cart.' + F('push') + '(' + STR(fruit) + ');',
+                ret: numberHTML(cart.length),
+                retType: 'number',
+                note: 'push 把「' + nameOf(fruit) + '」追加到末尾，返回值是<strong>新长度 ' + cart.length + '</strong>；原数组被改变了。',
+                changed: 'mut'
+            };
+        },
+
+        pop: function () {
+            if (!cart.length) {
+                return {
+                    code: 'cart.' + F('pop') + '();',
+                    ret: '<span class="crx_ret_undef">undefined</span>',
+                    retType: 'undefined',
+                    note: '空数组调用 <code>pop()</code> 不会报错，只是返回 undefined。',
+                    changed: 'none'
+                };
+            }
+            const removed = cart.pop();
+            return {
+                code: 'cart.' + F('pop') + '();',
+                ret: chip(removed),
+                retType: 'string',
+                note: 'pop 从末尾拿走「' + nameOf(removed) + '」，返回值就是它本身；现在 length = ' + cart.length + '。',
+                changed: 'mut'
+            };
+        },
+
+        unshift: function () {
+            const fruit = pickAbsent(HEAD_POOL);
+            if (!fruit) {
+                return noop(
+                    'cart.' + F('unshift') + '(???);',
+                    '购物车里水果太多，已经挑不出新的插到队头了。点「重置」重新开始。'
+                );
+            }
+            cart.unshift(fruit);
+            return {
+                code: 'cart.' + F('unshift') + '(' + STR(fruit) + ');',
+                ret: numberHTML(cart.length),
+                retType: 'number',
+                note: 'unshift 把「' + nameOf(fruit) + '」插到最前面，原来所有元素的下标都 +1；返回值仍是新长度 ' + cart.length + '。',
+                changed: 'mut'
+            };
+        },
+
+        shift: function () {
+            if (!cart.length) {
+                return {
+                    code: 'cart.' + F('shift') + '();',
+                    ret: '<span class="crx_ret_undef">undefined</span>',
+                    retType: 'undefined',
+                    note: '空数组调用 <code>shift()</code> 返回 undefined，同样不会报错。',
+                    changed: 'none'
+                };
+            }
+            const removed = cart.shift();
+            return {
+                code: 'cart.' + F('shift') + '();',
+                ret: chip(removed),
+                retType: 'string',
+                note: 'shift 从头部拿走「' + nameOf(removed) + '」，后面的元素下标全部 -1；返回值是被拿走的元素。',
+                changed: 'mut'
+            };
+        },
+
+        splice: function () {
+            const start = cart.length >= 2 ? 1 : cart.length;
+            const fruit = pickAbsent(SPLICE_POOL) || pickAbsent();
+            let removed = [];
+            let codeText = '';
+            let action = '';
+
+            if (fruit) {
+                const deleteCount = cart.length > start ? 1 : 0;
+                removed = cart.splice(start, deleteCount, fruit);
+                codeText = 'cart.' + F('splice') + '(' + start + ', ' + deleteCount + ', ' + STR(fruit) + ');';
+                action = deleteCount ? '删掉 1 件、插入 1 件' : '插入 1 件（因为没有可删的元素）';
+            } else if (cart.length) {
+                removed = cart.splice(start, 1);
+                codeText = 'cart.' + F('splice') + '(' + start + ', 1);';
+                action = '删掉 1 件';
+            } else {
+                return noop('cart.' + F('splice') + '(???);', '购物车是空的，先点「重置」再试。');
+            }
+
+            return {
+                code: codeText,
+                ret: arrayHTML(removed),
+                retType: 'array',
+                note: 'splice 直接在原数组上' + action + '；<strong>返回值是一个数组</strong>，装着被删掉的元素' +
+                    (removed.length ? '' : '（这次是空数组）') + '，别把返回值当成新数组。',
+                changed: 'mut',
+                panel: {
+                    title: '📤 返回值：被删掉的元素',
+                    sub: 'splice 的返回值也是数组，但原数组已经被改了',
+                    tone: 'mut',
+                    body: chipList(removed)
+                }
+            };
+        },
+
+        /* ---------- 查找判断 ---------- */
+        indexOf: function () {
+            const target = '🍇葡萄';
+            const index = cart.indexOf(target);
+            return {
+                code: 'cart.' + F('indexOf') + '(' + STR(target) + ');',
+                ret: numberHTML(index),
+                retType: 'number',
+                note: index === -1
+                    ? '购物车里没有「葡萄」，indexOf 返回 -1。它从不报错，只返回 -1。'
+                    : '「葡萄」在下标 ' + index + ' 的位置。indexOf 从左往右找，返回第一个匹配的下标。',
+                changed: 'none'
+            };
+        },
+
+        includes: function () {
+            const target = '🍉西瓜';
+            const has = cart.indexOf(target) !== -1;
+            return {
+                code: 'cart.' + F('includes') + '(' + STR(target) + ');',
+                ret: boolHTML(has),
+                retType: 'boolean',
+                note: has
+                    ? '购物车里有西瓜，includes 返回 true。它只回答“有没有”，不告诉你下标。'
+                    : '购物车里没有西瓜，includes 返回 false。先用 push 加一件西瓜，再点一次试试。',
+                changed: 'none'
+            };
+        },
+
+        find: function () {
+            const found = cart.find(function (name) { return priceOf(name) > 10; });
+            return {
+                code: 'cart.' + F('find') + '(item ' + P('=&gt;') + ' CATALOG[item].price ' + P('&gt;') + ' ' + N('10') + ');',
+                ret: found ? chip(found) : '<span class="crx_ret_undef">undefined</span>',
+                retType: found ? 'string' : 'undefined',
+                note: found
+                    ? 'find 返回第一个价格超过 10 元的「' + nameOf(found) + '」本身，不是下标；要下标请用 findIndex。'
+                    : '没有价格超过 10 元的商品，find 返回 undefined。',
+                changed: 'none'
+            };
+        },
+
+        findIndex: function () {
+            const index = cart.findIndex(function (name) { return priceOf(name) > 10; });
+            return {
+                code: 'cart.' + F('findIndex') + '(item ' + P('=&gt;') + ' CATALOG[item].price ' + P('&gt;') + ' ' + N('10') + ');',
+                ret: numberHTML(index),
+                retType: 'number',
+                note: index === -1
+                    ? '没有价格超过 10 元的商品，findIndex 返回 -1。'
+                    : '第一个价格超过 10 元的商品在下标 ' + index + '。find 返回元素，findIndex 返回下标。',
+                changed: 'none'
+            };
+        },
+
+        some: function () {
+            const hits = cart.filter(function (name) { return priceOf(name) > 20; });
+            const result = hits.length > 0;
+            return {
+                code: 'cart.' + F('some') + '(item ' + P('=&gt;') + ' CATALOG[item].price ' + P('&gt;') + ' ' + N('20') + ');',
+                ret: boolHTML(result),
+                retType: 'boolean',
+                note: result
+                    ? '有「' + hits.map(nameOf).join('、') + '」价格超过 20 元，some 返回 true：只要有一个满足就够了。'
+                    : '所有商品都不超过 20 元，some 返回 false。用 push 加一件 ¥25 的草莓再试试。',
+                changed: 'none'
+            };
+        },
+
+        every: function () {
+            const cheap = cart.filter(function (name) { return priceOf(name) <= 2; });
+            const result = cart.every(function (name) { return priceOf(name) > 2; });
+            return {
+                code: 'cart.' + F('every') + '(item ' + P('=&gt;') + ' CATALOG[item].price ' + P('&gt;') + ' ' + N('2') + ');',
+                ret: boolHTML(result),
+                retType: 'boolean',
+                note: result
+                    ? '每件商品都超过 2 元，every 返回 true。注意：空数组调用 every 会返回 true（找不出反例）。'
+                    : '「' + nameOf(cheap[0]) + '」不超过 2 元，every 立刻返回 false：只要有一个反例就失败。',
+                changed: 'none'
+            };
+        },
+
+        /* ---------- 转换加工 ---------- */
+        forEach: function () {
+            const lines = [];
+            cart.forEach(function (name, index) {
+                lines.push(
+                    '<div class="crx_receipt_line"><span>' + String(index).padStart(2, '0') + '</span>' +
+                    '<b>' + emojiOf(name) + ' ' + nameOf(name) + '</b>' +
+                    '<em>¥' + priceOf(name) + '</em></div>'
+                );
+            });
+            return {
+                code: 'cart.' + F('forEach') + '((item, index) ' + P('=&gt;') + ' {\n  console.log(index, item);\n});',
+                ret: '<span class="crx_ret_undef">undefined</span>',
+                retType: 'undefined',
+                note: 'forEach 挨个执行回调，本身<strong>没有返回值</strong>（undefined），所以不能链式调用。',
+                changed: 'none',
+                panel: {
+                    title: '🧾 forEach 打印的小票',
+                    sub: cart.length + ' 件商品各执行一次回调，但方法本身返回 undefined',
+                    tone: 'plain',
+                    body: lines.length
+                        ? '<div class="crx_receipt">' + lines.join('') + '</div>'
+                        : '<span class="crx_arr_empty">空数组，一次回调都不会执行</span>'
+                }
+            };
+        },
+
+        map: function () {
+            const prices = cart.map(function (name) { return priceOf(name); });
+            return {
+                code: 'cart.' + F('map') + '(item ' + P('=&gt;') + ' CATALOG[item].price);',
+                ret: arrayHTML(prices),
+                retType: 'array',
+                note: 'map 把每件商品加工成价格，返回长度 ' + prices.length + ' 的<strong>新数组</strong>；原购物车一件没动。',
+                changed: 'new',
+                panel: {
+                    title: '✨ map 生成的新数组',
+                    sub: '每个元素都被加工了一次，长度不变',
+                    tone: 'new',
+                    body: coinList(prices)
+                }
+            };
+        },
+
+        filter: function () {
+            const kept = cart.filter(function (name) { return priceOf(name) < 10; });
+            return {
+                code: 'cart.' + F('filter') + '(item ' + P('=&gt;') + ' CATALOG[item].price ' + P('&lt;') + ' ' + N('10') + ');',
+                ret: arrayHTML(kept),
+                retType: 'array',
+                note: 'filter 只留下价格低于 10 元的商品，共 ' + kept.length + ' 件，组成<strong>新数组</strong>；原购物车不变。',
+                changed: 'new',
+                panel: {
+                    title: '🔎 filter 筛选出的新数组',
+                    sub: '满足条件的元素留下，不满足的被过滤掉',
+                    tone: 'new',
+                    body: chipList(kept)
+                }
+            };
+        },
+
+        reduce: function () {
+            const steps = [];
+            let acc = 0;
+            cart.forEach(function (name) {
+                const next = acc + priceOf(name);
+                steps.push('<div class="crx_step_line"><b>sum</b> = ' + acc + ' + ¥' + priceOf(name) + ' → <b>' + next + '</b></div>');
+                acc = next;
+            });
+            const total = cart.reduce(function (sum, name) { return sum + priceOf(name); }, 0);
+            return {
+                code: 'cart.' + F('reduce') + '((sum, item) ' + P('=&gt;') + ' sum + CATALOG[item].price, ' + N('0') + ');',
+                ret: numberHTML(total),
+                retType: 'number',
+                note: 'reduce 把 ' + cart.length + ' 件商品的价格累加成一个值：<strong>¥' + total + '</strong>。第二个参数 0 是初始值。',
+                changed: 'none',
+                panel: {
+                    title: '🧮 reduce 的累加过程',
+                    sub: '上一次的结果会作为下一次的 sum',
+                    tone: 'plain',
+                    body: steps.length
+                        ? steps.join('')
+                        : '<span class="crx_arr_empty">空数组，直接返回初始值 0</span>'
+                }
+            };
+        },
+
+        join: function () {
+            const text = cart.join('、');
+            return {
+                code: 'cart.' + F('join') + '(' + STR('、') + ');',
+                ret: '<code class="crx_ret_literal">"' + escapeHtml(text) + '"</code>',
+                retType: 'string',
+                note: text
+                    ? 'join 用「、」把元素拼成一个字符串，返回的是字符串、不是数组；原数组不变。'
+                    : '空数组 join 得到空字符串 ""。',
+                changed: 'none',
+                panel: {
+                    title: '🧵 join 拼成的字符串',
+                    sub: '结果是一个字符串，不能再用数组方法',
+                    tone: 'plain',
+                    body: '<p class="crx_join_text">' + (text ? escapeHtml(text) : '""') + '</p>'
+                }
+            };
+        },
+
+        /* ---------- 排序拼接 ---------- */
+        sort: function () {
+            const before = cart.slice();
+            cart.sort(function (a, b) { return priceOf(a) - priceOf(b); });
+            const moved = before.join('|') !== cart.join('|');
+            return {
+                code: 'cart.' + F('sort') + '((a, b) ' + P('=&gt;') + ' CATALOG[a].price - CATALOG[b].price);',
+                ret: arrayHTML(cart),
+                retType: 'array',
+                note: (moved ? 'sort 按价格从小到大重排了原数组' : '当前购物车本来就有序，sort 没有移动任何元素') +
+                    '；返回值<strong>就是原数组本身</strong>。注意：不传比较函数时，sort 会按字符串编码排序，数字 10 会排在 2 前面。',
+                changed: 'mut'
+            };
+        },
+
+        reverse: function () {
+            cart.reverse();
+            return {
+                code: 'cart.' + F('reverse') + '();',
+                ret: arrayHTML(cart),
+                retType: 'array',
+                note: 'reverse 把原数组原地倒过来，返回值仍是<strong>原数组本身</strong>；不想改原数组，可以先复制：<code>cart.slice().reverse()</code>。',
+                changed: 'mut'
+            };
+        },
+
+        slice: function () {
+            const part = cart.slice(0, 2);
+            return {
+                code: 'cart.' + F('slice') + '(' + N('0') + ', ' + N('2') + ');',
+                ret: arrayHTML(part),
+                retType: 'array',
+                note: (cart.length < 2
+                        ? '购物车只有 ' + cart.length + ' 件商品，就全都截下来了'
+                        : 'slice(0, 2) 截取下标 0、1 的元素') +
+                    '；区间左闭右开，返回<strong>新数组</strong>，原数组不变。',
+                changed: 'new',
+                panel: {
+                    title: '📎 slice 截取出的新数组',
+                    sub: '浅拷贝，原购物车不受影响',
+                    tone: 'new',
+                    body: chipList(part)
+                }
+            };
+        },
+
+        concat: function () {
+            const extras = ALL_FRUITS.filter(function (name) { return cart.indexOf(name) === -1; }).slice(0, 2);
+            if (!extras.length) {
+                return noop(
+                    'cart.' + F('concat') + '(???);',
+                    '10 种水果都已经在购物车里了，没有可合并的新商品。点「重置」重新开始。'
+                );
+            }
+            const merged = cart.concat(extras);
+            return {
+                code: 'cart.' + F('concat') + '([' + extras.map(function (name) { return STR(name); }).join(', ') + ']);',
+                ret: arrayHTML(merged),
+                retType: 'array',
+                note: 'concat 把另外 ' + extras.length + ' 件商品接到数组后面，返回长度 ' + merged.length + ' 的<strong>新数组</strong>；原购物车不变。',
+                changed: 'new',
+                panel: {
+                    title: '🔗 concat 合并出的新数组',
+                    sub: '两个数组拼在一起，原数组不受影响',
+                    tone: 'new',
+                    body: chipList(merged)
+                }
+            };
+        }
+    };
+
+    /* ============================================================
+       6. 渲染：购物车、撤销按钮、数组字面量
+       ============================================================ */
+    function makeItem(name, index) {
+        const node = document.createElement('div');
+        node.className = 'crx_item';
+        node.dataset.name = name;
+        node.title = nameOf(name) + ' · ¥' + priceOf(name);
+        node.innerHTML =
+            '<span class="crx_item_idx">' + index + '</span>' +
+            '<span class="crx_item_emoji">' + emojiOf(name) + '</span>' +
+            '<span class="crx_item_name">' + nameOf(name) + '</span>' +
+            '<span class="crx_item_price">¥' + priceOf(name) + '</span>';
+        return node;
+    }
+
+    function render(added) {
+        const scrollLeft = el.track.scrollLeft;
+        const prev = new Map();
+
+        if (!reduceMotion) {
+            Array.prototype.forEach.call(el.track.children, function (node) {
+                if (node.dataset.name) {
+                    prev.set(node.dataset.name, { left: node.offsetLeft, top: node.offsetTop });
+                }
+            });
+        }
+
+        /* 整行重建，再用“同名商品”做 FLIP 位移动画 */
+        el.track.innerHTML = '';
+        cart.forEach(function (name, index) {
+            el.track.appendChild(makeItem(name, index));
+        });
+        el.track.scrollLeft = scrollLeft;
+
+        if (added && added.length) {
+            const target = Array.prototype.find.call(el.track.children, function (node) {
+                return added.indexOf(node.dataset.name) !== -1;
+            });
+            if (target && el.track.scrollTo) {
+                el.track.scrollTo({
+                    left: Math.max(0, target.offsetLeft - 20),
+                    behavior: reduceMotion ? 'auto' : 'smooth'
+                });
+            }
+        }
+
+        if (!reduceMotion) {
+            Array.prototype.forEach.call(el.track.children, function (node) {
+                const old = prev.get(node.dataset.name);
+                if (!old) {
+                    node.animate(
+                        [{ opacity: 0, transform: 'translateY(16px) scale(0.88)' }, { opacity: 1, transform: 'none' }],
+                        { duration: 360, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }
+                    );
+                    return;
+                }
+                const dx = old.left - node.offsetLeft;
+                const dy = old.top - node.offsetTop;
+                if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
+                    node.animate(
+                        [{ transform: 'translate(' + dx + 'px, ' + dy + 'px)' }, { transform: 'none' }],
+                        { duration: 420, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }
+                    );
+                }
+            });
+        }
+
+        el.len.textContent = 'length ' + cart.length;
+        el.empty.hidden = cart.length > 0;
+        el.literal.innerHTML = '<span class="tk-kw">const</span> cart = [' +
+            cart.map(function (name) { return '<span class="tk-str">' + "'" + name + "'" + '</span>'; }).join(', ') +
+            '];';
+        el.total.textContent = cart.length
+            ? cart.length + ' 件 · 合计 ¥' + totalOf()
+            : '购物车是空的';
+        el.undo.disabled = undoStack.length === 0;
+    }
+
+    /* ============================================================
+       7. 渲染：代码、返回值、说明、新数组面板
+       ============================================================ */
+    function renderPanel(panel) {
+        if (!panel) {
+            el.panel.hidden = true;
+            return;
+        }
+        el.panel.hidden = false;
+        el.panel.dataset.tone = panel.tone || 'new';
+        el.panelTitle.textContent = panel.title;
+        el.panelSub.textContent = panel.sub;
+        el.panelBody.innerHTML = panel.body;
+
+        if (!reduceMotion) {
+            el.panel.animate(
+                [{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }],
+                { duration: 300, easing: 'ease-out' }
+            );
+        }
+    }
+
+    function pulse(node, className) {
+        node.classList.remove(className);
+        /* 强制回流，让同一个动画可以重复触发 */
+        void node.offsetWidth;
+        node.classList.add(className);
+        window.setTimeout(function () { node.classList.remove(className); }, 720);
+    }
+
+    function showResult(result) {
+        el.code.innerHTML = result.code;
+        el.retValue.innerHTML = result.ret;
+
+        if (result.retType && result.retType !== 'none') {
+            el.retType.hidden = false;
+            el.retType.textContent = result.retType;
+        } else {
+            el.retType.hidden = true;
+        }
+
+        el.note.innerHTML = result.note;
+
+        if (result.changed) {
+            el.changed.hidden = false;
+            el.changed.textContent = CHANGED_TEXT[result.changed];
+            el.changed.className = 'crx_changed is-' + result.changed;
+        } else {
+            el.changed.hidden = true;
+        }
+
+        renderPanel(result.panel);
+
+        if (result.changed === 'mut') {
+            pulse(el.stage, 'is-flash-mut');
+        } else if (result.changed === 'new') {
+            pulse(el.stage, 'is-flash-new');
+        }
+
+        if (!reduceMotion) {
+            el.code.animate([{ opacity: 0.35 }, { opacity: 1 }], { duration: 260, easing: 'ease-out' });
+        }
+    }
+
+    function showPlainResult(message) {
+        el.code.innerHTML = C('// ' + message);
+        el.retValue.innerHTML = '<span class="crx_ret_undef">—</span>';
+        el.retType.hidden = true;
+        el.note.textContent = message;
+        el.changed.hidden = true;
+        el.panel.hidden = true;
+    }
+
+    /* ============================================================
+       8. 渲染：日志、方法货架、速查表
+       ============================================================ */
+    function renderLog() {
+        el.logCount.textContent = logItems.length + ' 次';
+        if (!logItems.length) {
+            el.log.innerHTML = '<li class="crx_log_empty">还没有操作，先挑一个方法试试。</li>';
+            return;
+        }
+        el.log.innerHTML = logItems.map(function (item) {
+            return '<li class="crx_log_item">' +
+                '<span class="crx_log_time">' + item.time + '</span>' +
+                '<i class="crx_mut_dot ' + item.mut + '"></i>' +
+                '<code>' + item.name + '</code>' +
+                '<span class="crx_log_text">' + escapeHtml(item.text) + '</span>' +
+                '</li>';
+        }).join('');
+    }
+
+    function addLog(method, result) {
+        logItems.unshift({
+            time: new Date().toLocaleTimeString('zh-CN', { hour12: false }),
+            name: method.name,
+            mut: result.changed || 'none',
+            text: stripTags(result.note)
+        });
+        logItems = logItems.slice(0, 8);
+        renderLog();
+    }
+
+    function renderTabs() {
+        el.tabs.innerHTML = GROUPS.map(function (group) {
+            const active = group.id === activeGroup;
+            return '<button type="button" role="tab" aria-selected="' + active + '" ' +
+                'class="crx_tab' + (active ? ' is-active' : '') + '" data-group="' + group.id + '">' +
+                '<span class="crx_tab_icon">' + group.icon + '</span>' + group.label +
+                '</button>';
+        }).join('');
+    }
+
+    function renderMethodGrid() {
+        const list = METHODS.filter(function (method) { return method.group === activeGroup; });
+        el.grid.innerHTML = list.map(function (method) {
+            return '<button type="button" class="crx_method" data-method="' + method.id + '" title="' + method.desc + '">' +
+                '<span class="crx_method_top">' +
+                '<code>' + method.name + '</code>' +
+                '<i class="crx_mut_dot ' + method.mut + '"></i>' +
+                '</span>' +
+                '<span class="crx_method_short">' + method.short + '</span>' +
+                '</button>';
+        }).join('');
+    }
+
+    function renderTable() {
+        el.table.innerHTML = GROUPS.map(function (group) {
+            const list = METHODS.filter(function (method) { return method.group === group.id; });
+            const rows = list.map(function (method) {
+                return '<tr>' +
+                    '<td><code class="crx_table_name">' + method.name + '</code>' +
+                    '<span class="crx_table_sig">' + method.sig + '</span></td>' +
+                    '<td>' + method.desc + '</td>' +
+                    '<td><span class="crx_pill ' + (method.mut === 'mut' ? 'is-mut' : 'is-keep') + '">' +
+                    (method.mut === 'mut' ? '会改变' : '不变') + '</span></td>' +
+                    '<td><span class="crx_ret_desc">' + method.ret + '</span></td>' +
+                    '</tr>';
+            }).join('');
+            return '<tr class="crx_table_group"><td colspan="4">' +
+                '<span>' + group.icon + ' ' + group.label + '</span>' +
+                '<em>' + list.length + ' 个方法</em></td></tr>' + rows;
+        }).join('');
+    }
+
+    /* ============================================================
+       9. 交互：运行方法、撤销、重置、切换分组
+       ============================================================ */
+    function run(id, button) {
+        const method = METHODS.find(function (item) { return item.id === id; });
+        const demo = DEMOS[id];
+        if (!method || !demo) return;
+
+        const before = cart.slice();
+        const result = demo();
+        const after = cart.slice();
+
+        if (before.join('|') !== after.join('|')) {
+            undoStack.push({ cart: before, label: method.name });
+        }
+
+        const added = after.filter(function (name) { return before.indexOf(name) === -1; });
+
+        render(added);
+        showResult(result);
+        addLog(method, result);
+
+        if (button) {
+            button.classList.add('is-hit');
+            window.setTimeout(function () { button.classList.remove('is-hit'); }, 380);
+        }
+    }
+
+    function undo() {
+        if (!undoStack.length) return;
+        const snapshot = undoStack.pop();
+        cart = snapshot.cart.slice();
+        render();
+        const message = '已撤销「' + snapshot.label + '」，购物车恢复到操作前。';
+        showPlainResult(message);
+        logItems.unshift({
+            time: new Date().toLocaleTimeString('zh-CN', { hour12: false }),
+            name: 'undo',
+            mut: 'none',
+            text: message
+        });
+        logItems = logItems.slice(0, 8);
+        renderLog();
+    }
+
+    function reset() {
+        cart = INITIAL.slice();
+        undoStack = [];
+        logItems = [];
+        render();
+        renderLog();
+        showPlainResult('购物车已重置为 3 件商品，可以重新开始。');
+    }
+
+    el.grid.addEventListener('click', function (event) {
+        const button = event.target.closest('.crx_method');
+        if (!button) return;
+        run(button.dataset.method, button);
+    });
+
+    el.tabs.addEventListener('click', function (event) {
+        const button = event.target.closest('.crx_tab');
+        if (!button) return;
+        activeGroup = button.dataset.group;
+        renderTabs();
+        renderMethodGrid();
+    });
+
+    el.undo.addEventListener('click', undo);
+    el.reset.addEventListener('click', reset);
+
+    /* ============================================================
+       10. 初始化
+       ============================================================ */
+    renderTabs();
+    renderMethodGrid();
+    renderTable();
+    renderLog();
+    render();
+
+    el.code.innerHTML =
+        C('// 点击任意方法，看看购物车会发生什么') + '\n' +
+        '<span class="tk-kw">const</span> cart = [' +
+        INITIAL.map(function (name) { return '<span class="tk-str">' + "'" + name + "'" + '</span>'; }).join(', ') +
+        '];';
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,2152 @@
+<!-- 姓名：王鹏宇，日期：2026-11-05，功能名称：基于 Canvas 的电商全站系统架构图 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#050a12">
+    <meta name="color-scheme" content="dark">
+    <title>18-2 Canvas 电商全站系统架构图 · 王鹏宇</title>
+    <style>
+        :root {
+            --bg: #050a12;
+            --ink: #eaf5ff;
+            --muted: #7e93aa;
+            --line: rgba(148, 184, 220, 0.15);
+            --cyan: #67e8f9;
+            --violet: #a78bfa;
+            --green: #34d399;
+            --amber: #fbbf24;
+            --rose: #fb7185;
+            --mono: "SFMono-Regular", Consolas, "Cascadia Code", "Courier New", monospace;
+            --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "PingFang SC", Roboto, Arial, sans-serif;
+            --ease: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            min-width: 320px;
+            overflow: hidden;
+            color: var(--ink);
+            background:
+                radial-gradient(ellipse 60% 45% at 50% -8%, rgba(34, 211, 238, 0.1), transparent 62%),
+                radial-gradient(ellipse 45% 50% at 100% 45%, rgba(124, 58, 237, 0.08), transparent 65%),
+                radial-gradient(ellipse 30% 40% at 0% 95%, rgba(14, 165, 233, 0.06), transparent 70%),
+                var(--bg);
+            font-family: var(--sans);
+            -webkit-font-smoothing: antialiased;
+            overscroll-behavior: none;
+        }
+
+        body::before {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(125, 190, 235, 0.028) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(125, 190, 235, 0.028) 1px, transparent 1px);
+            background-size: 64px 64px;
+            -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 45%, #000 0%, rgba(0, 0, 0, 0.5) 60%, transparent 90%);
+            mask-image: radial-gradient(ellipse 80% 70% at 50% 45%, #000 0%, rgba(0, 0, 0, 0.5) 60%, transparent 90%);
+            content: "";
+        }
+
+        button {
+            font-family: inherit;
+        }
+
+        .app {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 1920px;
+            height: 100vh;
+            height: 100dvh;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* ========== 顶部 ========== */
+        .topbar {
+            display: grid;
+            flex: 0 0 auto;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 16px;
+            height: 78px;
+            padding: 0 4px;
+            animation: fadeDown 0.9s var(--ease) both;
+        }
+
+        .identity {
+            display: inline-flex;
+            align-items: center;
+            gap: 11px;
+            justify-self: start;
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .identity_mark {
+            display: grid;
+            width: 36px;
+            height: 36px;
+            place-items: center;
+            border: 1px solid rgba(125, 211, 252, 0.28);
+            border-radius: 9px;
+            color: #bae6fd;
+            background: linear-gradient(145deg, rgba(56, 189, 248, 0.12), rgba(255, 255, 255, 0.02));
+            box-shadow: inset 0 1px rgba(255, 255, 255, 0.07);
+            font: 600 9px var(--mono);
+            letter-spacing: 0.08em;
+        }
+
+        .identity_text {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            line-height: 1;
+        }
+
+        .identity_text strong {
+            color: #e4f2ff;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+        }
+
+        .identity_text small {
+            color: #637990;
+            font: 500 7.5px var(--mono);
+            letter-spacing: 0.14em;
+        }
+
+        .page_title {
+            min-width: 0;
+            text-align: center;
+        }
+
+        .eyebrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            margin: 0;
+            color: #6f8ba3;
+            font: 500 8.5px var(--mono);
+            letter-spacing: 0.18em;
+            white-space: nowrap;
+        }
+
+        .eyebrow_dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 9px rgba(52, 211, 153, 0.85);
+            animation: pulse 2.4s ease-in-out infinite;
+        }
+
+        .page_title h1 {
+            margin: 4px 0 0;
+            overflow: hidden;
+            color: #f2f9ff;
+            font-size: clamp(20px, 2vw, 27px);
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            line-height: 1.2;
+            text-overflow: ellipsis;
+            text-shadow: 0 0 34px rgba(103, 232, 249, 0.12);
+            white-space: nowrap;
+        }
+
+        .top_right {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            justify-self: end;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            padding: 3px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: rgba(6, 15, 27, 0.62);
+            box-shadow: 0 10px 30px -22px #000;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        .nav a {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 11px;
+            border-radius: 999px;
+            color: #8095ac;
+            font-size: 10px;
+            letter-spacing: 0.03em;
+            text-decoration: none;
+            transition: color 0.25s, background 0.25s;
+        }
+
+        .nav a .nav_code {
+            color: #526980;
+            font: 8px var(--mono);
+            letter-spacing: 0.06em;
+        }
+
+        .nav a:hover {
+            color: #dff3ff;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .nav a.is-active {
+            color: #e4f6ff;
+            background: rgba(56, 189, 248, 0.1);
+            box-shadow: inset 0 0 0 1px rgba(125, 211, 252, 0.16);
+        }
+
+        .nav a.is-active .nav_code {
+            color: var(--cyan);
+        }
+
+        .live {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #69849b;
+            font: 500 7.5px var(--mono);
+            letter-spacing: 0.12em;
+            white-space: nowrap;
+        }
+
+        .live_dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 8px rgba(52, 211, 153, 0.9);
+        }
+
+        /* ========== 画布舞台 ========== */
+        .stage {
+            position: relative;
+            flex: 1 1 auto;
+            min-height: 0;
+            margin: 0 0 8px;
+            overflow: hidden;
+            border: 1px solid rgba(148, 184, 220, 0.16);
+            border-radius: 22px;
+            background:
+                radial-gradient(ellipse 58% 64% at 18% 12%, rgba(56, 189, 248, 0.06), transparent 70%),
+                radial-gradient(ellipse 52% 62% at 82% 48%, rgba(139, 92, 246, 0.05), transparent 70%),
+                radial-gradient(ellipse 50% 45% at 45% 92%, rgba(52, 211, 153, 0.035), transparent 70%),
+                linear-gradient(135deg, #081522, #050d18 52%, #07111d);
+            box-shadow:
+                inset 0 1px rgba(255, 255, 255, 0.04),
+                0 34px 90px -58px #000;
+            isolation: isolate;
+            animation: stageIn 1s 0.05s var(--ease) both;
+        }
+
+        .stage::before {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 72% 66% at 50% 48%, transparent 52%, rgba(2, 6, 12, 0.28) 100%),
+                linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 14%);
+            content: "";
+        }
+
+        .stage::after {
+            position: absolute;
+            top: 0;
+            right: 24px;
+            left: 24px;
+            z-index: 2;
+            height: 1px;
+            pointer-events: none;
+            background: linear-gradient(90deg, transparent, rgba(125, 211, 252, 0.2), transparent);
+            content: "";
+        }
+
+        #archCanvas {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            display: block;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+            cursor: default;
+        }
+
+        .stage_hint {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            z-index: 3;
+            display: none;
+            margin: 0;
+            color: rgba(142, 169, 193, 0.62);
+            font: 500 8px var(--mono);
+            letter-spacing: 0.04em;
+            pointer-events: none;
+            transform: translateX(-50%);
+            white-space: nowrap;
+        }
+
+        /* ========== 节点提示卡 ========== */
+        .node_tooltip {
+            --accent: #67e8f9;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 6;
+            width: 296px;
+            max-width: calc(100% - 20px);
+            padding: 15px 16px 14px;
+            border: 1px solid rgba(148, 184, 220, 0.22);
+            border-radius: 15px;
+            background: linear-gradient(155deg, rgba(12, 27, 45, 0.97), rgba(6, 15, 27, 0.98));
+            box-shadow:
+                0 26px 65px -30px #000,
+                inset 0 1px rgba(255, 255, 255, 0.06);
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(6px) scale(0.985);
+            transition: opacity 0.16s ease, transform 0.16s var(--ease), visibility 0.16s;
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+
+        .node_tooltip::before {
+            position: absolute;
+            top: 0;
+            right: 16px;
+            left: 16px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0.75;
+            content: "";
+        }
+
+        .node_tooltip.is-visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .tip_kicker {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: #7e98b0;
+            font: 500 8px var(--mono);
+            letter-spacing: 0.14em;
+        }
+
+        .tip_kicker i {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 9px var(--accent);
+        }
+
+        .tip_title {
+            margin: 7px 0 0;
+            color: #f1f9ff;
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            line-height: 1.35;
+        }
+
+        .tip_desc {
+            margin: 8px 0 12px;
+            color: #9db2c6;
+            font-size: 11.5px;
+            line-height: 1.75;
+        }
+
+        .tip_stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(148, 184, 220, 0.1);
+        }
+
+        .tip_stack span {
+            padding: 3px 6px;
+            border: 1px solid rgba(148, 184, 220, 0.16);
+            border-radius: 5px;
+            color: #aac2d7;
+            background: rgba(255, 255, 255, 0.03);
+            font: 500 8px var(--mono);
+            letter-spacing: 0.03em;
+        }
+
+        /* ========== 底部 ========== */
+        .footer {
+            display: flex;
+            flex: 0 0 auto;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            min-height: 52px;
+            padding: 8px 2px 10px;
+            animation: fadeUp 0.9s 0.15s var(--ease) both;
+        }
+
+        .legend {
+            display: flex;
+            flex: 0 1 auto;
+            align-items: center;
+            gap: 2px;
+            min-width: 0;
+            padding: 3px;
+            overflow-x: auto;
+            border: 1px solid var(--line);
+            border-radius: 11px;
+            background: rgba(6, 15, 27, 0.64);
+            scrollbar-width: none;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .legend::-webkit-scrollbar {
+            display: none;
+        }
+
+        .legend button {
+            display: inline-flex;
+            flex: 0 0 auto;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 8px;
+            border: 0;
+            border-radius: 7px;
+            color: #7e94aa;
+            background: transparent;
+            font-size: 10px;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            transition: color 0.2s, background 0.2s, box-shadow 0.2s;
+            white-space: nowrap;
+        }
+
+        .legend button:hover {
+            color: #dbeeff;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .legend button.is-active {
+            color: #e8f6ff;
+            background: rgba(125, 211, 252, 0.09);
+            box-shadow: inset 0 0 0 1px rgba(148, 197, 235, 0.13);
+        }
+
+        .legend button:focus-visible,
+        .view_tools button:focus-visible {
+            outline: 2px solid rgba(125, 211, 252, 0.72);
+            outline-offset: 2px;
+        }
+
+        .legend i {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--dot, #e2f3ff);
+            box-shadow: 0 0 7px var(--dot, #e2f3ff);
+        }
+
+        .footer_middle {
+            display: flex;
+            flex: 0 0 auto;
+            align-items: center;
+            gap: 7px;
+            color: #5f778e;
+            font: 500 8px var(--mono);
+            letter-spacing: 0.08em;
+            white-space: nowrap;
+        }
+
+        .footer_middle b {
+            color: #9fbcd2;
+            font-weight: 600;
+        }
+
+        .footer_middle .sep {
+            color: #30475c;
+        }
+
+        .footer_hint {
+            padding-left: 8px;
+            color: #526a80;
+            letter-spacing: 0.02em;
+        }
+
+        .view_tools {
+            display: flex;
+            flex: 0 0 auto;
+            align-items: center;
+            gap: 2px;
+            padding: 3px;
+            border: 1px solid var(--line);
+            border-radius: 11px;
+            background: rgba(6, 15, 27, 0.64);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .view_tools button {
+            display: grid;
+            width: 28px;
+            height: 26px;
+            padding: 0;
+            place-items: center;
+            border: 0;
+            border-radius: 7px;
+            color: #8fa9bf;
+            background: transparent;
+            font-size: 14px;
+            line-height: 1;
+            cursor: pointer;
+            transition: color 0.2s, background 0.2s;
+        }
+
+        .view_tools button:hover {
+            color: #e6f7ff;
+            background: rgba(125, 211, 252, 0.09);
+        }
+
+        .view_tools .tool_sep {
+            width: 1px;
+            height: 14px;
+            margin: 0 3px;
+            background: rgba(148, 184, 220, 0.13);
+        }
+
+        .zoom_readout {
+            min-width: 38px;
+            color: #7891a7;
+            font: 500 8px var(--mono);
+            text-align: center;
+            letter-spacing: 0.03em;
+        }
+
+        .view_tools svg {
+            width: 13px;
+            height: 13px;
+        }
+
+        .sr-only {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+
+        @keyframes fadeDown {
+            from {
+                opacity: 0;
+                transform: translateY(-9px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes stageIn {
+            from {
+                opacity: 0;
+                transform: translateY(9px) scale(0.996);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 0.55;
+                transform: scale(0.9);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.12);
+            }
+        }
+
+        @media (max-width: 1180px) {
+            .live {
+                display: none;
+            }
+
+            .footer_middle {
+                display: none;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .app {
+                padding: 0 12px;
+            }
+
+            .topbar {
+                height: 72px;
+                gap: 10px;
+            }
+
+            .nav a {
+                padding: 7px 9px;
+            }
+
+            .stage {
+                border-radius: 18px;
+            }
+
+            .footer {
+                padding-bottom: 8px;
+            }
+
+            .stage_hint {
+                display: block;
+            }
+
+            .node_tooltip {
+                width: 272px;
+            }
+        }
+
+        @media (max-width: 680px) {
+            .identity_text {
+                display: none;
+            }
+
+            .nav a .nav_label {
+                display: none;
+            }
+
+            .nav a {
+                gap: 0;
+                padding: 7px 9px;
+            }
+
+            .nav a .nav_code {
+                font-size: 8px;
+            }
+
+            .page_title h1 {
+                font-size: 18px;
+                letter-spacing: 0.03em;
+            }
+
+            .eyebrow {
+                font-size: 7.5px;
+                letter-spacing: 0.1em;
+            }
+
+            .footer {
+                flex-wrap: wrap;
+                gap: 6px;
+                padding-top: 6px;
+            }
+
+            .legend {
+                flex: 1 1 100%;
+                order: 1;
+            }
+
+            .view_tools {
+                order: 2;
+                margin-left: auto;
+            }
+
+            .node_tooltip {
+                width: 250px;
+                padding: 13px 14px 12px;
+            }
+
+            .tip_title {
+                font-size: 16px;
+            }
+
+            .tip_desc {
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 440px) {
+            .app {
+                padding: 0 9px;
+            }
+
+            .topbar {
+                height: 66px;
+            }
+
+            .identity_mark {
+                width: 32px;
+                height: 32px;
+            }
+
+            .page_title h1 {
+                font-size: 16.5px;
+            }
+
+            .eyebrow {
+                font-size: 7px;
+            }
+
+            .stage {
+                border-radius: 15px;
+            }
+
+            .legend button {
+                padding: 6px 7px;
+                font-size: 9.5px;
+            }
+
+            .zoom_readout {
+                display: none;
+            }
+        }
+
+        @media (max-height: 640px) {
+            .topbar {
+                height: 64px;
+            }
+
+            .footer {
+                min-height: 44px;
+            }
+
+            .page_title h1 {
+                font-size: 20px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.001ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header class="topbar">
+            <a class="identity" href="index.html" aria-label="返回作品集首页">
+                <span class="identity_mark">WP</span>
+                <span class="identity_text">
+                    <strong>王鹏宇</strong>
+                    <small>WEB SYSTEM LAB</small>
+                </span>
+            </a>
+
+            <div class="page_title">
+                <p class="eyebrow">
+                    <span class="eyebrow_dot"></span>
+                    SYSTEM BLUEPRINT / 18—02
+                </p>
+                <h1>电商全站系统架构</h1>
+            </div>
+
+            <div class="top_right">
+                <nav class="nav" aria-label="章节导航">
+                    <a href="18-1.html">
+                        <span class="nav_code">18—01</span>
+                        <span class="nav_label">粒子文字</span>
+                    </a>
+                    <a class="is-active" href="18-2.html" aria-current="page">
+                        <span class="nav_code">18—02</span>
+                        <span class="nav_label">电商架构</span>
+                    </a>
+                    <a href="18-3.html">
+                        <span class="nav_code">18—03</span>
+                        <span class="nav_label">智能客服</span>
+                    </a>
+                    <a href="18-4.html">
+                        <span class="nav_code">18—04</span>
+                        <span class="nav_label">图表分析</span>
+                    </a>
+                    <a href="18-6.html">
+                        <span class="nav_code">18—06</span>
+                        <span class="nav_label">流程与ER</span>
+                    </a>
+                    <a href="18-7.html">
+                        <span class="nav_code">18—07</span>
+                        <span class="nav_label">3D图表</span>
+                    </a>
+                    <a href="18-8.html">
+                        <span class="nav_code">18—08</span>
+                        <span class="nav_label">数据大屏</span>
+                    </a>
+                </nav>
+                <span class="live" aria-hidden="true">
+                    <span class="live_dot"></span>
+                    CANVAS LIVE
+                </span>
+            </div>
+        </header>
+
+        <main class="stage" id="stage">
+            <canvas id="archCanvas" role="img" aria-label="基于 Canvas 绘制的电商全站系统架构图，自上而下包含用户接入、接入与网关、业务服务、数据与中间件、基础设施和外部能力六层，共 36 个节点。可以悬停查看节点说明，滚轮缩放，拖动平移。">
+                您的浏览器不支持 Canvas，无法显示电商全站系统架构图。
+            </canvas>
+
+            <div class="node_tooltip" id="nodeTooltip" role="tooltip" aria-hidden="true">
+                <div class="tip_kicker">
+                    <i></i>
+                    <span id="tipLayer"></span>
+                </div>
+                <h2 class="tip_title" id="tipTitle"></h2>
+                <p class="tip_desc" id="tipDesc"></p>
+                <div class="tip_stack" id="tipStack"></div>
+            </div>
+
+            <p class="stage_hint" aria-hidden="true">轻点节点查看详情 · 拖动平移 · +/− 缩放</p>
+        </main>
+
+        <footer class="footer">
+            <div class="legend" role="group" aria-label="按架构层筛选">
+                <button class="is-active" type="button" data-filter="all" aria-pressed="true" style="--dot: #e2f3ff" title="显示全部架构层">
+                    <i></i>全部
+                </button>
+                <button type="button" data-filter="access" aria-pressed="false" style="--dot: #38bdf8" title="用户接入层">
+                    <i></i>接入
+                </button>
+                <button type="button" data-filter="edge" aria-pressed="false" style="--dot: #22d3ee" title="接入与网关层">
+                    <i></i>网关
+                </button>
+                <button type="button" data-filter="service" aria-pressed="false" style="--dot: #a78bfa" title="业务服务层">
+                    <i></i>服务
+                </button>
+                <button type="button" data-filter="data" aria-pressed="false" style="--dot: #34d399" title="数据与中间件层">
+                    <i></i>数据
+                </button>
+                <button type="button" data-filter="platform" aria-pressed="false" style="--dot: #fbbf24" title="基础设施层">
+                    <i></i>基础
+                </button>
+                <button type="button" data-filter="external" aria-pressed="false" style="--dot: #fb7185" title="外部能力层">
+                    <i></i>外部
+                </button>
+            </div>
+
+            <div class="footer_middle" aria-hidden="true">
+                <span><b>06</b> 层</span>
+                <span class="sep">/</span>
+                <span><b>36</b> 节点</span>
+                <span class="footer_hint">悬停节点查看详情 · 滚轮缩放 · 拖动平移</span>
+            </div>
+
+            <div class="view_tools" role="group" aria-label="画布缩放">
+                <button type="button" id="zoomOut" aria-label="缩小架构图" title="缩小">−</button>
+                <span class="zoom_readout" id="zoomLevel" aria-live="polite">100%</span>
+                <button type="button" id="zoomIn" aria-label="放大架构图" title="放大">+</button>
+                <span class="tool_sep"></span>
+                <button type="button" id="resetView" aria-label="恢复为适应屏幕" title="适应屏幕（0）">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M6 2.5H2.5V6"></path>
+                        <path d="M10 2.5h3.5V6"></path>
+                        <path d="M13.5 10v3.5H10"></path>
+                        <path d="M2.5 10v3.5H6"></path>
+                    </svg>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <p class="sr-only">
+        电商全站系统采用分层架构。用户通过 PC 官网、H5、微信小程序、自有 App 或商家工作台访问，经过 CDN、WAF、负载均衡、API 网关和 BFF 聚合层进入业务服务层。
+        业务服务包含用户、商品、购物车、订单、库存、支付、营销、搜索推荐和消息中心，统一访问 MySQL、Redis、Kafka、Elasticsearch、对象存储与任务调度。
+        系统运行在 Kubernetes 容器平台之上，并通过 CI/CD、Prometheus、ELK 与 SkyWalking 完成发布、监控、日志和链路追踪，同时对接微信支付、支付宝、物流、短信、发票及开放平台。
+    </p>
+
+    <script>
+        (() => {
+            'use strict';
+
+            const canvas = document.getElementById('archCanvas');
+            const ctx = canvas.getContext('2d', { alpha: true });
+            if (!ctx) return;
+
+            const stage = document.getElementById('stage');
+            const tooltip = document.getElementById('nodeTooltip');
+            const tipLayer = document.getElementById('tipLayer');
+            const tipTitle = document.getElementById('tipTitle');
+            const tipDesc = document.getElementById('tipDesc');
+            const tipStack = document.getElementById('tipStack');
+            const zoomLevel = document.getElementById('zoomLevel');
+            const zoomInBtn = document.getElementById('zoomIn');
+            const zoomOutBtn = document.getElementById('zoomOut');
+            const resetBtn = document.getElementById('resetView');
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            const DESIGN_W = 1500;
+            const DESIGN_H = 752;
+            const START_X = 190;
+            const CONTENT_W = 1270;
+            const TAU = Math.PI * 2;
+            const MONO = '"SFMono-Regular", Consolas, "Cascadia Code", "Courier New", monospace';
+            const SANS = '"Microsoft YaHei", "PingFang SC", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif';
+
+            const layers = [
+                { id: 'access', num: '01', name: '用户接入', en: 'USER / CLIENT', color: '#38bdf8', y: 30, h: 84, gap: 15 },
+                { id: 'edge', num: '02', name: '接入与网关', en: 'EDGE / GATEWAY', color: '#22d3ee', y: 152, h: 80, gap: 14 },
+                { id: 'service', num: '03', name: '业务服务', en: 'DOMAIN SERVICES', color: '#a78bfa', y: 272, h: 94, gap: 11 },
+                { id: 'data', num: '04', name: '数据与中间件', en: 'DATA / MIDDLEWARE', color: '#34d399', y: 406, h: 82, gap: 14 },
+                { id: 'platform', num: '05', name: '基础设施', en: 'PLATFORM / OPS', color: '#fbbf24', y: 528, h: 72, gap: 16 },
+                { id: 'external', num: '06', name: '外部能力', en: 'EXTERNAL CAPABILITIES', color: '#fb7185', y: 638, h: 54, gap: 14 }
+            ];
+
+            layers.forEach((layer, index) => {
+                layer.order = index;
+            });
+
+            const layerById = {};
+            layers.forEach(layer => {
+                layerById[layer.id] = layer;
+            });
+
+            const RAW = {
+                access: [
+                    {
+                        id: 'web',
+                        title: 'PC 官网 / H5',
+                        sub: 'Vue 3 · SSR · 多端适配',
+                        icon: '网',
+                        accent: '#38bdf8',
+                        desc: '面向桌面与移动浏览器的品牌商城入口。SSR 保障首屏速度与 SEO，响应式布局覆盖从手机到超宽屏的浏览体验。',
+                        stack: ['Vue 3', 'Nuxt', 'SSR', 'SEO'],
+                        related: ['gateway', 'auth']
+                    },
+                    {
+                        id: 'mini',
+                        title: '微信小程序',
+                        sub: 'Taro · 微信生态',
+                        icon: '小',
+                        accent: '#22d3ee',
+                        desc: '依托微信生态的轻量购物入口，复用商品、订单、支付等核心能力，支持订阅消息、分享与扫码进入。',
+                        stack: ['Taro', 'WeChat', 'OAuth', 'Share'],
+                        related: ['gateway', 'auth']
+                    },
+                    {
+                        id: 'app',
+                        title: 'iOS / Android',
+                        sub: 'Flutter · Push 触达',
+                        icon: '端',
+                        accent: '#60a5fa',
+                        desc: '高性能原生体验，承载会员权益、Push 触达与离线缓存，适合高黏性用户和复杂互动场景。',
+                        stack: ['Flutter', 'Push', 'Deep Link', 'CDN'],
+                        related: ['gateway', 'auth']
+                    },
+                    {
+                        id: 'merchant',
+                        title: '商家工作台',
+                        sub: 'SaaS · Open API',
+                        icon: '商',
+                        accent: '#a78bfa',
+                        desc: '商家与运营人员的工作台，覆盖商品上架、订单履约与数据看板，并通过 Open API 对接第三方系统。',
+                        stack: ['SaaS', 'OpenAPI', 'RBAC', 'Dashboard'],
+                        related: ['gateway', 'auth', 'openapi']
+                    }
+                ],
+                edge: [
+                    {
+                        id: 'cdn',
+                        title: 'CDN 加速',
+                        sub: '静态资源 · 边缘缓存',
+                        icon: 'C',
+                        accent: '#22d3ee',
+                        desc: '商品图片、脚本与静态资源就近分发，边缘缓存降低回源压力，配合智能 DNS 实现多活流量调度。',
+                        stack: ['CDN', 'DNS', 'Cache', 'Multi-AZ'],
+                        related: ['slb']
+                    },
+                    {
+                        id: 'waf',
+                        title: 'WAF / DDoS',
+                        sub: '边界防护 · 风控',
+                        icon: 'W',
+                        accent: '#fb7185',
+                        desc: '在流量入口完成 Web 应用防火墙、DDoS 清洗、Bot 识别与基础风控，拦截异常请求并保护核心接口。',
+                        stack: ['WAF', 'DDoS', 'Bot Guard'],
+                        related: ['slb', 'auth']
+                    },
+                    {
+                        id: 'slb',
+                        title: 'SLB / Nginx',
+                        sub: '七层负载 · TLS 卸载',
+                        icon: 'N',
+                        accent: '#38bdf8',
+                        desc: '四层与七层负载均衡，负责 TLS 卸载、灰度分流和健康检查，让无状态服务可以水平扩展。',
+                        stack: ['Nginx', 'TLS', 'Keepalived'],
+                        related: ['gateway']
+                    },
+                    {
+                        id: 'gateway',
+                        title: 'API Gateway',
+                        sub: '路由 · 限流 · 鉴权',
+                        icon: 'G',
+                        accent: '#60a5fa',
+                        desc: '所有流量的统一入口，集中处理路由、鉴权、限流、熔断、日志与协议转换，屏蔽后端服务拓扑。',
+                        stack: ['Spring Cloud Gateway', 'Sentinel', 'JWT'],
+                        related: ['user', 'product', 'cart', 'order', 'pay']
+                    },
+                    {
+                        id: 'bff',
+                        title: 'BFF 聚合层',
+                        sub: 'Web / App 专属聚合',
+                        icon: 'B',
+                        accent: '#a78bfa',
+                        desc: '面向 Web、App 和小程序的 Backend for Frontend，按端裁剪字段、聚合服务，降低端侧复杂度。',
+                        stack: ['BFF', 'GraphQL', 'REST', 'Cache'],
+                        related: ['user', 'product', 'order']
+                    },
+                    {
+                        id: 'auth',
+                        title: '认证中心',
+                        sub: 'OAuth2 · JWT · RBAC',
+                        icon: 'U',
+                        accent: '#f472b6',
+                        desc: '统一登录与权限中心，管理 OAuth2 / OIDC、JWT、RBAC 与多端会话，支撑风控与审计。',
+                        stack: ['OAuth2', 'OIDC', 'JWT', 'RBAC'],
+                        related: ['user', 'order']
+                    }
+                ],
+                service: [
+                    {
+                        id: 'user',
+                        title: '用户中心',
+                        sub: '会员 · 地址',
+                        icon: '用',
+                        accent: '#38bdf8',
+                        desc: '管理会员资料、收货地址、等级权益与账户安全，为全站提供统一的用户身份与画像能力。',
+                        stack: ['Spring Boot', 'MySQL', 'Redis'],
+                        related: ['mysql', 'redis', 'auth']
+                    },
+                    {
+                        id: 'product',
+                        title: '商品中心',
+                        sub: 'SPU · SKU',
+                        icon: '商',
+                        accent: '#60a5fa',
+                        desc: '维护 SPU、SKU、类目、品牌与价格体系，提供商品发布、上下架、库存展示和检索索引同步。',
+                        stack: ['Spring Cloud', 'MySQL', 'ES', 'OSS'],
+                        related: ['mysql', 'es', 'oss']
+                    },
+                    {
+                        id: 'cart',
+                        title: '购物车',
+                        sub: '试算 · 合并',
+                        icon: '车',
+                        accent: '#818cf8',
+                        desc: '支持加购、选中、数量修改、跨端合并与优惠试算，购物车数据以 Redis 为主并异步持久化。',
+                        stack: ['Redis', 'Spring Boot', 'MQ'],
+                        related: ['redis', 'product', 'marketing']
+                    },
+                    {
+                        id: 'order',
+                        title: '订单中心',
+                        sub: '履约 · 售后',
+                        icon: '单',
+                        accent: '#a78bfa',
+                        desc: '负责下单、订单状态机、拆单合单、履约与售后流程，通过消息队列驱动库存、支付和物流状态。',
+                        stack: ['Spring Boot', 'MySQL', 'Kafka', 'FSM'],
+                        related: ['mysql', 'kafka', 'stock', 'pay']
+                    },
+                    {
+                        id: 'stock',
+                        title: '库存中心',
+                        sub: '扣减 · 锁定',
+                        icon: '库',
+                        accent: '#c084fc',
+                        desc: '统一管理可售库存、活动库存与仓配库存，支持预占、扣减、回补和超卖防护。',
+                        stack: ['Redis', 'Lua', 'MySQL'],
+                        related: ['redis', 'mysql', 'kafka']
+                    },
+                    {
+                        id: 'pay',
+                        title: '支付中心',
+                        sub: '支付 · 对账',
+                        icon: '付',
+                        accent: '#34d399',
+                        desc: '聚合微信支付、支付宝等渠道，处理支付、退款、回调、对账与资金流水，保证交易最终一致。',
+                        stack: ['Payment', 'Kafka', 'MySQL', 'Reconcile'],
+                        related: ['mysql', 'kafka', 'wechatpay', 'alipay']
+                    },
+                    {
+                        id: 'marketing',
+                        title: '营销中心',
+                        sub: '优惠券 · 秒杀',
+                        icon: '营',
+                        accent: '#fb7185',
+                        desc: '承载优惠券、满减、秒杀、拼团等营销玩法，负责规则计算、活动库存与防刷风控。',
+                        stack: ['Coupon', 'Flash Sale', 'Redis', 'Lua'],
+                        related: ['redis', 'kafka', 'cart']
+                    },
+                    {
+                        id: 'search',
+                        title: '搜索推荐',
+                        sub: '召回 · 排序',
+                        icon: '搜',
+                        accent: '#22d3ee',
+                        desc: '提供商品搜索、筛选、聚合与个性化推荐，基于 Elasticsearch 完成召回，再通过排序模型精排。',
+                        stack: ['Elasticsearch', 'Recall', 'Ranking'],
+                        related: ['es', 'redis']
+                    },
+                    {
+                        id: 'message',
+                        title: '消息中心',
+                        sub: '短信 · Push',
+                        icon: '信',
+                        accent: '#fbbf24',
+                        desc: '统一发送短信、Push、站内信与订阅消息，支持模板管理、发送频控、失败重试与送达统计。',
+                        stack: ['SMS', 'Push', 'Kafka'],
+                        related: ['kafka', 'sms']
+                    }
+                ],
+                data: [
+                    {
+                        id: 'mysql',
+                        title: 'MySQL 集群',
+                        sub: '交易主库 · 分库分表',
+                        icon: 'M',
+                        accent: '#34d399',
+                        desc: '交易与订单的核心关系型数据库，采用主从复制、分库分表与读写分离，配合备份和容灾策略。',
+                        stack: ['MySQL', 'ShardingSphere', 'Binlog'],
+                        related: []
+                    },
+                    {
+                        id: 'redis',
+                        title: 'Redis 集群',
+                        sub: '缓存 · 分布式锁',
+                        icon: 'R',
+                        accent: '#2dd4bf',
+                        desc: '承载热点商品、会话、购物车与库存缓存，并提供分布式锁和原子扣减能力，保护数据库。',
+                        stack: ['Redis Cluster', 'Lua', 'TTL'],
+                        related: []
+                    },
+                    {
+                        id: 'kafka',
+                        title: 'Kafka 消息队列',
+                        sub: '削峰 · 异步解耦',
+                        icon: 'K',
+                        accent: '#fbbf24',
+                        desc: '作为异步事件总线，承载订单、支付、库存和通知事件，实现服务解耦、削峰填谷与最终一致。',
+                        stack: ['Kafka', 'Event Bus', 'DLQ'],
+                        related: []
+                    },
+                    {
+                        id: 'es',
+                        title: 'Elasticsearch',
+                        sub: '商品检索 · 日志检索',
+                        icon: 'E',
+                        accent: '#22d3ee',
+                        desc: '提供商品全文检索、聚合筛选和日志检索能力，通过索引同步链路保持与交易数据的一致性。',
+                        stack: ['Elasticsearch', 'Kibana', 'Index'],
+                        related: []
+                    },
+                    {
+                        id: 'oss',
+                        title: '对象存储 OSS',
+                        sub: '图片 · 视频 · 备份',
+                        icon: 'O',
+                        accent: '#60a5fa',
+                        desc: '存放商品图片、视频、附件与数据库备份，结合 CDN 回源和生命周期策略降低存储成本。',
+                        stack: ['OSS', 'CDN', 'Lifecycle'],
+                        related: []
+                    },
+                    {
+                        id: 'scheduler',
+                        title: '任务调度',
+                        sub: 'XXL-JOB · 定时任务',
+                        icon: 'T',
+                        accent: '#a78bfa',
+                        desc: '统一管理对账、报表、库存回补和消息补偿等定时任务，支持分片执行、失败重试与告警。',
+                        stack: ['XXL-JOB', 'Cron', 'Alert'],
+                        related: []
+                    }
+                ],
+                platform: [
+                    {
+                        id: 'k8s',
+                        title: 'Kubernetes',
+                        sub: '容器编排 · 弹性扩缩容',
+                        icon: 'K',
+                        accent: '#60a5fa',
+                        desc: '基于 Kubernetes 编排无状态服务和有状态中间件，支持滚动发布、自动扩缩容与故障自愈。',
+                        stack: ['K8s', 'Docker', 'HPA'],
+                        related: []
+                    },
+                    {
+                        id: 'cicd',
+                        title: 'CI / CD',
+                        sub: 'GitLab · 灰度发布',
+                        icon: 'C',
+                        accent: '#fbbf24',
+                        desc: '从代码提交到镜像构建、自动化测试、灰度和生产发布的全链路流水线，保证交付可追溯。',
+                        stack: ['GitLab CI', 'Argo CD', 'Canary'],
+                        related: []
+                    },
+                    {
+                        id: 'prometheus',
+                        title: 'Prometheus / Grafana',
+                        sub: '指标监控 · 告警',
+                        icon: 'P',
+                        accent: '#fb7185',
+                        desc: '采集服务、主机与中间件指标，通过 Grafana 可视化面板和告警规则及时发现容量与可用性问题。',
+                        stack: ['Prometheus', 'Grafana', 'Alertmanager'],
+                        related: []
+                    },
+                    {
+                        id: 'elk',
+                        title: 'ELK Stack',
+                        sub: '日志采集 · 检索',
+                        icon: 'L',
+                        accent: '#34d399',
+                        desc: '集中采集、解析和检索应用日志，支撑问题定位、安全审计与业务行为分析。',
+                        stack: ['Elasticsearch', 'Logstash', 'Kibana'],
+                        related: []
+                    },
+                    {
+                        id: 'skywalking',
+                        title: 'SkyWalking',
+                        sub: '全链路追踪 · APM',
+                        icon: 'S',
+                        accent: '#a78bfa',
+                        desc: '采集分布式调用链、服务依赖和慢调用指标，帮助定位跨服务性能瓶颈与异常。',
+                        stack: ['SkyWalking', 'Trace', 'APM'],
+                        related: []
+                    }
+                ],
+                external: [
+                    {
+                        id: 'wechatpay',
+                        title: '微信支付',
+                        sub: '支付 · 分账',
+                        icon: '微',
+                        accent: '#22c55e',
+                        desc: '接入微信支付的下单、支付、退款与分账能力，通过异步回调与主动查询保证支付结果可靠。',
+                        stack: ['WeChat Pay', 'Callback'],
+                        related: ['pay']
+                    },
+                    {
+                        id: 'alipay',
+                        title: '支付宝',
+                        sub: '支付 · 退款',
+                        icon: '支',
+                        accent: '#38bdf8',
+                        desc: '接入支付宝的支付、退款与对账能力，为不同用户群体提供多样化的支付方式。',
+                        stack: ['Alipay', 'Callback'],
+                        related: ['pay']
+                    },
+                    {
+                        id: 'logistics',
+                        title: '物流平台',
+                        sub: '运单 · 轨迹',
+                        icon: '物',
+                        accent: '#fbbf24',
+                        desc: '对接快递承运商，完成电子面单、运单创建、轨迹订阅与签收状态回传。',
+                        stack: ['Express', 'Waybill', 'Webhook'],
+                        related: ['order']
+                    },
+                    {
+                        id: 'sms',
+                        title: '短信 / 邮件',
+                        sub: '验证码 · 通知',
+                        icon: '信',
+                        accent: '#fb7185',
+                        desc: '提供验证码、订单通知和营销触达通道，配合模板、频控与发送状态回执。',
+                        stack: ['SMS', 'Email', 'Template'],
+                        related: ['message']
+                    },
+                    {
+                        id: 'invoice',
+                        title: '电子发票',
+                        sub: '开票 · 下载',
+                        icon: '票',
+                        accent: '#a78bfa',
+                        desc: '对接税务与电子发票服务，完成订单开票、红冲和发票文件下载。',
+                        stack: ['Invoice', 'Tax', 'PDF'],
+                        related: ['order']
+                    },
+                    {
+                        id: 'openapi',
+                        title: '开放集成',
+                        sub: 'OpenAPI · Webhook',
+                        icon: '开',
+                        accent: '#94a3b8',
+                        desc: '为商家、ERP 与第三方系统提供 OpenAPI 和 Webhook，支撑商品、订单与库存的双向同步。',
+                        stack: ['OpenAPI', 'Webhook', 'OAuth2'],
+                        related: ['gateway', 'merchant']
+                    }
+                ]
+            };
+
+            const NODES = [];
+            const nodeById = new Map();
+            const reverseRelated = new Map();
+
+            layers.forEach(layer => {
+                const items = RAW[layer.id];
+                const gap = layer.gap;
+                const width = (CONTENT_W - gap * (items.length - 1)) / items.length;
+                items.forEach((item, index) => {
+                    const node = Object.assign({}, item, {
+                        layerId: layer.id,
+                        layerOrder: layer.order,
+                        x: START_X + index * (width + gap),
+                        y: layer.y,
+                        w: width,
+                        h: layer.h,
+                        accent: item.accent || layer.color,
+                        index: index,
+                        num: layer.num
+                    });
+                    NODES.push(node);
+                    nodeById.set(node.id, node);
+                });
+            });
+
+            NODES.forEach(node => {
+                node.related.forEach(relatedId => {
+                    if (!reverseRelated.has(relatedId)) reverseRelated.set(relatedId, new Set());
+                    reverseRelated.get(relatedId).add(node.id);
+                });
+            });
+
+            const protocols = [
+                'HTTPS / WSS',
+                'REST / gRPC',
+                'SQL · CACHE · MQ',
+                'DEPLOY · OBSERVE',
+                'OPEN API / WEBHOOK'
+            ];
+
+            const view = { zoom: 1, panX: 0, panY: 0 };
+            let W = 0;
+            let H = 0;
+            let dpr = 1;
+            let fitScale = 1;
+            let hoveredId = null;
+            let selectedId = null;
+            let activeLayer = 'all';
+            let dragging = false;
+            let dragMoved = false;
+            let dragPointerId = null;
+            let dragStart = null;
+            let dust = [];
+            let introAt = performance.now();
+            let resizeFrame = 0;
+
+            const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+            const rand = (min = 0, max = 1) => min + Math.random() * (max - min);
+            const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+
+            function rgba(hex, alpha) {
+                const value = hex.replace('#', '');
+                const r = parseInt(value.slice(0, 2), 16);
+                const g = parseInt(value.slice(2, 4), 16);
+                const b = parseInt(value.slice(4, 6), 16);
+                return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + alpha + ')';
+            }
+
+            function roundedRect(context, x, y, width, height, radius) {
+                const r = Math.min(radius, width / 2, height / 2);
+                context.beginPath();
+                context.moveTo(x + r, y);
+                context.arcTo(x + width, y, x + width, y + height, r);
+                context.arcTo(x + width, y + height, x, y + height, r);
+                context.arcTo(x, y + height, x, y, r);
+                context.arcTo(x, y, x + width, y, r);
+                context.closePath();
+            }
+
+            function seedDust() {
+                const amount = Math.round(clamp((W * H) / 22000, 24, 70));
+                dust = [];
+                for (let i = 0; i < amount; i += 1) {
+                    dust.push({
+                        x: rand(0, W),
+                        y: rand(0, H),
+                        r: rand(0.35, 1.2),
+                        alpha: rand(0.1, 0.38),
+                        phase: rand(0, TAU),
+                        speed: rand(0.3, 1)
+                    });
+                }
+            }
+
+            function updateZoomUI() {
+                zoomLevel.textContent = Math.round(view.zoom * 100) + '%';
+            }
+
+            function clampPan() {
+                const scale = fitScale * view.zoom;
+                const maxX = Math.max(0, (DESIGN_W * scale - W) / 2);
+                const maxY = Math.max(0, (DESIGN_H * scale - H) / 2);
+                view.panX = clamp(view.panX, -maxX, maxX);
+                view.panY = clamp(view.panY, -maxY, maxY);
+            }
+
+            function resize() {
+                const rect = stage.getBoundingClientRect();
+                W = Math.max(1, stage.clientWidth || rect.width);
+                H = Math.max(1, stage.clientHeight || rect.height);
+                dpr = Math.min(window.devicePixelRatio || 1, 2);
+                canvas.width = Math.round(W * dpr);
+                canvas.height = Math.round(H * dpr);
+                fitScale = Math.min((W - 18) / DESIGN_W, (H - 18) / DESIGN_H);
+                if (!Number.isFinite(fitScale) || fitScale <= 0) fitScale = 0.1;
+                clampPan();
+                seedDust();
+                hoveredId = null;
+                hideTooltip();
+                updateZoomUI();
+            }
+
+            function getSceneTransform() {
+                const scale = fitScale * view.zoom;
+                return {
+                    s: scale,
+                    ox: (W - DESIGN_W * scale) / 2 + view.panX,
+                    oy: (H - DESIGN_H * scale) / 2 + view.panY
+                };
+            }
+
+            function localPoint(event) {
+                const rect = canvas.getBoundingClientRect();
+                return {
+                    x: event.clientX - rect.left,
+                    y: event.clientY - rect.top
+                };
+            }
+
+            function hitTest(x, y) {
+                const transform = getSceneTransform();
+                const designX = (x - transform.ox) / transform.s;
+                const designY = (y - transform.oy) / transform.s;
+
+                for (let i = NODES.length - 1; i >= 0; i -= 1) {
+                    const node = NODES[i];
+                    if (activeLayer !== 'all' && node.layerId !== activeLayer) continue;
+                    if (
+                        designX >= node.x &&
+                        designX <= node.x + node.w &&
+                        designY >= node.y &&
+                        designY <= node.y + node.h
+                    ) {
+                        return node;
+                    }
+                }
+                return null;
+            }
+
+            function hideTooltip() {
+                tooltip.classList.remove('is-visible');
+                tooltip.setAttribute('aria-hidden', 'true');
+            }
+
+            function positionTooltip(node) {
+                const transform = getSceneTransform();
+                const left = transform.ox + node.x * transform.s;
+                const top = transform.oy + node.y * transform.s;
+                const right = left + node.w * transform.s;
+                const bottom = top + node.h * transform.s;
+                const width = tooltip.offsetWidth || 296;
+                const height = tooltip.offsetHeight || 160;
+                const gap = 12;
+
+                let x = right + gap;
+                if (x + width > W - 10) x = left - width - gap;
+                if (x < 10) x = clamp((left + right) / 2 - width / 2, 10, Math.max(10, W - width - 10));
+
+                let y = top + (bottom - top) / 2 - height / 2;
+                y = clamp(y, 10, Math.max(10, H - height - 10));
+
+                tooltip.style.left = Math.round(x) + 'px';
+                tooltip.style.top = Math.round(y) + 'px';
+            }
+
+            function showTooltip(node) {
+                if (!node) {
+                    hideTooltip();
+                    return;
+                }
+                if (activeLayer !== 'all' && node.layerId !== activeLayer) {
+                    hideTooltip();
+                    return;
+                }
+
+                const layer = layerById[node.layerId];
+                tooltip.style.setProperty('--accent', node.accent);
+                tipLayer.textContent = layer.num + ' · ' + layer.name;
+                tipTitle.textContent = node.title;
+                tipDesc.textContent = node.desc;
+
+                while (tipStack.firstChild) tipStack.removeChild(tipStack.firstChild);
+                node.stack.forEach(tag => {
+                    const item = document.createElement('span');
+                    item.textContent = tag;
+                    tipStack.appendChild(item);
+                });
+
+                tooltip.classList.add('is-visible');
+                tooltip.setAttribute('aria-hidden', 'false');
+                positionTooltip(node);
+            }
+
+            function zoomAt(px, py, factor) {
+                const before = getSceneTransform();
+                const nextZoom = clamp(view.zoom * factor, 1, 5);
+                if (Math.abs(nextZoom - view.zoom) < 0.001) return;
+
+                const designX = (px - before.ox) / before.s;
+                const designY = (py - before.oy) / before.s;
+                view.zoom = nextZoom;
+
+                const scale = fitScale * nextZoom;
+                const baseX = (W - DESIGN_W * scale) / 2;
+                const baseY = (H - DESIGN_H * scale) / 2;
+                view.panX = px - designX * scale - baseX;
+                view.panY = py - designY * scale - baseY;
+                clampPan();
+                hideTooltip();
+                hoveredId = null;
+                updateZoomUI();
+            }
+
+            function resetView() {
+                view.zoom = 1;
+                view.panX = 0;
+                view.panY = 0;
+                selectedId = null;
+                hoveredId = null;
+                hideTooltip();
+                updateZoomUI();
+            }
+
+            function drawBackdrop(now) {
+                const grid = 48;
+                ctx.save();
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = 'rgba(112, 169, 220, 0.05)';
+                ctx.beginPath();
+                for (let x = 0.5; x < W; x += grid) {
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, H);
+                }
+                for (let y = 0.5; y < H; y += grid) {
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(W, y);
+                }
+                ctx.stroke();
+
+                ctx.strokeStyle = 'rgba(112, 169, 220, 0.075)';
+                ctx.beginPath();
+                for (let x = 0.5; x < W; x += grid * 4) {
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, H);
+                }
+                for (let y = 0.5; y < H; y += grid * 4) {
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(W, y);
+                }
+                ctx.stroke();
+                ctx.restore();
+
+                ctx.save();
+                ctx.globalCompositeOperation = 'lighter';
+                const time = now / 1000;
+                for (let i = 0; i < dust.length; i += 1) {
+                    const speck = dust[i];
+                    const twinkle = 0.5 + 0.5 * Math.sin(time * speck.speed + speck.phase);
+                    ctx.globalAlpha = speck.alpha * (0.35 + 0.65 * twinkle);
+                    ctx.fillStyle = i % 4 === 0 ? 'rgba(103, 232, 249, 0.9)' : 'rgba(203, 229, 250, 0.9)';
+                    ctx.beginPath();
+                    ctx.arc(
+                        speck.x + Math.sin(time * 0.08 + speck.phase) * 2.2,
+                        speck.y + Math.cos(time * 0.06 + speck.phase) * 1.5,
+                        speck.r,
+                        0,
+                        TAU
+                    );
+                    ctx.fill();
+                }
+                ctx.restore();
+
+                if (!reduceMotion) {
+                    const scanY = ((now * 0.019) % (H + 220)) - 110;
+                    const scan = ctx.createLinearGradient(0, scanY - 80, 0, scanY + 80);
+                    scan.addColorStop(0, 'rgba(103, 232, 249, 0)');
+                    scan.addColorStop(0.5, 'rgba(103, 232, 249, 0.022)');
+                    scan.addColorStop(1, 'rgba(103, 232, 249, 0)');
+                    ctx.fillStyle = scan;
+                    ctx.fillRect(0, scanY - 80, W, 160);
+                }
+
+                ctx.save();
+                ctx.strokeStyle = 'rgba(125, 211, 252, 0.14)';
+                ctx.lineWidth = 1;
+                const length = 16;
+                const inset = 14;
+                ctx.beginPath();
+                ctx.moveTo(inset, inset + length);
+                ctx.lineTo(inset, inset);
+                ctx.lineTo(inset + length, inset);
+                ctx.moveTo(W - inset - length, inset);
+                ctx.lineTo(W - inset, inset);
+                ctx.lineTo(W - inset, inset + length);
+                ctx.moveTo(W - inset, H - inset - length);
+                ctx.lineTo(W - inset, H - inset);
+                ctx.lineTo(W - inset - length, H - inset);
+                ctx.moveTo(inset + length, H - inset);
+                ctx.lineTo(inset, H - inset);
+                ctx.lineTo(inset, H - inset - length);
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            function drawLayerTints(intro, focusNode) {
+                layers.forEach(layer => {
+                    const emphasized = activeLayer === layer.id || (focusNode && focusNode.layerId === layer.id);
+                    if (!emphasized) return;
+
+                    ctx.save();
+                    ctx.globalAlpha = intro * (activeLayer === layer.id ? 0.95 : 0.55);
+                    roundedRect(ctx, 178, layer.y - 6, 1288, layer.h + 12, 12);
+                    ctx.fillStyle = rgba(layer.color, 0.026);
+                    ctx.fill();
+                    ctx.strokeStyle = rgba(layer.color, 0.08);
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    ctx.restore();
+                });
+            }
+
+            function drawFlows(now, intro) {
+                ctx.save();
+                ctx.globalAlpha = intro * 0.95;
+
+                layers.slice(0, -1).forEach((layer, index) => {
+                    const next = layers[index + 1];
+                    const top = layer.y + layer.h;
+                    const bottom = next.y;
+                    const middle = (top + bottom) / 2;
+
+                    ctx.strokeStyle = 'rgba(144, 179, 210, 0.09)';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([2, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(START_X, middle);
+                    ctx.lineTo(START_X + CONTENT_W, middle);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    ctx.font = '500 7.5px ' + MONO;
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'middle';
+                    const label = protocols[index];
+                    const labelWidth = ctx.measureText(label).width;
+                    ctx.fillStyle = 'rgba(6, 16, 29, 0.96)';
+                    ctx.fillRect(START_X - 2, middle - 5.5, labelWidth + 11, 11);
+                    ctx.fillStyle = 'rgba(121, 154, 183, 0.62)';
+                    ctx.fillText(label, START_X + 3, middle + 0.5);
+
+                    [560, 830, 1100].forEach((x, laneIndex) => {
+                        const lineGradient = ctx.createLinearGradient(0, top, 0, bottom);
+                        lineGradient.addColorStop(0, rgba(layer.color, 0.03));
+                        lineGradient.addColorStop(0.5, rgba(next.color, 0.24));
+                        lineGradient.addColorStop(1, rgba(next.color, 0.03));
+                        ctx.strokeStyle = lineGradient;
+                        ctx.lineWidth = 1;
+                        ctx.setLineDash([2, 4]);
+                        ctx.beginPath();
+                        ctx.moveTo(x, top + 3);
+                        ctx.lineTo(x, bottom - 5);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+
+                        ctx.strokeStyle = rgba(next.color, 0.2);
+                        ctx.beginPath();
+                        ctx.moveTo(x - 3, bottom - 7);
+                        ctx.lineTo(x, bottom - 3);
+                        ctx.lineTo(x + 3, bottom - 7);
+                        ctx.stroke();
+
+                        if (!reduceMotion) {
+                            const progress = ((now * 0.00017) + index * 0.29 + laneIndex * 0.21) % 1;
+                            const dotY = top + 5 + progress * (bottom - top - 11);
+                            ctx.fillStyle = rgba(next.color, 0.9);
+                            ctx.shadowColor = rgba(next.color, 0.8);
+                            ctx.shadowBlur = 7;
+                            ctx.beginPath();
+                            ctx.arc(x, dotY, 1.5, 0, TAU);
+                            ctx.fill();
+                            ctx.shadowBlur = 0;
+                        }
+                    });
+                });
+
+                ctx.restore();
+            }
+
+            function drawMeta(intro) {
+                ctx.save();
+                ctx.globalAlpha = intro * 0.62;
+                ctx.font = '500 7.5px ' + MONO;
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = 'rgba(138, 166, 192, 0.56)';
+                ctx.textAlign = 'left';
+                ctx.fillText('E-COMMERCE PLATFORM / SYSTEM TOPOLOGY', 32, 14);
+                ctx.textAlign = 'right';
+                ctx.fillText('BLUEPRINT 2.6 / CANVAS', 1468, 14);
+
+                ctx.strokeStyle = 'rgba(148, 184, 220, 0.09)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(32, 714);
+                ctx.lineTo(1468, 714);
+                ctx.stroke();
+
+                ctx.fillStyle = 'rgba(129, 157, 183, 0.48)';
+                ctx.textAlign = 'left';
+                ctx.fillText('FLOW  CLIENT → EDGE → SERVICE → DATA', 32, 730);
+                ctx.textAlign = 'right';
+                ctx.fillText('REQUEST ↓  /  RESPONSE ↑', 1468, 730);
+                ctx.restore();
+            }
+
+            function drawLayerLabels(intro) {
+                layers.forEach(layer => {
+                    const dimmed = activeLayer !== 'all' && layer.id !== activeLayer;
+                    const centerY = layer.y + layer.h / 2;
+                    ctx.save();
+                    ctx.globalAlpha = intro * (dimmed ? 0.28 : 1);
+
+                    ctx.fillStyle = rgba(layer.color, 0.8);
+                    ctx.fillRect(24, centerY - 22, 2, 44);
+
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'middle';
+                    ctx.font = '600 8px ' + MONO;
+                    ctx.fillStyle = rgba(layer.color, 0.88);
+                    ctx.fillText(layer.num, 34, centerY - 21);
+
+                    ctx.font = '700 13px ' + SANS;
+                    ctx.fillStyle = '#e5f2ff';
+                    ctx.fillText(layer.name, 34, centerY - 1);
+
+                    ctx.font = '500 7.5px ' + MONO;
+                    ctx.fillStyle = 'rgba(123, 151, 177, 0.7)';
+                    ctx.fillText(layer.en, 34, centerY + 15);
+
+                    ctx.strokeStyle = rgba(layer.color, 0.22);
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([2, 3]);
+                    ctx.beginPath();
+                    ctx.moveTo(164, centerY);
+                    ctx.lineTo(183, centerY);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    ctx.fillStyle = rgba(layer.color, 0.6);
+                    ctx.beginPath();
+                    ctx.arc(186, centerY, 2, 0, TAU);
+                    ctx.fill();
+                    ctx.restore();
+                });
+            }
+
+            function ellipsize(text, maxWidth) {
+                if (ctx.measureText(text).width <= maxWidth) return text;
+                let result = text;
+                while (result.length > 1 && ctx.measureText(result + '…').width > maxWidth) {
+                    result = result.slice(0, -1);
+                }
+                return result + '…';
+            }
+
+            function drawNode(node, now, focusNode, relatedSet) {
+                const layer = layerById[node.layerId];
+                const appear = reduceMotion ? 1 : easeOutCubic(clamp(
+                    (now - introAt - layer.order * 62 - node.index * 13) / 460,
+                    0,
+                    1
+                ));
+                if (appear <= 0) return;
+
+                const isFocus = focusNode && focusNode.id === node.id;
+                const isRelated = focusNode && relatedSet.has(node.id) && !isFocus;
+                const filteredOut = activeLayer !== 'all' && node.layerId !== activeLayer;
+                let alpha = appear;
+
+                if (filteredOut) {
+                    alpha *= 0.13;
+                } else if (focusNode && relatedSet.size > 0 && !isFocus && !isRelated) {
+                    alpha *= 0.3;
+                }
+
+                const y = node.y + (1 - appear) * 9;
+                const x = node.x;
+                const w = node.w;
+                const h = node.h;
+                const tiny = h < 62;
+                const compact = node.layerId === 'service';
+                const iconSize = tiny ? 22 : (compact ? 23 : 26);
+                const titleY = tiny ? y + 22 : y + Math.min(36, h * 0.44);
+                const subY = titleY + (tiny ? 16 : 20);
+                const titleSize = tiny ? 14 : (compact ? 14.6 : 15.4);
+                const subSize = tiny ? 9.2 : (compact ? 9.2 : 10);
+                const textX = x + 13 + iconSize + 10;
+                const textWidth = x + w - 13 - textX;
+
+                ctx.save();
+                ctx.globalAlpha = alpha;
+
+                if (isFocus) {
+                    ctx.save();
+                    ctx.shadowColor = rgba(node.accent, 0.55);
+                    ctx.shadowBlur = 24;
+                    ctx.fillStyle = rgba(node.accent, 0.12);
+                    roundedRect(ctx, x, y, w, h, 11);
+                    ctx.fill();
+                    ctx.restore();
+                }
+
+                const cardFill = ctx.createLinearGradient(0, y, 0, y + h);
+                cardFill.addColorStop(0, 'rgba(16, 32, 51, 0.97)');
+                cardFill.addColorStop(1, 'rgba(8, 19, 32, 0.97)');
+                roundedRect(ctx, x, y, w, h, 11);
+                ctx.fillStyle = cardFill;
+                ctx.fill();
+
+                const wash = ctx.createLinearGradient(x, y, x + w, y + h);
+                wash.addColorStop(0, rgba(node.accent, 0.08));
+                wash.addColorStop(0.65, rgba(node.accent, 0));
+                ctx.fillStyle = wash;
+                ctx.fill();
+
+                const isExternal = node.layerId === 'external';
+                ctx.strokeStyle = isFocus
+                    ? rgba(node.accent, 0.8)
+                    : isRelated
+                        ? rgba(node.accent, 0.32)
+                        : 'rgba(148, 180, 210, 0.15)';
+                ctx.lineWidth = isFocus ? 1.4 : 1;
+                if (isExternal && !isFocus) ctx.setLineDash([3, 3]);
+                roundedRect(ctx, x, y, w, h, 11);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                const topLine = ctx.createLinearGradient(x + 12, 0, x + 88, 0);
+                topLine.addColorStop(0, rgba(node.accent, 0.75));
+                topLine.addColorStop(1, rgba(node.accent, 0));
+                ctx.fillStyle = topLine;
+                ctx.fillRect(x + 13, y + 0.5, 62, 1.2);
+
+                ctx.beginPath();
+                ctx.arc(x + w / 2, y, 1.6, 0, TAU);
+                ctx.arc(x + w / 2, y + h, 1.6, 0, TAU);
+                ctx.fillStyle = rgba(node.accent, isFocus ? 0.9 : 0.34);
+                ctx.fill();
+
+                ctx.fillStyle = rgba(node.accent, isFocus ? 1 : 0.5);
+                ctx.beginPath();
+                ctx.arc(x + w - 12, y + 12, 1.7, 0, TAU);
+                ctx.fill();
+
+                const iconX = x + 13;
+                const iconY = titleY - iconSize / 2 + 1;
+                roundedRect(ctx, iconX, iconY, iconSize, iconSize, 7);
+                ctx.fillStyle = rgba(node.accent, 0.1);
+                ctx.fill();
+                ctx.strokeStyle = rgba(node.accent, 0.26);
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                ctx.fillStyle = rgba(node.accent, 0.95);
+                ctx.font = '600 ' + (tiny ? 9.5 : 10.5) + 'px ' + MONO;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(node.icon, iconX + iconSize / 2, iconY + iconSize / 2 + 0.5);
+
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.font = '700 ' + titleSize + 'px ' + SANS;
+                ctx.fillStyle = '#edf7ff';
+                ctx.fillText(ellipsize(node.title, textWidth), textX, titleY);
+
+                ctx.font = '500 ' + subSize + 'px ' + SANS;
+                ctx.fillStyle = isFocus ? 'rgba(191, 216, 236, 0.92)' : 'rgba(158, 185, 208, 0.78)';
+                ctx.fillText(ellipsize(node.sub, textWidth), textX, subY);
+
+                if (node.h >= 68) {
+                    ctx.fillStyle = rgba(node.accent, 0.18);
+                    for (let k = 0; k < 3; k += 1) {
+                        ctx.fillRect(x + 13 + k * 7, y + h - 13, 4, 1.2);
+                    }
+
+                    ctx.font = '500 7px ' + MONO;
+                    ctx.textAlign = 'right';
+                    ctx.fillStyle = 'rgba(128, 157, 184, 0.38)';
+                    ctx.fillText(layer.num + '.' + String(node.index + 1).padStart(2, '0'), x + w - 11, y + h - 10);
+                }
+
+                ctx.restore();
+            }
+
+            function drawScene(now) {
+                const intro = reduceMotion ? 1 : easeOutCubic(clamp((now - introAt) / 800, 0, 1));
+                const focusId = hoveredId || selectedId;
+                const focusNode = focusId ? nodeById.get(focusId) : null;
+                const relatedSet = new Set();
+                if (focusNode) {
+                    focusNode.related.forEach(id => relatedSet.add(id));
+                    const reverse = reverseRelated.get(focusNode.id);
+                    if (reverse) reverse.forEach(id => relatedSet.add(id));
+                    relatedSet.delete(focusNode.id);
+                }
+
+                drawLayerTints(intro, focusNode);
+                drawFlows(now, intro);
+                drawLayerLabels(intro);
+                NODES.forEach(node => drawNode(node, now, focusNode, relatedSet));
+                drawMeta(intro);
+            }
+
+            function frame(now) {
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                ctx.clearRect(0, 0, W, H);
+                drawBackdrop(now);
+
+                const transform = getSceneTransform();
+                ctx.save();
+                ctx.translate(transform.ox, transform.oy);
+                ctx.scale(transform.s, transform.s);
+                drawScene(now);
+                ctx.restore();
+
+                window.requestAnimationFrame(frame);
+            }
+
+            canvas.addEventListener('pointerdown', event => {
+                if (event.pointerType === 'mouse' && event.button !== 0) return;
+                if (dragPointerId !== null) return;
+                dragging = true;
+                dragMoved = false;
+                dragPointerId = event.pointerId;
+                dragStart = {
+                    x: event.clientX,
+                    y: event.clientY,
+                    panX: view.panX,
+                    panY: view.panY
+                };
+                if (canvas.setPointerCapture) {
+                    canvas.setPointerCapture(event.pointerId);
+                }
+                canvas.style.cursor = 'grabbing';
+            });
+
+            canvas.addEventListener('pointermove', event => {
+                if (dragPointerId !== null && event.pointerId !== dragPointerId) return;
+
+                if (dragging && event.pointerId === dragPointerId) {
+                    const dx = event.clientX - dragStart.x;
+                    const dy = event.clientY - dragStart.y;
+                    if (!dragMoved && Math.sqrt(dx * dx + dy * dy) > 4) {
+                        dragMoved = true;
+                        hoveredId = null;
+                        hideTooltip();
+                    }
+                    if (dragMoved) {
+                        view.panX = dragStart.panX + dx;
+                        view.panY = dragStart.panY + dy;
+                        clampPan();
+                    }
+                    return;
+                }
+
+                const point = localPoint(event);
+                const node = hitTest(point.x, point.y);
+                const nextId = node ? node.id : null;
+
+                if (nextId !== hoveredId) {
+                    hoveredId = nextId;
+                    if (node) {
+                        showTooltip(node);
+                    } else if (selectedId) {
+                        showTooltip(nodeById.get(selectedId));
+                    } else {
+                        hideTooltip();
+                    }
+                }
+
+                canvas.style.cursor = node ? 'pointer' : (view.zoom > 1.02 ? 'grab' : 'default');
+            });
+
+            function endPointer(event) {
+                if (event.pointerId !== dragPointerId) return;
+                const wasMoved = dragMoved;
+                dragging = false;
+                dragPointerId = null;
+                dragStart = null;
+
+                if (canvas.hasPointerCapture && canvas.hasPointerCapture(event.pointerId)) {
+                    canvas.releasePointerCapture(event.pointerId);
+                }
+
+                if (!wasMoved) {
+                    const point = localPoint(event);
+                    const node = hitTest(point.x, point.y);
+                    if (node) {
+                        selectedId = selectedId === node.id ? null : node.id;
+                        hoveredId = node.id;
+                        if (selectedId) {
+                            showTooltip(node);
+                        } else {
+                            hoveredId = null;
+                            hideTooltip();
+                        }
+                    } else {
+                        selectedId = null;
+                        hoveredId = null;
+                        hideTooltip();
+                    }
+                }
+
+                canvas.style.cursor = view.zoom > 1.02 ? 'grab' : 'default';
+            }
+
+            canvas.addEventListener('pointerup', endPointer);
+            canvas.addEventListener('pointercancel', endPointer);
+
+            canvas.addEventListener('lostpointercapture', () => {
+                dragging = false;
+                dragPointerId = null;
+                dragStart = null;
+            });
+
+            canvas.addEventListener('pointerleave', () => {
+                if (dragging) return;
+                hoveredId = null;
+                if (selectedId) {
+                    showTooltip(nodeById.get(selectedId));
+                } else {
+                    hideTooltip();
+                }
+                canvas.style.cursor = 'default';
+            });
+
+            canvas.addEventListener('wheel', event => {
+                event.preventDefault();
+                const point = localPoint(event);
+                const factor = event.deltaY < 0 ? 1.15 : 1 / 1.15;
+                zoomAt(point.x, point.y, factor);
+            }, { passive: false });
+
+            canvas.addEventListener('dblclick', event => {
+                event.preventDefault();
+                resetView();
+            });
+
+            document.querySelectorAll('[data-filter]').forEach(button => {
+                button.addEventListener('click', () => {
+                    const requested = button.dataset.filter;
+                    activeLayer = requested === activeLayer && requested !== 'all' ? 'all' : requested;
+                    document.querySelectorAll('[data-filter]').forEach(item => {
+                        const isCurrent = item.dataset.filter === activeLayer;
+                        item.classList.toggle('is-active', isCurrent);
+                        item.setAttribute('aria-pressed', String(isCurrent));
+                    });
+                    selectedId = null;
+                    hoveredId = null;
+                    hideTooltip();
+                });
+            });
+
+            zoomInBtn.addEventListener('click', () => zoomAt(W / 2, H / 2, 1.3));
+            zoomOutBtn.addEventListener('click', () => zoomAt(W / 2, H / 2, 1 / 1.3));
+            resetBtn.addEventListener('click', resetView);
+
+            window.addEventListener('keydown', event => {
+                if (event.key === 'Escape') {
+                    selectedId = null;
+                    hoveredId = null;
+                    hideTooltip();
+                } else if (event.key === '0' || event.key === 'Home') {
+                    resetView();
+                }
+            });
+
+            if ('ResizeObserver' in window) {
+                const observer = new ResizeObserver(() => {
+                    window.cancelAnimationFrame(resizeFrame);
+                    resizeFrame = window.requestAnimationFrame(resize);
+                });
+                observer.observe(stage);
+            } else {
+                window.addEventListener('resize', resize);
+            }
+
+            window.addEventListener('orientationchange', () => {
+                window.setTimeout(resize, 180);
+            });
+
+            resize();
+            introAt = performance.now();
+            window.requestAnimationFrame(frame);
+        })();
+    </script>
+</body>
+</html>

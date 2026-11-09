@@ -1,0 +1,2393 @@
+<!-- 姓名：王鹏宇，日期：2026-11-05，功能名称：基于知识库智能客服系统系统架构图 (SVG / 科研方向) -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#050a14">
+    <meta name="color-scheme" content="dark light">
+    <title>18-3 基于知识库智能客服系统架构图 · 科研方向 · 王鹏宇</title>
+    <style>
+        :root {
+            --bg: #060b17;
+            --surface: rgba(10, 20, 38, 0.75);
+            --surface-solid: #0d1729;
+            --surface-elevated: #13223d;
+            --ink: #f0f6fc;
+            --muted: #8b9eb7;
+            --dim: #50647e;
+            --line: rgba(148, 184, 220, 0.16);
+            --line-strong: rgba(148, 184, 220, 0.32);
+            --line-subtle: rgba(148, 184, 220, 0.08);
+
+            /* Academic Research Accents */
+            --cyan: #38bdf8;
+            --blue: #2563eb;
+            --violet: #8b5cf6;
+            --purple: #a855f7;
+            --green: #10b981;
+            --emerald: #059669;
+            --amber: #f59e0b;
+            --rose: #f43f5e;
+            --teal: #14b8a6;
+            --indigo: #6366f1;
+
+            --mono: "SFMono-Regular", Consolas, "Cascadia Code", "Fira Code", monospace;
+            --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Roboto, sans-serif;
+            --serif: "Cambria", "Times New Roman", "Source Serif Pro", serif;
+            --ease: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* 论文印刷浅色模式 (Academic Light Paper Mode) */
+        body.theme-light {
+            --bg: #f8fafc;
+            --surface: rgba(255, 255, 255, 0.92);
+            --surface-solid: #ffffff;
+            --surface-elevated: #f1f5f9;
+            --ink: #0f172a;
+            --muted: #475569;
+            --dim: #94a3b8;
+            --line: rgba(51, 65, 85, 0.14);
+            --line-strong: rgba(51, 65, 85, 0.28);
+            --line-subtle: rgba(51, 65, 85, 0.06);
+
+            --cyan: #0284c7;
+            --blue: #1d4ed8;
+            --violet: #7c3aed;
+            --purple: #9333ea;
+            --green: #059669;
+            --emerald: #047857;
+            --amber: #d97706;
+            --rose: #e11d48;
+            --teal: #0d9488;
+            --indigo: #4f46e5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: var(--sans);
+            color: var(--ink);
+            background: var(--bg);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* 背景微网格与学术导轨质感 */
+        body::before {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            content: "";
+            background-image:
+                linear-gradient(var(--line-subtle) 1px, transparent 1px),
+                linear-gradient(90deg, var(--line-subtle) 1px, transparent 1px);
+            background-size: 48px 48px;
+            opacity: 0.85;
+        }
+
+        body::after {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            content: "";
+            background: radial-gradient(circle at 50% 18%, rgba(56, 189, 248, 0.08), transparent 70%),
+                        radial-gradient(circle at 88% 85%, rgba(139, 92, 246, 0.06), transparent 60%);
+        }
+
+        body.theme-light::after {
+            background: radial-gradient(circle at 50% 18%, rgba(2, 132, 199, 0.05), transparent 70%),
+                        radial-gradient(circle at 88% 85%, rgba(124, 58, 237, 0.04), transparent 60%);
+        }
+
+        /* 主容器 */
+        .app {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+        }
+
+        /* ==================== 顶部导航栏 ==================== */
+        .topbar {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 16px;
+            height: 70px;
+            padding: 0 24px;
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--line);
+            flex-shrink: 0;
+        }
+
+        .identity {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .identity_mark {
+            display: grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(139, 92, 246, 0.15));
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+        }
+
+        .identity_text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .identity_text strong {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            color: var(--ink);
+        }
+
+        .identity_text small {
+            font-family: var(--mono);
+            font-size: 9px;
+            color: var(--muted);
+            letter-spacing: 0.1em;
+        }
+
+        .page_title {
+            text-align: center;
+            min-width: 0;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: 0.18em;
+            color: var(--cyan);
+            text-transform: uppercase;
+        }
+
+        .eyebrow_dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 8px var(--green);
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+
+        .page_title h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            color: var(--ink);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+        }
+
+        .top_right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px;
+            background: var(--surface-solid);
+            border: 1px solid var(--line);
+            border-radius: 999px;
+        }
+
+        .nav a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            text-decoration: none;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav a .nav_code {
+            font-family: var(--mono);
+            font-size: 9px;
+            opacity: 0.8;
+        }
+
+        .nav a:hover {
+            color: var(--ink);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav a.is-active {
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--blue), var(--cyan));
+            box-shadow: 0 2px 10px rgba(56, 189, 248, 0.3);
+        }
+
+        body.theme-light .nav a.is-active {
+            color: #ffffff;
+        }
+
+        .live_badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--green);
+            font-family: var(--mono);
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+        }
+
+        /* ==================== 次顶科研工具栏 ==================== */
+        .subbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 8px 24px;
+            background: var(--surface-solid);
+            border-bottom: 1px solid var(--line-subtle);
+            flex-shrink: 0;
+            overflow-x: auto;
+        }
+
+        .mode_tabs {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .mode_tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--line);
+            background: var(--surface);
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .mode_tab:hover {
+            color: var(--ink);
+            border-color: var(--line-strong);
+        }
+
+        .mode_tab.is-active {
+            color: var(--ink);
+            background: rgba(56, 189, 248, 0.12);
+            border-color: var(--cyan);
+            box-shadow: inset 0 0 0 1px var(--cyan);
+        }
+
+        .mode_tab_indicator {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--dot, var(--cyan));
+        }
+
+        .subbar_actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search_box {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search_box input {
+            width: 190px;
+            height: 30px;
+            padding: 0 28px 0 10px;
+            border-radius: 6px;
+            border: 1px solid var(--line);
+            background: var(--bg);
+            color: var(--ink);
+            font-size: 11px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .search_box input:focus {
+            width: 240px;
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
+        }
+
+        .search_icon {
+            position: absolute;
+            right: 8px;
+            color: var(--dim);
+            font-size: 12px;
+            pointer-events: none;
+        }
+
+        .tool_btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            height: 30px;
+            padding: 0 10px;
+            border-radius: 6px;
+            border: 1px solid var(--line);
+            background: var(--surface);
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .tool_btn:hover {
+            color: var(--ink);
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--line-strong);
+        }
+
+        .tool_btn svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            fill: none;
+        }
+
+        .tool_btn.primary {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(37, 99, 235, 0.25));
+            border-color: rgba(56, 189, 248, 0.4);
+            color: var(--cyan);
+        }
+
+        .tool_btn.primary:hover {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.3), rgba(37, 99, 235, 0.35));
+            color: #ffffff;
+        }
+
+        /* ==================== SVG 画布区域 ==================== */
+        .stage {
+            position: relative;
+            flex: 1;
+            min-height: 0;
+            width: 100%;
+            overflow: hidden;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .stage.is-panning {
+            cursor: grabbing;
+        }
+
+        #archSvg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform-origin: 0 0;
+            will-change: transform;
+        }
+
+        /* SVG 样式精修 */
+        .layer_bg {
+            transition: all 0.3s ease;
+        }
+
+        .layer_group:hover .layer_bg {
+            stroke-width: 1.5;
+        }
+
+        .layer_title {
+            font-family: var(--sans);
+            font-weight: 700;
+            font-size: 11.5px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .layer_code {
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: 10px;
+            letter-spacing: 0.1em;
+        }
+
+        /* 节点样式 */
+        .arch_node {
+            cursor: pointer;
+            transition: all 0.25s var(--ease);
+        }
+
+        .node_card {
+            transition: all 0.25s var(--ease);
+            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
+        }
+
+        .arch_node:hover .node_card {
+            transform: translateY(-2px);
+            filter: drop-shadow(0 8px 18px rgba(56, 189, 248, 0.28));
+        }
+
+        .arch_node.is-active .node_card {
+            stroke-width: 2.2px !important;
+            filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.45));
+        }
+
+        .arch_node.is-dimmed {
+            opacity: 0.18;
+            filter: grayscale(0.8);
+        }
+
+        .node_title {
+            font-family: var(--sans);
+            font-weight: 600;
+            font-size: 11.5px;
+            letter-spacing: 0.02em;
+            pointer-events: none;
+        }
+
+        .node_sub {
+            font-family: var(--mono);
+            font-size: 8.5px;
+            letter-spacing: 0.04em;
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        .node_tag {
+            font-family: var(--mono);
+            font-size: 7.5px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            pointer-events: none;
+        }
+
+        /* 连线与科研数据流 */
+        .flow_line {
+            fill: none;
+            stroke-width: 1.5;
+            transition: stroke 0.3s, stroke-width 0.3s, opacity 0.3s;
+        }
+
+        .flow_line.animated {
+            stroke-dasharray: 6 5;
+            animation: dashMove 1.5s linear infinite;
+        }
+
+        @keyframes dashMove {
+            to { stroke-dashoffset: -22; }
+        }
+
+        .flow_line.highlighted {
+            stroke-width: 2.8 !important;
+            opacity: 1 !important;
+            filter: drop-shadow(0 0 6px var(--cyan));
+        }
+
+        .flow_line.dimmed {
+            opacity: 0.1 !important;
+        }
+
+        /* 浮动 HUD 迷你缩放卡片 */
+        .hud_controls {
+            position: absolute;
+            left: 24px;
+            bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 6px;
+            background: var(--surface);
+            backdrop-filter: blur(14px);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        .hud_btn {
+            display: grid;
+            place-items: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid var(--line-subtle);
+            background: var(--surface-solid);
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .hud_btn:hover {
+            color: var(--ink);
+            background: var(--surface-elevated);
+            border-color: var(--line);
+        }
+
+        .hud_zoom_level {
+            font-family: var(--mono);
+            font-size: 9px;
+            text-align: center;
+            color: var(--dim);
+            padding: 2px 0;
+        }
+
+        /* ==================== 科研模块侧边详细面板 (Drawer) ==================== */
+        .inspector_drawer {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 440px;
+            height: 100%;
+            background: var(--surface-solid);
+            border-left: 1px solid var(--line);
+            box-shadow: -10px 0 35px rgba(0, 0, 0, 0.4);
+            transform: translateX(100%);
+            transition: transform 0.35s var(--ease);
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .inspector_drawer.is-open {
+            transform: translateX(0);
+        }
+
+        .drawer_header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--line);
+            background: var(--surface);
+        }
+
+        .drawer_meta {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .drawer_badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--mono);
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: var(--cyan);
+        }
+
+        .drawer_title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--ink);
+            line-height: 1.3;
+        }
+
+        .drawer_sub {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--muted);
+            letter-spacing: 0.04em;
+        }
+
+        .drawer_close {
+            display: grid;
+            place-items: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid var(--line);
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .drawer_close:hover {
+            color: var(--ink);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .drawer_body {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .drawer_section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .drawer_section_title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--mono);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            color: var(--dim);
+            text-transform: uppercase;
+        }
+
+        .drawer_section_title::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--line-subtle);
+        }
+
+        .drawer_desc {
+            font-size: 12.5px;
+            line-height: 1.7;
+            color: var(--muted);
+        }
+
+        /* 数学公式卡片 */
+        .math_box {
+            padding: 12px 14px;
+            background: var(--bg);
+            border: 1px solid var(--line);
+            border-left: 3px solid var(--cyan);
+            border-radius: 6px;
+            font-family: var(--serif);
+            font-style: italic;
+            font-size: 13.5px;
+            color: var(--cyan);
+            letter-spacing: 0.02em;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        .math_desc {
+            font-family: var(--sans);
+            font-style: normal;
+            font-size: 10px;
+            color: var(--dim);
+            margin-top: 5px;
+        }
+
+        /* 关键科研指标芯片 */
+        .metric_grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .metric_card {
+            padding: 10px 12px;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .metric_label {
+            font-family: var(--mono);
+            font-size: 9px;
+            color: var(--dim);
+            letter-spacing: 0.05em;
+        }
+
+        .metric_val {
+            font-family: var(--mono);
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .metric_val.accent {
+            color: var(--cyan);
+        }
+
+        /* 学术论文引用标签 */
+        .paper_pill {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 10px 12px;
+            background: rgba(139, 92, 246, 0.08);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            border-radius: 6px;
+        }
+
+        .paper_title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--violet);
+        }
+
+        .paper_venue {
+            font-family: var(--mono);
+            font-size: 9px;
+            color: var(--dim);
+        }
+
+        /* ==================== 底部科研状态与图例 ==================== */
+        .footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            height: 48px;
+            padding: 0 24px;
+            background: var(--surface-solid);
+            border-top: 1px solid var(--line);
+            flex-shrink: 0;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .legend_list {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            list-style: none;
+        }
+
+        .legend_item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10.5px;
+            font-family: var(--mono);
+        }
+
+        .legend_line {
+            width: 18px;
+            height: 2px;
+            border-radius: 1px;
+        }
+
+        .legend_line.dashed {
+            background: repeating-linear-gradient(90deg, var(--cyan), var(--cyan) 4px, transparent 4px, transparent 8px);
+        }
+
+        .footer_stats {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-family: var(--mono);
+            font-size: 10px;
+        }
+
+        .footer_stats span {
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+        /* 打印时优化 (Paper Print) */
+        @media print {
+            .topbar, .subbar, .hud_controls, .inspector_drawer, .footer {
+                display: none !important;
+            }
+            .stage {
+                width: 100vw;
+                height: 100vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- 顶部导航栏 -->
+        <header class="topbar">
+            <a class="identity" href="18-3.html">
+                <div class="identity_mark">WP</div>
+                <div class="identity_text">
+                    <strong>王鹏宇 · 科研架构</strong>
+                    <small>DATE: 2026-11-05 · ACL/SIGIR</small>
+                </div>
+            </a>
+
+            <div class="page_title">
+                <div class="eyebrow">
+                    <span class="eyebrow_dot"></span>
+                    <span>Knowledge-Grounded Dialogue Architecture · SOTA Research</span>
+                </div>
+                <h1>基于知识库智能客服系统架构图 (科研方向)</h1>
+            </div>
+
+            <div class="top_right">
+                <nav class="nav" aria-label="章节导航">
+                    <a href="18-1.html">
+                        <span class="nav_code">18—01</span>
+                        <span class="nav_label">粒子文字</span>
+                    </a>
+                    <a href="18-2.html">
+                        <span class="nav_code">18—02</span>
+                        <span class="nav_label">电商架构</span>
+                    </a>
+                    <a class="is-active" href="18-3.html" aria-current="page">
+                        <span class="nav_code">18—03</span>
+                        <span class="nav_label">智能客服</span>
+                    </a>
+                    <a href="18-4.html">
+                        <span class="nav_code">18—04</span>
+                        <span class="nav_label">图表分析</span>
+                    </a>
+                    <a href="18-6.html">
+                        <span class="nav_code">18—06</span>
+                        <span class="nav_label">流程与ER</span>
+                    </a>
+                    <a href="18-7.html">
+                        <span class="nav_code">18—07</span>
+                        <span class="nav_label">3D图表</span>
+                    </a>
+                    <a href="18-8.html">
+                        <span class="nav_code">18—08</span>
+                        <span class="nav_label">数据大屏</span>
+                    </a>
+                </nav>
+                <div class="live_badge">
+                    <span>SVG VECTOR LIVE</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 次顶科研工具栏 -->
+        <div class="subbar">
+            <div class="mode_tabs">
+                <button class="mode_tab is-active" data-mode="all" onclick="switchResearchMode('all')">
+                    <span class="mode_tab_indicator" style="--dot: var(--cyan);"></span>
+                    全景系统架构 (Full Overview)
+                </button>
+                <button class="mode_tab" data-mode="rag" onclick="switchResearchMode('rag')">
+                    <span class="mode_tab_indicator" style="--dot: #38bdf8;"></span>
+                    在线 RAG 检索生成链路
+                </button>
+                <button class="mode_tab" data-mode="graph" onclick="switchResearchMode('graph')">
+                    <span class="mode_tab_indicator" style="--dot: #a855f7;"></span>
+                    双轨知识图谱推理 (GraphRAG)
+                </button>
+                <button class="mode_tab" data-mode="reflection" onclick="switchResearchMode('reflection')">
+                    <span class="mode_tab_indicator" style="--dot: #10b981;"></span>
+                    自反思与抗幻觉闭环 (Self-RAG)
+                </button>
+                <button class="mode_tab" data-mode="evolution" onclick="switchResearchMode('evolution')">
+                    <span class="mode_tab_indicator" style="--dot: #f59e0b;"></span>
+                    评测与持续对齐演进 (DPO)
+                </button>
+            </div>
+
+            <div class="subbar_actions">
+                <div class="search_box">
+                    <input type="text" id="nodeSearch" placeholder="搜索模块/公式/技术指标..." oninput="handleSearch(this.value)">
+                    <span class="search_icon">🔍</span>
+                </div>
+                <button class="tool_btn" onclick="toggleTheme()" title="切换论文印刷浅色/深色模式">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                    <span>论文模式</span>
+                </button>
+                <button class="tool_btn" onclick="toggleFlowAnimation()" id="animBtn" title="开/关数据流粒子动画">
+                    <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <span>流行动画</span>
+                </button>
+                <button class="tool_btn primary" onclick="exportSvgFile()" title="下载高保真科研矢量图（可直接插入 LaTeX / Word）">
+                    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span>导出 SVG 矢量图</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- SVG 架构图交互主舞台 -->
+        <main class="stage" id="stage">
+            <svg id="archSvg" viewBox="0 0 1700 970" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                    <!-- 渐变定义 (暗黑科研风) -->
+                    <linearGradient id="gradL1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#0284c7" stop-opacity="0.25"/>
+                        <stop offset="100%" stop-color="#2563eb" stop-opacity="0.12"/>
+                    </linearGradient>
+                    <linearGradient id="gradL2" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#4f46e5" stop-opacity="0.25"/>
+                        <stop offset="100%" stop-color="#7c3aed" stop-opacity="0.12"/>
+                    </linearGradient>
+                    <linearGradient id="gradL3Graph" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#9333ea" stop-opacity="0.28"/>
+                        <stop offset="100%" stop-color="#c026d3" stop-opacity="0.14"/>
+                    </linearGradient>
+                    <linearGradient id="gradL3Dense" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#0284c7" stop-opacity="0.28"/>
+                        <stop offset="100%" stop-color="#0d9488" stop-opacity="0.14"/>
+                    </linearGradient>
+                    <linearGradient id="gradL3Fusion" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#059669" stop-opacity="0.25"/>
+                        <stop offset="100%" stop-color="#0284c7" stop-opacity="0.18"/>
+                    </linearGradient>
+                    <linearGradient id="gradL4" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#e11d48" stop-opacity="0.22"/>
+                        <stop offset="50%" stop-color="#7c3aed" stop-opacity="0.2"/>
+                        <stop offset="100%" stop-color="#2563eb" stop-opacity="0.22"/>
+                    </linearGradient>
+                    <linearGradient id="gradL5" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#d97706" stop-opacity="0.2"/>
+                        <stop offset="100%" stop-color="#b45309" stop-opacity="0.1"/>
+                    </linearGradient>
+                    <linearGradient id="gradL6" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#059669" stop-opacity="0.22"/>
+                        <stop offset="100%" stop-color="#0284c7" stop-opacity="0.14"/>
+                    </linearGradient>
+
+                    <!-- 节点常态卡片背景 -->
+                    <linearGradient id="nodeCardBg" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#15243d" stop-opacity="0.95"/>
+                        <stop offset="100%" stop-color="#0d182b" stop-opacity="0.98"/>
+                    </linearGradient>
+
+                    <!-- 箭头标记 Marker -->
+                    <marker id="arrow-cyan" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#38bdf8"/>
+                    </marker>
+                    <marker id="arrow-violet" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#a855f7"/>
+                    </marker>
+                    <marker id="arrow-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#10b981"/>
+                    </marker>
+                    <marker id="arrow-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#f59e0b"/>
+                    </marker>
+                    <marker id="arrow-dim" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#64748b"/>
+                    </marker>
+
+                    <!-- 发光滤镜 -->
+                    <filter id="glow-cyan" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="3" result="blur"/>
+                        <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                    </filter>
+                </defs>
+
+                <!-- ==================== 0. 背景层框架与纵向科研总线 ==================== -->
+                <g id="gridGuides" opacity="0.6">
+                    <!-- 左侧: 离线多模态知识工程流水线指示条 (Offline Pipeline) -->
+                    <rect x="18" y="22" width="16" height="926" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+                    <text x="26" y="480" fill="#64748b" font-family="var(--mono)" font-size="9" font-weight="700" letter-spacing="0.25em" writing-mode="vertical-rl" text-anchor="middle">
+                        OFFLINE MULTIMODAL KNOWLEDGE ENGINEERING PIPELINE
+                    </text>
+
+                    <!-- 右侧: 在线反馈、对齐与持续微调演进总线 (Evolution Pipeline) -->
+                    <rect x="1666" y="22" width="16" height="926" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+                    <text x="1674" y="480" fill="#64748b" font-family="var(--mono)" font-size="9" font-weight="700" letter-spacing="0.25em" writing-mode="vertical-rl" text-anchor="middle">
+                        ONLINE FEEDBACK & DPO CONTINUAL ALIGNMENT LOOP
+                    </text>
+                </g>
+
+                <!-- ==================== 1. LAYER 1: 感知与多模态交互层 ==================== -->
+                <g class="layer_group" id="layer1" data-layer="1">
+                    <rect class="layer_bg" x="48" y="22" width="1604" height="92" rx="12" fill="url(#gradL1)" stroke="#0284c7" stroke-width="1" stroke-opacity="0.4"/>
+                    <g transform="translate(68, 42)">
+                        <rect x="0" y="0" width="22" height="15" rx="3" fill="#0284c7" fill-opacity="0.3"/>
+                        <text class="layer_code" x="11" y="11" fill="#38bdf8" text-anchor="middle">L1</text>
+                        <text class="layer_title" x="30" y="12" fill="#e0f2fe">多模态多渠道感知与交互接入层</text>
+                        <text x="285" y="12" fill="#7dd3fc" font-family="var(--mono)" font-size="9" opacity="0.8">/ Multimodal Perception & Omnichannel Interaction</text>
+                    </g>
+
+                    <!-- 节点 1-4 -->
+                    <g class="arch_node" id="node-n1" data-id="n1" transform="translate(68, 52)">
+                        <rect class="node_card" width="370" height="52" rx="8" fill="url(#nodeCardBg)" stroke="#38bdf8" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="18" cy="26" r="5" fill="#38bdf8"/>
+                        <text class="node_title" x="32" y="22" fill="#f0f6fc">全渠道接入与实时会话网关</text>
+                        <text class="node_sub" x="32" y="38" fill="#94a3b8">Omnichannel Gateway (WebSocket/SSE/WebRTC)</text>
+                        <rect x="290" y="8" width="68" height="16" rx="4" fill="#0369a1" fill-opacity="0.4"/>
+                        <text class="node_tag" x="324" y="19" fill="#7dd3fc" text-anchor="middle">P99 &lt; 20ms</text>
+                    </g>
+
+                    <g class="arch_node" id="node-n2" data-id="n2" transform="translate(460, 52)">
+                        <rect class="node_card" width="370" height="52" rx="8" fill="url(#nodeCardBg)" stroke="#38bdf8" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="18" cy="26" r="5" fill="#38bdf8"/>
+                        <text class="node_title" x="32" y="22" fill="#f0f6fc">语音/图像多模态特征预处理器</text>
+                        <text class="node_sub" x="32" y="38" fill="#94a3b8">Whisper-v3 ASR &amp; ViT Multi-modal Encoder</text>
+                        <rect x="295" y="8" width="63" height="16" rx="4" fill="#0369a1" fill-opacity="0.4"/>
+                        <text class="node_tag" x="326" y="19" fill="#7dd3fc" text-anchor="middle">WER &lt; 3.2%</text>
+                    </g>
+
+                    <g class="arch_node" id="node-n3" data-id="n3" transform="translate(852, 52)">
+                        <rect class="node_card" width="370" height="52" rx="8" fill="url(#nodeCardBg)" stroke="#38bdf8" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="18" cy="26" r="5" fill="#38bdf8"/>
+                        <text class="node_title" x="32" y="22" fill="#f0f6fc">流式双工调度与打断控制器</text>
+                        <text class="node_sub" x="32" y="38" fill="#94a3b8">Stream Session Controller &amp; VAD Interruption</text>
+                        <rect x="300" y="8" width="58" height="16" rx="4" fill="#0369a1" fill-opacity="0.4"/>
+                        <text class="node_tag" x="329" y="19" fill="#7dd3fc" text-anchor="middle">Zero-Drop</text>
+                    </g>
+
+                    <g class="arch_node" id="node-n4" data-id="n4" transform="translate(1244, 52)">
+                        <rect class="node_card" width="388" height="52" rx="8" fill="url(#nodeCardBg)" stroke="#38bdf8" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="18" cy="26" r="5" fill="#38bdf8"/>
+                        <text class="node_title" x="32" y="22" fill="#f0f6fc">隐私脱敏与越狱防御防火墙</text>
+                        <text class="node_sub" x="32" y="38" fill="#94a3b8">PII Masking &amp; Adversarial Guardrail Engine</text>
+                        <rect x="310" y="8" width="66" height="16" rx="4" fill="#0369a1" fill-opacity="0.4"/>
+                        <text class="node_tag" x="343" y="19" fill="#7dd3fc" text-anchor="middle">Acc: 99.4%</text>
+                    </g>
+                </g>
+
+                <!-- ==================== 2. LAYER 2: 语义解析与动态对话状态跟踪层 ==================== -->
+                <g class="layer_group" id="layer2" data-layer="2">
+                    <rect class="layer_bg" x="48" y="126" width="1604" height="92" rx="12" fill="url(#gradL2)" stroke="#6366f1" stroke-width="1" stroke-opacity="0.4"/>
+                    <g transform="translate(68, 146)">
+                        <rect x="0" y="0" width="22" height="15" rx="3" fill="#6366f1" fill-opacity="0.3"/>
+                        <text class="layer_code" x="11" y="11" fill="#818cf8" text-anchor="middle">L2</text>
+                        <text class="layer_title" x="30" y="12" fill="#ede9fe">语义理解与动态对话状态跟踪层 (DST)</text>
+                        <text x="315" y="12" fill="#c7d2fe" font-family="var(--mono)" font-size="9" opacity="0.8">/ Semantic Parsing, Query Rewriting &amp; DST Agent</text>
+                    </g>
+
+                    <!-- 节点 5-8 -->
+                    <g class="arch_node" id="node-n5" data-id="n5" transform="translate(68, 156)">
+                        <rect class="node_card" width="370" height="52" rx="8" fill="url(#nodeCardBg)" stroke="#818cf8" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="18" cy="26" r="5" fill="#818cf8"/>
+                        <text class="node_title" x="32" y="22" fill="#f0f6fc">意图层次分类与情感倾向判别</text>
+                        <text class="node_sub" x="32" y="38" fill="#94a3b8">Hierarchical Intent Tree &amp; Sentiment Mining</text>
+                        <rect x="290" y="8" width="68" height="16" rx="4" fill="#4338ca" fill-opacity="0.4"/>
+                        <text class="node_tag" x="324" y="19" fill="#a5b4fc" text-anchor="middle">F1: 94.8%</text>
+                    </g>
+
+                    <g class="arch_node" id="node-n6" data-id="n6" transform="translate(460, 156)">
+                        <rect class="node_card" width="370" height="52" rx="8" fill="url(#nodeCardBg)" stroke="#818cf8" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="18" cy="26" r="5" fill="#818cf8"/>
+                        <text class="node_title" x="32" y="22" fill="#f0f6fc">多轮指代消解与语义补全重写</text>
+                        <text class="node_sub" x="32" y="38" fill="#94a3b8">Coreference Resolution &amp; Context Rewriter</text>
+                        <rect x="290" y="8" width="68" height="16" rx="4" fill="#4338ca" fill-opacity="0.4"/>
+                        <text class="node_tag" x="324" y="19" fill="#a5b4fc" text-anchor="middle">EM: 91.2%</text>
+                    </g>
+
+                    <g class="arch_node" id="node-n7" data-id="n7" transform="translate(852, 156)">
+                        <rect class="node_card" width="370" height="52" rx="8" fill="url(#nodeCardBg)" stroke="#818cf8" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="18" cy="26" r="5" fill="#818cf8"/>
+                        <text class="node_title" x="32" y="22" fill="#f0f6fc">动态对话状态跟踪器 (DST)</text>
+                        <text class="node_sub" x="32" y="38" fill="#94a3b8">Dynamic Slot Filling &amp; Multi-turn Belief State</text>
+                        <rect x="300" y="8" width="58" height="16" rx="4" fill="#4338ca" fill-opacity="0.4"/>
+                        <text class="node_tag" x="329" y="19" fill="#a5b4fc" text-anchor="middle">JGA: 88.6%</text>
+                    </g>
+
+                    <g class="arch_node" id="node-n8" data-id="n8" transform="translate(1244, 156)">
+                        <rect class="node_card" width="388" height="52" rx="8" fill="url(#nodeCardBg)" stroke="#818cf8" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="18" cy="26" r="5" fill="#818cf8"/>
+                        <text class="node_title" x="32" y="22" fill="#f0f6fc">分层工作记忆与情景长程记忆栈</text>
+                        <text class="node_sub" x="32" y="38" fill="#94a3b8">Working Memory Buffer &amp; Episodic Vector Stack</text>
+                        <rect x="310" y="8" width="66" height="16" rx="4" fill="#4338ca" fill-opacity="0.4"/>
+                        <text class="node_tag" x="343" y="19" fill="#a5b4fc" text-anchor="middle">Top-K Rec</text>
+                    </g>
+                </g>
+
+                <!-- ==================== 3. LAYER 3: 双轨混合检索与图谱增强层 (科研核心) ==================== -->
+                <g class="layer_group" id="layer3" data-layer="3">
+                    <!-- 大外框 -->
+                    <rect class="layer_bg" x="48" y="230" width="1604" height="268" rx="12" fill="url(#gradL3Fusion)" stroke="#0d9488" stroke-width="1" stroke-opacity="0.4"/>
+                    <g transform="translate(68, 248)">
+                        <rect x="0" y="0" width="22" height="15" rx="3" fill="#0d9488" fill-opacity="0.3"/>
+                        <text class="layer_code" x="11" y="11" fill="#2dd4bf" text-anchor="middle">L3</text>
+                        <text class="layer_title" x="30" y="12" fill="#ccfbf1">科研核心：双轨混合检索、图谱推理与多路融合增强层</text>
+                        <text x="445" y="12" fill="#99f6e4" font-family="var(--mono)" font-size="9" opacity="0.8">/ Dual-Track Hybrid Retrieval: Symbolic GraphRAG &amp; Dense Neural Search</text>
+                    </g>
+
+                    <!-- 轨道 A: 符号知识图谱推理轨道 (左) -->
+                    <rect x="68" y="266" width="750" height="116" rx="8" fill="url(#gradL3Graph)" stroke="#a855f7" stroke-width="1" stroke-opacity="0.4"/>
+                    <text x="86" y="284" fill="#f3e8ff" font-family="var(--sans)" font-size="11" font-weight="700">TRACK A · 符号逻辑与知识图谱子图推理轨道 (Symbolic &amp; GraphRAG)</text>
+                    <text x="540" y="284" fill="#d8b4fe" font-family="var(--mono)" font-size="8.5">Sub-Graph Reasoner</text>
+
+                    <!-- 节点 9-11 -->
+                    <g class="arch_node" id="node-n9" data-id="n9" transform="translate(82, 296)">
+                        <rect class="node_card" width="226" height="74" rx="6" fill="url(#nodeCardBg)" stroke="#c084fc" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="16" cy="20" r="4.5" fill="#c084fc"/>
+                        <text class="node_title" x="28" y="22" fill="#f0f6fc">领域实体链接与对齐</text>
+                        <text class="node_sub" x="28" y="38" fill="#94a3b8">Entity Linking &amp; Alias</text>
+                        <text class="node_sub" x="28" y="52" fill="#64748b">Ontology Mapping (EL)</text>
+                        <text class="node_tag" x="28" y="66" fill="#d8b4fe">P@1: 96.1%</text>
+                    </g>
+
+                    <g class="arch_node" id="node-n10" data-id="n10" transform="translate(324, 296)">
+                        <rect class="node_card" width="242" height="74" rx="6" fill="url(#nodeCardBg)" stroke="#c084fc" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="16" cy="20" r="4.5" fill="#c084fc"/>
+                        <text class="node_title" x="28" y="22" fill="#f0f6fc">多跳子图推理与路径发现</text>
+                        <text class="node_sub" x="28" y="38" fill="#94a3b8">Multi-hop GNN Path Finder</text>
+                        <text class="node_sub" x="28" y="52" fill="#64748b">k-hop Subgraph Extraction</text>
+                        <text class="node_tag" x="28" y="66" fill="#d8b4fe">MRR: 0.892</text>
+                    </g>
+
+                    <g class="arch_node" id="node-n11" data-id="n11" transform="translate(582, 296)">
+                        <rect class="node_card" width="222" height="74" rx="6" fill="url(#nodeCardBg)" stroke="#c084fc" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="16" cy="20" r="4.5" fill="#c084fc"/>
+                        <text class="node_title" x="28" y="22" fill="#f0f6fc">符号三元组规则匹配</text>
+                        <text class="node_sub" x="28" y="38" fill="#94a3b8">Symbolic Triplet Reasoner</text>
+                        <text class="node_sub" x="28" y="52" fill="#64748b">First-Order Predicate</text>
+                        <text class="node_tag" x="28" y="66" fill="#d8b4fe">Deterministic</text>
+                    </g>
+
+                    <!-- 轨道 B: 神经语义与稠密/稀疏向量检索轨道 (右) -->
+                    <rect x="834" y="266" width="798" height="116" rx="8" fill="url(#gradL3Dense)" stroke="#0284c7" stroke-width="1" stroke-opacity="0.4"/>
+                    <text x="852" y="284" fill="#e0f2fe" font-family="var(--sans)" font-size="11" font-weight="700">TRACK B · 神经语义稠密检索与学习型稀疏检索轨道 (Dense &amp; Learned Sparse)</text>
+                    <text x="1440" y="284" fill="#7dd3fc" font-family="var(--mono)" font-size="8.5">Dual-Encoder SOTA</text>
+
+                    <!-- 节点 12-14 -->
+                    <g class="arch_node" id="node-n12" data-id="n12" transform="translate(848, 296)">
+                        <rect class="node_card" width="250" height="74" rx="6" fill="url(#nodeCardBg)" stroke="#38bdf8" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="16" cy="20" r="4.5" fill="#38bdf8"/>
+                        <text class="node_title" x="28" y="22" fill="#f0f6fc">稠密多向量双塔语义检索</text>
+                        <text class="node_sub" x="28" y="38" fill="#94a3b8">BGE-M3 / ColBERT Multi-vector</text>
+                        <text class="node_sub" x="28" y="52" fill="#64748b">HNSW Approximate Search</text>
+                        <text class="node_tag" x="28" y="66" fill="#7dd3fc">Recall@10: 95.3%</text>
+                    </g>
+
+                    <g class="arch_node" id="node-n13" data-id="n13" transform="translate(1114, 296)">
+                        <rect class="node_card" width="248" height="74" rx="6" fill="url(#nodeCardBg)" stroke="#38bdf8" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="16" cy="20" r="4.5" fill="#38bdf8"/>
+                        <text class="node_title" x="28" y="22" fill="#f0f6fc">学习型稀疏词项级精准检索</text>
+                        <text class="node_sub" x="28" y="38" fill="#94a3b8">SPLADE-v2 + BM25 Precision</text>
+                        <text class="node_sub" x="28" y="52" fill="#64748b">Inverted Index + Term Weight</text>
+                        <text class="node_tag" x="28" y="66" fill="#7dd3fc">Exact Match</text>
+                    </g>
+
+                    <g class="arch_node" id="node-n14" data-id="n14" transform="translate(1378, 296)">
+                        <rect class="node_card" width="240" height="74" rx="6" fill="url(#nodeCardBg)" stroke="#38bdf8" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="16" cy="20" r="4.5" fill="#38bdf8"/>
+                        <text class="node_title" x="28" y="22" fill="#f0f6fc">假想文档生成与多查询扩展</text>
+                        <text class="node_sub" x="28" y="38" fill="#94a3b8">HyDE (Hypothetical Doc) &amp; Expansion</text>
+                        <text class="node_sub" x="28" y="52" fill="#64748b">Semantic Gap Bridging</text>
+                        <text class="node_tag" x="28" y="66" fill="#7dd3fc">+8.4% MRR Boost</text>
+                    </g>
+
+                    <!-- 轨道 C: 倒数排序融合与重排 (中下) -->
+                    <rect x="68" y="394" width="1564" height="92" rx="8" fill="#082f49" fill-opacity="0.35" stroke="#0369a1" stroke-width="1" stroke-dasharray="4 4"/>
+                    <text x="86" y="412" fill="#bae6fd" font-family="var(--sans)" font-size="10" font-weight="700">FUSION &amp; RERANKING · 多路证据加权排序、交叉注意力重排与信息瓶颈压缩</text>
+
+                    <!-- 节点 15-17 -->
+                    <g class="arch_node" id="node-n15" data-id="n15" transform="translate(82, 420)">
+                        <rect class="node_card" width="480" height="56" rx="6" fill="url(#nodeCardBg)" stroke="#2dd4bf" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="18" cy="28" r="4.5" fill="#2dd4bf"/>
+                        <text class="node_title" x="32" y="24" fill="#f0f6fc">倒数排序融合器 (RRF) &amp; 置信度归一化</text>
+                        <text class="node_sub" x="32" y="40" fill="#94a3b8">Reciprocal Rank Fusion (RRF: k=60) &amp; Multi-source Calibration</text>
+                        <rect x="388" y="8" width="80" height="16" rx="4" fill="#134e4a" fill-opacity="0.5"/>
+                        <text class="node_tag" x="428" y="19" fill="#5eead4" text-anchor="middle">NDCG@10: 0.91</text>
+                    </g>
+
+                    <g class="arch_node" id="node-n16" data-id="n16" transform="translate(582, 420)">
+                        <rect class="node_card" width="510" height="56" rx="6" fill="url(#nodeCardBg)" stroke="#2dd4bf" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="18" cy="28" r="4.5" fill="#2dd4bf"/>
+                        <text class="node_title" x="32" y="24" fill="#f0f6fc">深度交叉注意力重排精滤器 (Neural Reranker)</text>
+                        <text class="node_sub" x="32" y="40" fill="#94a3b8">Cross-Encoder (bge-reranker-large) Token-level Interaction</text>
+                        <rect x="420" y="8" width="78" height="16" rx="4" fill="#134e4a" fill-opacity="0.5"/>
+                        <text class="node_tag" x="459" y="19" fill="#5eead4" text-anchor="middle">Top-3 精准率</text>
+                    </g>
+
+                    <g class="arch_node" id="node-n17" data-id="n17" transform="translate(1112, 420)">
+                        <rect class="node_card" width="506" height="56" rx="6" fill="url(#nodeCardBg)" stroke="#2dd4bf" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="18" cy="28" r="4.5" fill="#2dd4bf"/>
+                        <text class="node_title" x="32" y="24" fill="#f0f6fc">信息瓶颈上下文自适应剪枝器 (Context Pruner)</text>
+                        <text class="node_sub" x="32" y="40" fill="#94a3b8">Information Bottleneck Token Compression &amp; Long-Context Filter</text>
+                        <rect x="418" y="8" width="76" height="16" rx="4" fill="#134e4a" fill-opacity="0.5"/>
+                        <text class="node_tag" x="456" y="19" fill="#5eead4" text-anchor="middle">-45% Prompt 开销</text>
+                    </g>
+                </g>
+
+                <!-- ==================== 4. LAYER 4: 大模型自反思推理、Agent与可控生成层 ==================== -->
+                <g class="layer_group" id="layer4" data-layer="4">
+                    <rect class="layer_bg" x="48" y="510" width="1604" height="124" rx="12" fill="url(#gradL4)" stroke="#8b5cf6" stroke-width="1" stroke-opacity="0.4"/>
+                    <g transform="translate(68, 528)">
+                        <rect x="0" y="0" width="22" height="15" rx="3" fill="#8b5cf6" fill-opacity="0.3"/>
+                        <text class="layer_code" x="11" y="11" fill="#c4b5fd" text-anchor="middle">L4</text>
+                        <text class="layer_title" x="30" y="12" fill="#f5f3ff">认知推理、大模型 Agent 编排与自反思生成层</text>
+                        <text x="360" y="12" fill="#ddd6fe" font-family="var(--mono)" font-size="9" opacity="0.8">/ Cognitive LLM, ReAct Tool Agent &amp; Self-Reflective Generation</text>
+                    </g>
+
+                    <!-- 节点 18-22 -->
+                    <g class="arch_node" id="node-n18" data-id="n18" transform="translate(68, 546)">
+                        <rect class="node_card" width="300" height="74" rx="8" fill="url(#nodeCardBg)" stroke="#a78bfa" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="16" cy="20" r="4.5" fill="#a78bfa"/>
+                        <text class="node_title" x="28" y="22" fill="#f0f6fc">基座大模型高效推理服务</text>
+                        <text class="node_sub" x="28" y="38" fill="#94a3b8">Foundation LLM Serving Engine</text>
+                        <text class="node_sub" x="28" y="52" fill="#64748b">vLLM Speculative Decoding</text>
+                        <rect x="205" y="8" width="84" height="16" rx="4" fill="#5b21b6" fill-opacity="0.4"/>
+                        <text class="node_tag" x="247" y="19" fill="#c4b5fd" text-anchor="middle">120 tokens/s</text>
+                    </g>
+
+                    <g class="arch_node" id="node-n19" data-id="n19" transform="translate(384, 546)">
+                        <rect class="node_card" width="310" height="74" rx="8" fill="url(#nodeCardBg)" stroke="#a78bfa" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="16" cy="20" r="4.5" fill="#a78bfa"/>
+                        <text class="node_title" x="28" y="22" fill="#f0f6fc">ReAct 智能体工具执行编排器</text>
+                        <text class="node_sub" x="28" y="38" fill="#94a3b8">Agentic Tool Executor &amp; Function Calling</text>
+                        <text class="node_sub" x="28" y="52" fill="#64748b">ERP/CRM API Transactions</text>
+                        <rect x="225" y="8" width="74" height="16" rx="4" fill="#5b21b6" fill-opacity="0.4"/>
+                        <text class="node_tag" x="262" y="19" fill="#c4b5fd" text-anchor="middle">Tool-Success 98%</text>
+                    </g>
+
+                    <g class="arch_node" id="node-n20" data-id="n20" transform="translate(710, 546)">
+                        <rect class="node_card" width="320" height="74" rx="8" fill="url(#nodeCardBg)" stroke="#10b981" stroke-width="1.3" stroke-opacity="0.6"/>
+                        <circle cx="16" cy="20" r="4.5" fill="#10b981"/>
+                        <text class="node_title" x="28" y="22" fill="#f0f6fc">Self-RAG 细粒度自反思核验器</text>
+                        <text class="node_sub" x="28" y="38" fill="#94a3b8">Claim-level Fact Verifier &amp; Reflection</text>
+                        <text class="node_sub" x="28" y="52" fill="#64748b">Critic Tokens: [IsRel] [IsSup] [IsUse]</text>
+                        <rect x="225" y="8" width="84" height="16" rx="4" fill="#065f46" fill-opacity="0.5"/>
+                        <text class="node_tag" x="267" y="19" fill="#6ee7b7" text-anchor="middle">幻觉率 &lt; 1.4%</text>
+                    </g>
+
+                    <g class="arch_node" id="node-n21" data-id="n21" transform="translate(1046, 546)">
+                        <rect class="node_card" width="300" height="74" rx="8" fill="url(#nodeCardBg)" stroke="#a78bfa" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="16" cy="20" r="4.5" fill="#a78bfa"/>
+                        <text class="node_title" x="28" y="22" fill="#f0f6fc">可控生成与证据链溯源引用</text>
+                        <text class="node_sub" x="28" y="38" fill="#94a3b8">Controlled NLG &amp; Citation Synthesizer</text>
+                        <text class="node_sub" x="28" y="52" fill="#64748b">Policy Constrained Generation</text>
+                        <rect x="215" y="8" width="74" height="16" rx="4" fill="#5b21b6" fill-opacity="0.4"/>
+                        <text class="node_tag" x="252" y="19" fill="#c4b5fd" text-anchor="middle">溯源对准率 97%</text>
+                    </g>
+
+                    <g class="arch_node" id="node-n22" data-id="n22" transform="translate(1362, 546)">
+                        <rect class="node_card" width="270" height="74" rx="8" fill="url(#nodeCardBg)" stroke="#f59e0b" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="16" cy="20" r="4.5" fill="#f59e0b"/>
+                        <text class="node_title" x="28" y="22" fill="#f0f6fc">置信度评估与动态人机协同</text>
+                        <text class="node_sub" x="28" y="38" fill="#94a3b8">Confidence Estimator &amp; Handoff</text>
+                        <text class="node_sub" x="28" y="52" fill="#64748b">Fallback to Human Expert</text>
+                        <rect x="180" y="8" width="78" height="16" rx="4" fill="#78350f" fill-opacity="0.4"/>
+                        <text class="node_tag" x="219" y="19" fill="#fcd34d" text-anchor="middle">平滑无感分流</text>
+                    </g>
+                </g>
+
+                <!-- ==================== 5. LAYER 5: 异构知识底座 与 LAYER 6: 持续演进闭环 (双区并列) ==================== -->
+                <!-- 底部左侧: LAYER 5 异构知识底座 -->
+                <g class="layer_group" id="layer5" data-layer="5">
+                    <rect class="layer_bg" x="48" y="646" width="780" height="174" rx="12" fill="url(#gradL5)" stroke="#d97706" stroke-width="1" stroke-opacity="0.4"/>
+                    <g transform="translate(68, 664)">
+                        <rect x="0" y="0" width="22" height="15" rx="3" fill="#d97706" fill-opacity="0.3"/>
+                        <text class="layer_code" x="11" y="11" fill="#fbbf24" text-anchor="middle">L5</text>
+                        <text class="layer_title" x="30" y="12" fill="#fef3c7">多源异构知识底座与知识工程管理库</text>
+                        <text x="290" y="12" fill="#fde68a" font-family="var(--mono)" font-size="9" opacity="0.8">/ Multi-Modal Heterogeneous Knowledge Bases</text>
+                    </g>
+
+                    <!-- 节点 23-26 (2x2 网格) -->
+                    <g class="arch_node" id="node-n23" data-id="n23" transform="translate(68, 686)">
+                        <rect class="node_card" width="356" height="56" rx="6" fill="url(#nodeCardBg)" stroke="#f59e0b" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="16" cy="20" r="4.5" fill="#f59e0b"/>
+                        <text class="node_title" x="28" y="22" fill="#f0f6fc">非结构化文档多模态分块向量库</text>
+                        <text class="node_sub" x="28" y="38" fill="#94a3b8">Milvus / Qdrant Dense Vector Store (HNSW Index)</text>
+                        <rect x="270" y="8" width="75" height="16" rx="4" fill="#78350f" fill-opacity="0.4"/>
+                        <text class="node_tag" x="307" y="19" fill="#fde68a" text-anchor="middle">10M+ Chunks</text>
+                    </g>
+
+                    <g class="arch_node" id="node-n24" data-id="n24" transform="translate(442, 686)">
+                        <rect class="node_card" width="366" height="56" rx="6" fill="url(#nodeCardBg)" stroke="#f59e0b" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="16" cy="20" r="4.5" fill="#f59e0b"/>
+                        <text class="node_title" x="28" y="22" fill="#f0f6fc">领域图谱本体与实体关系知识库</text>
+                        <text class="node_sub" x="28" y="38" fill="#94a3b8">Neo4j / NebulaGraph Graph Triplet Knowledge</text>
+                        <rect x="285" y="8" width="70" height="16" rx="4" fill="#78350f" fill-opacity="0.4"/>
+                        <text class="node_tag" x="320" y="19" fill="#fde68a" text-anchor="middle">2.4M Entities</text>
+                    </g>
+
+                    <g class="arch_node" id="node-n25" data-id="n25" transform="translate(68, 750)">
+                        <rect class="node_card" width="356" height="56" rx="6" fill="url(#nodeCardBg)" stroke="#f59e0b" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="16" cy="20" r="4.5" fill="#f59e0b"/>
+                        <text class="node_title" x="28" y="22" fill="#f0f6fc">结构化业务表与实时事务数据库</text>
+                        <text class="node_sub" x="28" y="38" fill="#94a3b8">CRM / ERP / Order Transactional Relational DB</text>
+                        <rect x="270" y="8" width="75" height="16" rx="4" fill="#78350f" fill-opacity="0.4"/>
+                        <text class="node_tag" x="307" y="19" fill="#fde68a" text-anchor="middle">ACID Strong</text>
+                    </g>
+
+                    <g class="arch_node" id="node-n26" data-id="n26" transform="translate(442, 750)">
+                        <rect class="node_card" width="366" height="56" rx="6" fill="url(#nodeCardBg)" stroke="#f59e0b" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="16" cy="20" r="4.5" fill="#f59e0b"/>
+                        <text class="node_title" x="28" y="22" fill="#f0f6fc">高置信度黄金专家问答与政策库</text>
+                        <text class="node_sub" x="28" y="38" fill="#94a3b8">Verified Standard Golden FAQ &amp; Legal Compliance</text>
+                        <rect x="285" y="8" width="70" height="16" rx="4" fill="#78350f" fill-opacity="0.4"/>
+                        <text class="node_tag" x="320" y="19" fill="#fde68a" text-anchor="middle">Zero-Halluc</text>
+                    </g>
+                </g>
+
+                <!-- 底部右侧: LAYER 6 评测基准与闭环持续演进 -->
+                <g class="layer_group" id="layer6" data-layer="6">
+                    <rect class="layer_bg" x="842" y="646" width="810" height="174" rx="12" fill="url(#gradL6)" stroke="#059669" stroke-width="1" stroke-opacity="0.4"/>
+                    <g transform="translate(862, 664)">
+                        <rect x="0" y="0" width="22" height="15" rx="3" fill="#059669" fill-opacity="0.3"/>
+                        <text class="layer_code" x="11" y="11" fill="#34d399" text-anchor="middle">L6</text>
+                        <text class="layer_title" x="30" y="12" fill="#ecfdf5">学术量化评测体系、对齐微调与持续演进闭环</text>
+                        <text x="350" y="12" fill="#a7f3d0" font-family="var(--mono)" font-size="9" opacity="0.8">/ Scientific Evaluation, DPO Alignment &amp; Evolution</text>
+                    </g>
+
+                    <!-- 节点 27-30 (2x2 网格) -->
+                    <g class="arch_node" id="node-n27" data-id="n27" transform="translate(862, 686)">
+                        <rect class="node_card" width="378" height="56" rx="6" fill="url(#nodeCardBg)" stroke="#10b981" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="16" cy="20" r="4.5" fill="#10b981"/>
+                        <text class="node_title" x="28" y="22" fill="#f0f6fc">多维科研量化评测矩阵 (RAGAS)</text>
+                        <text class="node_sub" x="28" y="38" fill="#94a3b8">Faithfulness, Context Precision &amp; Answer Relevancy</text>
+                        <rect x="290" y="8" width="78" height="16" rx="4" fill="#065f46" fill-opacity="0.4"/>
+                        <text class="node_tag" x="329" y="19" fill="#6ee7b7" text-anchor="middle">Score: 92.8</text>
+                    </g>
+
+                    <g class="arch_node" id="node-n28" data-id="n28" transform="translate(1256, 686)">
+                        <rect class="node_card" width="376" height="56" rx="6" fill="url(#nodeCardBg)" stroke="#10b981" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="16" cy="20" r="4.5" fill="#10b981"/>
+                        <text class="node_title" x="28" y="22" fill="#f0f6fc">人机交互轨迹与隐式偏好收集器</text>
+                        <text class="node_sub" x="28" y="38" fill="#94a3b8">Implicit Feedback, Thumbs &amp; Human Corrections</text>
+                        <rect x="290" y="8" width="76" height="16" rx="4" fill="#065f46" fill-opacity="0.4"/>
+                        <text class="node_tag" x="328" y="19" fill="#6ee7b7" text-anchor="middle">Active Loop</text>
+                    </g>
+
+                    <g class="arch_node" id="node-n29" data-id="n29" transform="translate(862, 750)">
+                        <rect class="node_card" width="378" height="56" rx="6" fill="url(#nodeCardBg)" stroke="#10b981" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="16" cy="20" r="4.5" fill="#10b981"/>
+                        <text class="node_title" x="28" y="22" fill="#f0f6fc">动态知识冲突检测与版本同步器</text>
+                        <text class="node_sub" x="28" y="38" fill="#94a3b8">Temporal Inconsistency Resolver &amp; KG Updater</text>
+                        <rect x="290" y="8" width="78" height="16" rx="4" fill="#065f46" fill-opacity="0.4"/>
+                        <text class="node_tag" x="329" y="19" fill="#6ee7b7" text-anchor="middle">Auto-Sync</text>
+                    </g>
+
+                    <g class="arch_node" id="node-n30" data-id="n30" transform="translate(1256, 750)">
+                        <rect class="node_card" width="376" height="56" rx="6" fill="url(#nodeCardBg)" stroke="#10b981" stroke-width="1" stroke-opacity="0.5"/>
+                        <circle cx="16" cy="20" r="4.5" fill="#10b981"/>
+                        <text class="node_title" x="28" y="22" fill="#f0f6fc">持续直接偏好优化流水线 (DPO)</text>
+                        <text class="node_sub" x="28" y="38" fill="#94a3b8">Continual DPO &amp; Domain LoRA Online Fine-tuning</text>
+                        <rect x="290" y="8" width="76" height="16" rx="4" fill="#065f46" fill-opacity="0.4"/>
+                        <text class="node_tag" x="328" y="19" fill="#6ee7b7" text-anchor="middle">LoRA Adapters</text>
+                    </g>
+                </g>
+
+                <!-- ==================== 底部科研创新看板与关键学术指标 ==================== -->
+                <g id="academicCards" transform="translate(48, 832)">
+                    <rect width="1604" height="106" rx="10" fill="#0b1324" stroke="#1e293b" stroke-width="1"/>
+                    
+                    <!-- 创新点 1 -->
+                    <g transform="translate(24, 16)">
+                        <rect width="365" height="74" rx="6" fill="#111c33" stroke="#2563eb" stroke-width="1" stroke-opacity="0.4"/>
+                        <text x="14" y="22" fill="#60a5fa" font-family="var(--sans)" font-size="11" font-weight="700">创新点 1 · 符号图谱与神经向量协同双轨 RAG</text>
+                        <text x="14" y="42" fill="#94a3b8" font-family="var(--sans)" font-size="9.5">突破单一向量检索在复杂多跳关系上的语义鸿沟，</text>
+                        <text x="14" y="58" fill="#94a3b8" font-family="var(--sans)" font-size="9.5">实现子图多跳推理与稠密检索的 RRF 互补融合。</text>
+                    </g>
+
+                    <!-- 创新点 2 -->
+                    <g transform="translate(414, 16)">
+                        <rect width="365" height="74" rx="6" fill="#111c33" stroke="#10b981" stroke-width="1" stroke-opacity="0.4"/>
+                        <text x="14" y="22" fill="#34d399" font-family="var(--sans)" font-size="11" font-weight="700">创新点 2 · 细粒度 Claim 级反思抗幻觉机制</text>
+                        <text x="14" y="42" fill="#94a3b8" font-family="var(--sans)" font-size="9.5">引入 Self-RAG 反思标记生成与证据链对准校验，</text>
+                        <text x="14" y="58" fill="#94a3b8" font-family="var(--sans)" font-size="9.5">使客服事实回答幻觉率降低至行业领先的 &lt; 1.4%。</text>
+                    </g>
+
+                    <!-- 创新点 3 -->
+                    <g transform="translate(804, 16)">
+                        <rect width="365" height="74" rx="6" fill="#111c33" stroke="#a855f7" stroke-width="1" stroke-opacity="0.4"/>
+                        <text x="14" y="22" fill="#c084fc" font-family="var(--sans)" font-size="11" font-weight="700">创新点 3 · 时序知识冲突自消解与 DPO 对齐</text>
+                        <text x="14" y="42" fill="#94a3b8" font-family="var(--sans)" font-size="9.5">结合业务生命周期的时序知识图谱自更新，</text>
+                        <text x="14" y="58" fill="#94a3b8" font-family="var(--sans)" font-size="9.5">借助人机反馈闭环持续迭代轻量化领域 LoRA 权重。</text>
+                    </g>
+
+                    <!-- 性能指标 -->
+                    <g transform="translate(1194, 16)">
+                        <rect width="386" height="74" rx="6" fill="#0f172a" stroke="#0ea5e9" stroke-width="1" stroke-opacity="0.3"/>
+                        <text x="16" y="22" fill="#38bdf8" font-family="var(--mono)" font-size="10.5" font-weight="700">SYSTEM BENCHMARK MATRIX (SOTA)</text>
+                        <g transform="translate(16, 34)">
+                            <text x="0" y="14" fill="#94a3b8" font-family="var(--mono)" font-size="9">RAGAS Faithfulness: <tspan fill="#34d399" font-weight="700">96.8%</tspan></text>
+                            <text x="190" y="14" fill="#94a3b8" font-family="var(--mono)" font-size="9">Answer Relevance: <tspan fill="#38bdf8" font-weight="700">94.2%</tspan></text>
+                            <text x="0" y="32" fill="#94a3b8" font-family="var(--mono)" font-size="9">P99 Latency: <tspan fill="#fbbf24" font-weight="700">480ms</tspan></text>
+                            <text x="190" y="32" fill="#94a3b8" font-family="var(--mono)" font-size="9">Multi-hop Hit@3: <tspan fill="#c084fc" font-weight="700">91.5%</tspan></text>
+                        </g>
+                    </g>
+                </g>
+
+                <!-- ==================== 6. 数据流连线与动态路径 (Flow Connectors) ==================== -->
+                <g id="flowLines" stroke-linecap="round">
+                    <!-- L1 -> L2 流向 -->
+                    <path class="flow_line animated" id="flow-l1-l2" d="M 253 104 L 253 156" stroke="#38bdf8" marker-end="url(#arrow-cyan)"/>
+                    <path class="flow_line animated" id="flow-l1-l2-b" d="M 645 104 L 645 156" stroke="#38bdf8" marker-end="url(#arrow-cyan)"/>
+                    <path class="flow_line animated" id="flow-l1-l2-c" d="M 1037 104 L 1037 156" stroke="#38bdf8" marker-end="url(#arrow-cyan)"/>
+
+                    <!-- L2 -> L3 双轨分流 (Query 分发至 Track A 图谱 & Track B 向量) -->
+                    <!-- 分流到图谱 -->
+                    <path class="flow_line animated" id="flow-l2-graph" d="M 645 208 C 645 240, 445 250, 445 296" stroke="#a855f7" marker-end="url(#arrow-violet)"/>
+                    <!-- 分流到向量 -->
+                    <path class="flow_line animated" id="flow-l2-dense" d="M 645 208 C 645 240, 973 250, 973 296" stroke="#38bdf8" marker-end="url(#arrow-cyan)"/>
+                    <!-- DST 状态注入记忆与 HyDE -->
+                    <path class="flow_line" id="flow-dst-dense" d="M 1037 208 C 1037 250, 1498 250, 1498 296" stroke="#6366f1" marker-end="url(#arrow-cyan)"/>
+
+                    <!-- L3 内部: Track A & Track B 汇聚至 RRF 融合 -->
+                    <path class="flow_line animated" id="flow-trackA-rrf" d="M 445 370 C 445 390, 322 395, 322 420" stroke="#a855f7" marker-end="url(#arrow-violet)"/>
+                    <path class="flow_line animated" id="flow-trackB-rrf" d="M 973 370 C 973 390, 322 395, 322 420" stroke="#38bdf8" marker-end="url(#arrow-cyan)"/>
+                    
+                    <!-- RRF -> 重排 -> 剪枝 -->
+                    <path class="flow_line animated" id="flow-rrf-rerank" d="M 562 448 L 582 448" stroke="#2dd4bf" marker-end="url(#arrow-green)"/>
+                    <path class="flow_line animated" id="flow-rerank-prune" d="M 1092 448 L 1112 448" stroke="#2dd4bf" marker-end="url(#arrow-green)"/>
+
+                    <!-- L3 压缩后上下文 -> L4 大模型推理 -->
+                    <path class="flow_line animated" id="flow-l3-llm" d="M 1365 476 C 1365 510, 218 510, 218 546" stroke="#10b981" marker-end="url(#arrow-green)"/>
+
+                    <!-- L4 内部协作: LLM <-> Agent 工具执行 -->
+                    <path class="flow_line animated" id="flow-llm-tool" d="M 368 570 L 384 570" stroke="#a78bfa" marker-end="url(#arrow-violet)"/>
+                    <path class="flow_line" id="flow-tool-llm" d="M 384 595 L 368 595" stroke="#a78bfa" stroke-dasharray="3 3"/>
+
+                    <!-- LLM -> Self-RAG 反思核验 -->
+                    <path class="flow_line animated" id="flow-llm-selfrag" d="M 694 583 L 710 583" stroke="#10b981" marker-end="url(#arrow-green)"/>
+
+                    <!-- Self-RAG -> 可控生成 -> 人机协同评估 -->
+                    <path class="flow_line animated" id="flow-selfrag-nlg" d="M 1030 583 L 1046 583" stroke="#a78bfa" marker-end="url(#arrow-violet)"/>
+                    <path class="flow_line animated" id="flow-nlg-handoff" d="M 1346 583 L 1362 583" stroke="#f59e0b" marker-end="url(#arrow-amber)"/>
+
+                    <!-- L5 知识注入流 (底座注入检索轨道) -->
+                    <path class="flow_line" id="flow-kbg-inject" d="M 625 686 C 625 500, 693 420, 693 370" stroke="#f59e0b" stroke-dasharray="4 4" marker-end="url(#arrow-amber)"/>
+                    <path class="flow_line" id="flow-kvd-inject" d="M 246 686 C 246 500, 973 420, 973 370" stroke="#f59e0b" stroke-dasharray="4 4" marker-end="url(#arrow-amber)"/>
+
+                    <!-- L4 回复输出回环与 L6 评测反馈闭环 -->
+                    <path class="flow_line" id="flow-feedback-l6" d="M 1497 620 C 1497 650, 1444 650, 1444 686" stroke="#10b981" stroke-dasharray="4 4" marker-end="url(#arrow-green)"/>
+                    <path class="flow_line" id="flow-dpo-sync" d="M 1444 750 C 1444 790, 1051 790, 1051 750" stroke="#10b981" stroke-dasharray="4 4"/>
+                    <path class="flow_line" id="flow-conflict-update" d="M 862 778 C 830 778, 830 778, 808 778" stroke="#10b981" marker-end="url(#arrow-green)"/>
+                </g>
+            </svg>
+
+            <!-- 浮动 HUD 缩放平移控制器 -->
+            <div class="hud_controls">
+                <button class="hud_btn" onclick="zoomIn()" title="放大 (Zoom In)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </button>
+                <div class="hud_zoom_level" id="zoomLevel">100%</div>
+                <button class="hud_btn" onclick="zoomOut()" title="缩小 (Zoom Out)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </button>
+                <button class="hud_btn" onclick="resetZoom()" title="适应画布 (Fit View)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                </button>
+            </div>
+
+            <!-- 右侧科研模块详细分析面板 (Inspector Drawer) -->
+            <aside class="inspector_drawer" id="inspectorDrawer">
+                <div class="drawer_header">
+                    <div class="drawer_meta">
+                        <span class="drawer_badge" id="drawerBadge">LAYER 3 · RESEARCH CORE</span>
+                        <h2 class="drawer_title" id="drawerTitle">多跳子图推理与路径发现</h2>
+                        <span class="drawer_sub" id="drawerSub">Multi-hop GNN Path Finder &amp; Subgraph Reasoning</span>
+                    </div>
+                    <button class="drawer_close" onclick="closeDrawer()" title="关闭面板 (Esc)">✕</button>
+                </div>
+
+                <div class="drawer_body">
+                    <!-- 研究痛点与核心价值 -->
+                    <div class="drawer_section">
+                        <div class="drawer_section_title">RESEARCH MOTIVATION · 科研动机与痛点</div>
+                        <p class="drawer_desc" id="drawerMotivation">
+                            传统稠密向量检索在跨实体多跳关联推理（如“政策变更导致退订费率变化”）时存在严重语义断层。本模块利用图神经网络与符号路径提取，弥合文本向量与逻辑知识的鸿沟。
+                        </p>
+                    </div>
+
+                    <!-- 核心算法与数学公式 -->
+                    <div class="drawer_section">
+                        <div class="drawer_section_title">MATHEMATICAL FORMULATION · 核心公式与算法</div>
+                        <div class="math_box" id="drawerFormula">
+                            h_v^{(k)} = \sigma \left( W_k \cdot \text{AGG} \left( \{ h_u^{(k-1)} : u \in \mathcal{N}(v) \} \right) + B_k h_v^{(k-1)} \right)
+                        </div>
+                        <div class="math_desc" id="drawerFormulaDesc">
+                            基于 k-hop 邻域拓扑聚合的子图节点向量表征计算，结合 RRF 倒数排序加权策略。
+                        </div>
+                    </div>
+
+                    <!-- 关键科研量化指标 -->
+                    <div class="drawer_section">
+                        <div class="drawer_section_title">KEY SCIENTIFIC METRICS · 评测表现</div>
+                        <div class="metric_grid">
+                            <div class="metric_card">
+                                <span class="metric_label">MRR@5 准确率</span>
+                                <span class="metric_val accent" id="drawerMetric1">0.892</span>
+                            </div>
+                            <div class="metric_card">
+                                <span class="metric_label">多跳实体召回率</span>
+                                <span class="metric_val" id="drawerMetric2">93.4%</span>
+                            </div>
+                            <div class="metric_card">
+                                <span class="metric_label">子图检索时延</span>
+                                <span class="metric_val" id="drawerMetric3">28 ms</span>
+                            </div>
+                            <div class="metric_card">
+                                <span class="metric_label">抗噪鲁棒性</span>
+                                <span class="metric_val" id="drawerMetric4">+14.2%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 前沿代表论文 -->
+                    <div class="drawer_section">
+                        <div class="drawer_section_title">SOTA REFERENCE PAPERS · 代表学术文献</div>
+                        <div class="paper_pill">
+                            <span class="paper_title" id="drawerPaperTitle">From Local to Global: A Graph RAG Approach to Query-Focused Summarization</span>
+                            <span class="paper_venue" id="drawerPaperVenue">Edge et al., Microsoft Research, arXiv:2404.16130 (2024)</span>
+                        </div>
+                    </div>
+
+                    <!-- 输入输出与架构连通 -->
+                    <div class="drawer_section">
+                        <div class="drawer_section_title">I/O SPECIFICATION · 数据协议与输入输出</div>
+                        <p class="drawer_desc" id="drawerIO">
+                            <b>Input:</b> 意图重写查询 $q^*$, 链接实体集合 $\{e_1, e_2, ...\} \subset \mathcal{V}_G$<br>
+                            <b>Output:</b> $k$-跳证据子图路径集合 $\mathcal{P} = \{ (e_i, r_{ij}, e_j) \}$ 及拓扑置信度分布
+                        </p>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <!-- 底部科研图例与状态栏 -->
+        <footer class="footer">
+            <ul class="legend_list">
+                <li class="legend_item">
+                    <span class="legend_line dashed" style="--cyan: #38bdf8;"></span>
+                    <span>实时推理流 (Online Inference)</span>
+                </li>
+                <li class="legend_item">
+                    <span class="legend_line" style="background: #a855f7;"></span>
+                    <span>知识图谱推理轨道 (Graph Track)</span>
+                </li>
+                <li class="legend_item">
+                    <span class="legend_line" style="background: #10b981;"></span>
+                    <span>自反思与真实性核验 (Self-RAG)</span>
+                </li>
+                <li class="legend_item">
+                    <span class="legend_line" style="background: #f59e0b;"></span>
+                    <span>异构知识注入 (Knowledge Base)</span>
+                </li>
+            </ul>
+
+            <div class="footer_stats">
+                <div>核心科研模块: <span>30 个</span></div>
+                <div>系统层级: <span>6 大层次</span></div>
+                <div>渲染格式: <span>矢量 SVG (IEEE/ACM 论文级)</span></div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 交互脚本与科研知识库配置 -->
+    <script>
+        /**
+         * 30个科研模块的深层次学术数据字典
+         */
+        const NODE_DATABASE = {
+            "n1": {
+                badge: "LAYER 1 · PERCEPTION",
+                title: "全渠道接入与实时会话网关",
+                sub: "Omnichannel Gateway (WebSocket/SSE/WebRTC)",
+                motivation: "统一整合 Web、APP、小程序、语音 IVR 与企业 IM 等异构信道，维护高并发低延迟的双工有状态连接。",
+                formula: "\\mathcal{S}_{session} = \\langle uid, cid, t_{create}, \\Phi_{channel}, \\mathcal{K}_{ctx} \\rangle",
+                formulaDesc: "会话上下文元组建模，支持跨通道断线平滑重连与分布式租约管理。",
+                metric1: "P99 < 20ms",
+                metric2: "50k+ QPS",
+                metric3: "Zero Loss",
+                metric4: "99.999% SLA",
+                paperTitle: "High-Throughput Streaming Dialogue Architectures for Omnichannel Services",
+                paperVenue: "IEEE Transactions on Services Computing (2024)",
+                io: "<b>Input:</b> 异构客户端原始网络数据包 (JSON / Audio Stream / Binary)<br><b>Output:</b> 统一会话帧数据流 & 会话标识符 SessionID"
+            },
+            "n2": {
+                badge: "LAYER 1 · MULTIMODAL",
+                title: "语音/图像多模态特征预处理器",
+                sub: "Whisper-v3 ASR & ViT Multi-modal Encoder",
+                motivation: "消除多模态交互输入中的噪声，将口语语音实时转录为高保真文本，将用户截图/凭证提取为视觉语义 Token。",
+                formula: "X_{text} = \\arg\\max_W P(W \\mid X_{audio}; \\theta_{whisper}), \\quad z_{img} = \\text{ViT}(I_{crop})",
+                formulaDesc: "语音端到端转录最大后验概率估计与视觉多层 Transformer 特征编码投影。",
+                metric1: "3.2% WER",
+                metric2: "180ms ASR",
+                metric3: "98.4% OCR",
+                metric4: "+22% 降噪",
+                paperTitle: "Robust Speech Recognition via Large-Scale Weak Supervision (Whisper)",
+                paperVenue: "Radford et al., OpenAI / ICML (2023)",
+                io: "<b>Input:</b> 原始音频波形 (PCM/WAV) 或图像 (PNG/JPEG)<br><b>Output:</b> 规范化中文文本串与多模态嵌入张量 $\\mathbf{z}_{vis} \\in \\mathbb{R}^{d}$"
+            },
+            "n3": {
+                badge: "LAYER 1 · STREAMING",
+                title: "流式双工调度与打断控制器",
+                sub: "Stream Session Controller & VAD Interruption",
+                motivation: "实现自然类人对话的流畅度，支持客户端流式边输入边思考，以及用户随时插话的无感语音断句 (Barge-in)。",
+                formula: "P(VAD = 1) = \\sigma(f_{\\theta}(x_t, h_{t-1})), \\quad \\text{Trigger}(Interrupt) \\iff \\sum_{i=0}^k P_{t-i} > \\tau",
+                formulaDesc: "基于循环神经网络的端点检测概率累计与打断判定阈值函数。",
+                metric1: "< 60ms",
+                metric2: "零音频丢包",
+                metric3: "97.8% 准确打断",
+                metric4: "双工全双通",
+                paperTitle: "Full-Duplex Speech Interaction in Conversational Agents: A Survey",
+                paperVenue: "ACM Computing Surveys (CSUR 2024)",
+                io: "<b>Input:</b> 连续实时音频分块流 (Audio Chunks)<br><b>Output:</b> 对话意图断句触发事件 (Turn-Taking Events) 与打断指令"
+            },
+            "n4": {
+                badge: "LAYER 1 · SAFETY",
+                title: "隐私脱敏与越狱防御防火墙",
+                sub: "PII Masking & Adversarial Guardrail Engine",
+                motivation: "严格遵守数据合规（GDPR/个人信息保护法），抵御 Prompt Injection、越狱提示与敏感词攻击。",
+                formula: "\\tilde{X} = \\mathcal{R}_{regex}(X) \\oplus \\text{NamedEntityMask}(X), \\quad \\text{Risk}(X) > \\theta_{safe}",
+                formulaDesc: "差分隐私实体替换算法与轻量级对抗攻击分类器级联防御。",
+                metric1: "99.4% 拦截率",
+                metric2: "< 8ms 时延",
+                metric3: "零合规泄露",
+                metric4: "F1: 0.985",
+                paperTitle: "Llama Guard: LLM-based Input-Output Safeguard for Human-AI Conversations",
+                paperVenue: "Inan et al., Meta AI, arXiv:2312.06674 (2023)",
+                io: "<b>Input:</b> 用户原始未经审查输入文本 $X$<br><b>Output:</b> 匿名化安全文本 $\\tilde{X}$ 或安全阻断响应"
+            },
+            "n5": {
+                badge: "LAYER 2 · SEMANTICS",
+                title: "意图层次分类与情感倾向判别",
+                sub: "Hierarchical Intent Tree & Sentiment Mining",
+                motivation: "将用户多轮诉求精准定位于粗粒度大类（如售后服务、退换货、账单争议）及细粒度叶子节点，并检测用户情绪状态。",
+                formula: "P(c_{l} \\mid X) = \\text{Softmax}(W_l \\cdot [h_{cls}; P(c_{l-1})]), \\quad s_{emo} \\in [-1.0, +1.0]",
+                formulaDesc: "结合先验层级拓扑结构的条件概率链式预测与多任务情感回归。",
+                metric1: "F1: 94.8%",
+                metric2: "300+ 意图叶节点",
+                metric3: "15ms 推理",
+                metric4: "情绪分类 91%",
+                paperTitle: "Hierarchical Multi-Label Intent Classification with Semantic Boundary Constraints",
+                paperVenue: "EMNLP Findings (2023)",
+                io: "<b>Input:</b> 脱敏后用户查询文本 $\\tilde{X}$<br><b>Output:</b> 层次意图路径 $\\mathcal{T}_{intent}$ 与情绪唤醒度数值 $s_{emo}$"
+            },
+            "n6": {
+                badge: "LAYER 2 · QUERY REWRITE",
+                title: "多轮指代消解与语义补全重写",
+                sub: "Coreference Resolution & Context Rewriter",
+                motivation: "用户在多轮对话中常用“它多少钱”、“第二个也是吗”等省略和代词，重写器将其还原为包含完备上下文的独立可检索 Query。",
+                formula: "q^* = \\arg\\max_{Q'} P(Q' \\mid q_t, H_{1:t-1}; \\theta_{rewrite})",
+                formulaDesc: "基于自回归序列生成的重写概率最大化，保留核心名词短语与限定约束。",
+                metric1: "EM: 91.2%",
+                metric2: "BLEU-4: 87.5",
+                metric3: "98% 实体保留",
+                metric4: "时延: 45ms",
+                paperTitle: "Query Rewriting in Conversational Search: A Systematic Evaluation",
+                paperVenue: "SIGIR (2023)",
+                io: "<b>Input:</b> 当前轮用户问句 $q_t$ 及前序对话历史 $H_{1:t-1}$<br><b>Output:</b> 去指代、语义完备的独立查询 $q^*$"
+            },
+            "n7": {
+                badge: "LAYER 2 · DIALOGUE STATE",
+                title: "动态对话状态跟踪器 (DST)",
+                sub: "Dynamic Slot Filling & Multi-turn Belief State",
+                motivation: "维护结构化业务表单的填充进度（如订单号、机型、故障码、预订日期），判定任务完成度与缺失槽位。",
+                formula: "\\mathcal{B}_t = \\mathcal{B}_{t-1} \\cup \\{ (s_i, v_i) \\mid P(s_i = v_i \\mid q^*, \\mathcal{B}_{t-1}) > \\gamma \\}",
+                formulaDesc: "槽位取值信念分布更新与多轮状态转移马尔可夫决策过程。",
+                metric1: "JGA: 88.6%",
+                metric2: "Slot F1: 96%",
+                metric3: "即时更新",
+                metric4: "零状态回滚",
+                paperTitle: "Towards Robust Dialogue State Tracking on Complex Business Schemas",
+                paperVenue: "ACL (2023)",
+                io: "<b>Input:</b> 完备查询 $q^*$ 及上一轮信念状态 $\\mathcal{B}_{t-1}$<br><b>Output:</b> 更新后槽位-取值状态字典 $\\mathcal{B}_t$"
+            },
+            "n8": {
+                badge: "LAYER 2 · MEMORY",
+                title: "分层工作记忆与情景长程记忆栈",
+                sub: "Working Memory Buffer & Episodic Vector Stack",
+                motivation: "模拟人类记忆机制，分为瞬时工作区（当前对话槽位）、会话级情景记忆与用户画像长期记忆，支持跨月复核。",
+                formula: "M_{final} = \\text{Compress}(M_{work}) \\oplus \\text{TopK}_{cosine}(\\text{Embed}(q^*), \\mathcal{M}_{episodic})",
+                formulaDesc: "短期工作记忆摘要与长程向量情景记忆检索的高维空间级联。",
+                metric1: "100k Token",
+                metric2: "Top-5 准确率",
+                metric3: "自动遗忘遗留",
+                metric4: "亚毫秒读取",
+                paperTitle: "Generative Agents: Interactive Simulacra of Human Behavior (Memory Stream)",
+                paperVenue: "Park et al., Stanford / UIST (2023)",
+                io: "<b>Input:</b> 用户唯一标识符 UID 与当前查询语义向量<br><b>Output:</b> 注入上下文的相关历史画像与先验问答记忆块"
+            },
+            "n9": {
+                badge: "LAYER 3 · GRAPHRAG (TRACK A)",
+                title: "领域实体链接与对齐",
+                sub: "Entity Linking & Disambiguation",
+                motivation: "识别查询中的口语化表达、商品简写、故障术语，将其精确映射并链接到知识图谱的规范实体节点 (Canonical Entities)。",
+                formula: "e^* = \\arg\\max_{e \\in \\mathcal{E}} \\left( \\alpha \\cdot \\cos(z_m, z_e) + (1-\\alpha) \\cdot P_{prior}(e \\mid m) \\right)",
+                formulaDesc: "结合上下文密集表征余弦相似度与知识库先验实体流行度的双重排序。",
+                metric1: "P@1: 96.1%",
+                metric2: "覆盖 98.7%",
+                metric3: "歧义消除率 94%",
+                metric4: "12ms 计算",
+                paperTitle: "End-to-End Neural Entity Linking with Cross-Encoder Context Interaction",
+                paperVenue: "NAACL (2022)",
+                io: "<b>Input:</b> 候选文本提及 (Mentions) $m \\in q^*$<br><b>Output:</b> 知识图谱对齐节点集合 $\\mathcal{V}_{linked} \\subset \\mathcal{V}_G$"
+            },
+            "n10": {
+                badge: "LAYER 3 · GRAPHRAG (TRACK A)",
+                title: "多跳子图推理与路径发现",
+                sub: "Multi-hop GNN Path Finder & Subgraph Extraction",
+                motivation: "跨越非连续文档间的信息孤岛，在知识图谱上执行 2-3 跳的关系扩散，找出解释因果关系（如故障根因-处理方案）的推理链条。",
+                formula: "h_v^{(k)} = \\sigma \\left( W_k \\cdot \\text{AGG} \\left( \\{ h_u^{(k-1)} : u \\in \\mathcal{N}(v) \\} \\right) + B_k h_v^{(k-1)} \\right)",
+                formulaDesc: "关系感知图卷积网络 (R-GCN) 消息传递机制，提取实体间的最优连通路径。",
+                metric1: "MRR: 0.892",
+                metric2: "多跳召回 93.4%",
+                metric3: "28ms 子图提取",
+                metric4: "可解释性 100%",
+                paperTitle: "From Local to Global: A Graph RAG Approach to Query-Focused Summarization",
+                paperVenue: "Edge et al., Microsoft Research, arXiv:2404.16130 (2024)",
+                io: "<b>Input:</b> 对齐实体 $\\mathcal{V}_{linked}$ 及多跳跳数约束 $k=2$<br><b>Output:</b> 证据子图三元组集合 $\\mathcal{G}_{sub} = \\{ (h, r, t) \\}$"
+            },
+            "n11": {
+                badge: "LAYER 3 · GRAPHRAG (TRACK A)",
+                title: "符号三元组规则匹配",
+                sub: "Symbolic Triplet Reasoner",
+                motivation: "对于硬性业务逻辑（如退订扣费比例、退货时效），采用确定性的一阶谓词逻辑与 Cypher 查询，确保绝对正确无歧义。",
+                formula: "\\forall x, y: \\text{Purchased}(x, y) \\wedge \\text{Days}(y) \\le 7 \\implies \\text{EligibleForRefund}(x)",
+                formulaDesc: "Horn 子句规则推理引擎与图数据库声明式规则匹配。",
+                metric1: "100% 确定性",
+                metric2: "零概率幻觉",
+                metric3: "< 5ms 匹配",
+                metric4: "规则库 10k+",
+                paperTitle: "Knowledge Graph Embedding with Logical Rule Constraints",
+                paperVenue: "AAAI Conference on Artificial Intelligence (2023)",
+                io: "<b>Input:</b> 结构化槽位与实体谓词条件<br><b>Output:</b> 布尔约束结果与判定结论 (Rule Output)"
+            },
+            "n12": {
+                badge: "LAYER 3 · NEURAL (TRACK B)",
+                title: "稠密多向量双塔语义检索",
+                sub: "BGE-M3 / ColBERT Multi-vector Dense Search",
+                motivation: "捕获深层抽象语义相似度，克服词汇不匹配（Vocabulary Mismatch）难题，实现高维向量空间的高召回匹配。",
+                formula: "S_{dense}(q, d) = \\sum_{i \\in q} \\max_{j \\in d} (E_q)_i \\cdot (E_d)_j^T \\quad \\text{or} \\quad \\cos(v_q, v_d)",
+                formulaDesc: "ColBERT 晚期交互 (Late Interaction) 细粒度 Token 相似度计算或单向量点积。",
+                metric1: "Recall@10: 95.3%",
+                metric2: "NDCG@10: 0.88",
+                metric3: "HNSW 18ms",
+                metric4: "8192 长度",
+                paperTitle: "BGE-M3: Multi-Lingual, Multi-Functionality, Multi-Granularity Text Embeddings",
+                paperVenue: "Chen et al., BAAI (2024)",
+                io: "<b>Input:</b> 语义重写查询文本 $q^*$<br><b>Output:</b> 稠密候选文档切片列表 $\\mathcal{D}_{dense} = \\{ d_1, d_2, ... \\}$ 及得分"
+            },
+            "n13": {
+                badge: "LAYER 3 · NEURAL (TRACK B)",
+                title: "学习型稀疏词项级精准检索",
+                sub: "SPLADE-v2 + BM25 Precision Search",
+                motivation: "专攻型号、代码、专有名词、错误码等精确关键词检索，防止稠密向量“过度联想”导致的精度损失。",
+                formula: "w_j(d) = \\max_{t \\in d} \\log(1 + \\text{ReLU}(W_j h_t)), \\quad S_{sparse}(q, d) = \\sum_{t \\in q \\cap d} w_t(q) \\cdot w_t(d)",
+                formulaDesc: "基于神经网络的词汇扩展权重稀疏化建模与倒排索引加速。",
+                metric1: "精准度 97.2%",
+                metric2: "型号召回 99%",
+                metric3: "BM25 互补",
+                metric4: "5ms 倒排查询",
+                paperTitle: "SPLADE v2: Sparse Lexical and Expansion Model for Information Retrieval",
+                paperVenue: "SIGIR (2022)",
+                io: "<b>Input:</b> 查询文本 $q^*$<br><b>Output:</b> 稀疏词权匹配文档列表 $\\mathcal{D}_{sparse}$"
+            },
+            "n14": {
+                badge: "LAYER 3 · NEURAL (TRACK B)",
+                title: "假想文档生成与多查询扩展",
+                sub: "HyDE (Hypothetical Doc) & Query Expansion",
+                motivation: "当问句极短或提问方式抽象时，先由 LLM 生成一篇假想的答案短文（HyDE），以答案找答案，大幅缩小问答语义鸿沟。",
+                formula: "d_{hypo} \\sim \\mathcal{M}_{gen}(\\cdot \\mid q^*), \\quad v_{search} = \\beta \\cdot \\text{Enc}(q^*) + (1-\\beta) \\cdot \\text{Enc}(d_{hypo})",
+                formulaDesc: "假想文档表征插值加权向量检索机制。",
+                metric1: "+8.4% MRR",
+                metric2: "短句召回 +18%",
+                metric3: "3 组扩展 Query",
+                metric4: "P@5: 92.1%",
+                paperTitle: "Precise Zero-Shot Dense Retrieval without Relevance Labels (HyDE)",
+                paperVenue: "Gao et al., ACL (2023)",
+                io: "<b>Input:</b> 原始简略提问 $q^*$<br><b>Output:</b> 假想合成文档 $d_{hypo}$ 及扩展查询集 $\\{ q'_1, q'_2, q'_3 \\}$"
+            },
+            "n15": {
+                badge: "LAYER 3 · FUSION",
+                title: "倒数排序融合器 (RRF) & 置信度归一化",
+                sub: "Reciprocal Rank Fusion (RRF: k=60) & Score Calibration",
+                motivation: "将来自稀疏检索、稠密检索、图谱推理等不同量纲的排序结果做无参加权融合，具备极高鲁棒性与免调参优势。",
+                formula: "S_{RRF}(d) = \\sum_{m \\in \\mathcal{M}} \\frac{w_m}{k + r_m(d)}, \\quad k=60",
+                formulaDesc: "倒数排序加权和算法，保证多路检索证据的一致性互补。",
+                metric1: "NDCG@10: 0.91",
+                metric2: "时延 < 2ms",
+                metric3: "多源无量纲",
+                metric4: "抗单路崩溃",
+                paperTitle: "Reciprocal Rank Fusion Outperforms Condorcet and Individual Rankers",
+                paperVenue: "Cormack et al., SIGIR (2009 / 广泛应用于现代 RAG)",
+                io: "<b>Input:</b> 多路候选列表 $\\{ \\mathcal{D}_{dense}, \\mathcal{D}_{sparse}, \\mathcal{D}_{graph} \\}$<br><b>Output:</b> 粗排统一候选列表 $\\mathcal{D}_{fused}$ (Top-50)"
+            },
+            "n16": {
+                badge: "LAYER 3 · FUSION",
+                title: "深度交叉注意力重排精滤器 (Neural Reranker)",
+                sub: "Cross-Encoder (bge-reranker-large) Token Interaction",
+                motivation: "双塔模型只在向量层面计算内积，重排器将 Query 与每个候选 Chunk 拼接输入完整 Transformer，进行全注意力交叉评分。",
+                formula: "S_{rerank}(q, d) = \\text{Sigmoid}(W \\cdot [\\text{BERT}(q \\circ d)]_{CLS})",
+                formulaDesc: "全交叉注意力全词交互精排模型，输出 [0, 1] 的绝对相关性置信度。",
+                metric1: "Top-3 准度 94%",
+                metric2: "MRR 提升 12%",
+                metric3: "35ms 精排",
+                metric4: "阈值精滤过滤",
+                paperTitle: "Cross-Encoder Reranking in Retrieval Augmented Generation",
+                paperVenue: "EMNLP (2023)",
+                io: "<b>Input:</b> 粗排 Top-50 文档与用户查询拼接序列 $[q \\circ d_i]$<br><b>Output:</b> 高置信精排候选文档集 $\\mathcal{D}_{ranked}$ (Top-5)"
+            },
+            "n17": {
+                badge: "LAYER 3 · FUSION",
+                title: "信息瓶颈上下文自适应剪枝器 (Context Pruner)",
+                sub: "Information Bottleneck Token Compression & Filter",
+                motivation: "去除检索结果中与答案无关的冗余铺垫与噪声，避免“迷失在中间 (Lost in the Middle)”现象，降低大模型输入 Token 消耗。",
+                formula: "\\min I(X; Z) - \\beta I(Y; Z), \\quad \\text{CompressRatio} = \\frac{|Z|}{|X|} \\approx 0.55",
+                formulaDesc: "信息瓶颈约束下的句子级/Token 级重要性剪枝与自适应重组。",
+                metric1: "-45% Prompt 开销",
+                metric2: "零关键信息丢失",
+                metric3: "+3.2% 准确度",
+                metric4: "< 10ms 剪枝",
+                paperTitle: "Lost in the Middle: How Language Models Use Long Contexts",
+                paperVenue: "Liu et al., Stanford / TACL (2024)",
+                io: "<b>Input:</b> 精排文档列表 $\\mathcal{D}_{ranked}$<br><b>Output:</b> 高信息密度压缩提示上下文 $C_{dense}$"
+            },
+            "n18": {
+                badge: "LAYER 4 · REASONING",
+                title: "基座大模型高效推理服务",
+                sub: "Foundation LLM Serving Engine (vLLM / Speculative Decoding)",
+                motivation: "提供百亿/千亿参数大模型的高吞吐、低首字延迟 (TTFT) 生成服务，支撑多轮深度逻辑推理与流式生成。",
+                formula: "\\text{PagedAttention}(\\mathbf{Q}, \\mathbf{K}_{block}, \\mathbf{V}_{block}), \\quad y_t \\sim P(y_t \\mid y_{<t}, q^*, C_{dense})",
+                formulaDesc: "PagedAttention 显存零碎片化调度与草稿小模型投机采样加速。",
+                metric1: "120 tokens/s",
+                metric2: "TTFT < 150ms",
+                metric3: "32k 上下文",
+                metric4: "4x 吞吐提升",
+                paperTitle: "Efficient Memory Management for Large Language Model Serving with PagedAttention (vLLM)",
+                paperVenue: "Kwon et al., UC Berkeley / SOSP (2023)",
+                io: "<b>Input:</b> 系统指令、紧凑上下文 $C_{dense}$、记忆栈与重写查询 $q^*$<br><b>Output:</b> 生成推理 Token 流 (Reasoning Stream)"
+            },
+            "n19": {
+                badge: "LAYER 4 · AGENT",
+                title: "ReAct 智能体工具执行编排器",
+                sub: "Agentic Tool Executor & Function Calling",
+                motivation: "打破纯文本生成的局限，允许模型自主决定调用业务 API（如查询运单轨迹、修改发票抬头、锁定退款订单）。",
+                formula: "\\text{Thought}_t \\to \\text{Action}_t(\\text{API}, \\text{Params}) \\to \\text{Observation}_t \\to \\text{Thought}_{t+1}",
+                formulaDesc: "ReAct (Reasoning + Acting) 交替循环推理与外部 API 事务执行器。",
+                metric1: "98% 工具调用准度",
+                metric2: "多工具编排",
+                metric3: "超时回滚机制",
+                metric4: "安全沙箱运行",
+                paperTitle: "ReAct: Synergizing Reasoning and Acting in Language Models",
+                paperVenue: "Yao et al., Princeton & Google Brain / ICLR (2023)",
+                io: "<b>Input:</b> 模型发起的工具调用请求 ToolCall(name, args)<br><b>Output:</b> 真实业务系统的结构化返回结果 JSON (Observation)"
+            },
+            "n20": {
+                badge: "LAYER 4 · SELF-RAG",
+                title: "Self-RAG 细粒度自反思核验器",
+                sub: "Claim-level Fact Verifier & Reflection Tokens",
+                motivation: "实时检验生成的每一个主张 (Claim) 是否具备检索上下文支撑。一旦发现无根据的凭空臆造，立即驳回重构或触发自校准。",
+                formula: "P(\\text{Self-Critique}) = \\prod_{c \\in \\text{Claims}} P([\\text{IsSup}] \\mid c, C_{dense}) \\times P([\\text{IsUse}] \\mid c, q^*)",
+                formulaDesc: "细粒度反思 Token 条件概率估计与证据事实对准检验。",
+                metric1: "幻觉率 < 1.4%",
+                metric2: "事实忠实度 96.8%",
+                metric3: "逐句核验",
+                metric4: "动态重生成",
+                paperTitle: "Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection",
+                paperVenue: "Asai et al., Univ. of Washington / ICLR (2024)",
+                io: "<b>Input:</b> 模型候选生成文本段落 $\\hat{Y}$ 及证据上下文 $C_{dense}$<br><b>Output:</b> 事实核验证明标签及抗幻觉修正文本 $Y_{verified}$"
+            },
+            "n21": {
+                badge: "LAYER 4 · CONTROLLED NLG",
+                title: "可控生成与证据链溯源引用",
+                sub: "Controlled NLG & Citation Synthesizer",
+                motivation: "严格遵守客服语气语调规范与政策条款，为回答中的关键结论标注引用角标 [1][2]，使用户与质检可直接核对源文档。",
+                formula: "Y_{final} = \\text{AlignStyle}(Y_{verified}, \\mathcal{P}_{policy}) \\circ \\text{AttachCitations}(\\mathcal{D}_{source})",
+                formulaDesc: "受控语言生成与确定性引用角标索引溯源对齐算法。",
+                metric1: "溯源对准率 97%",
+                metric2: "政策遵循 99.6%",
+                metric3: "支持富文本/卡片",
+                metric4: "可读性提升 30%",
+                paperTitle: "ALCE: Enabling Large Language Models to Generate Text with Citations",
+                paperVenue: "Gao et al., Stanford / EMNLP (2023)",
+                io: "<b>Input:</b> 核验后事实文本 $Y_{verified}$<br><b>Output:</b> 带引用溯源标记与样式渲染的最终回复卡片 $Y_{final}$"
+            },
+            "n22": {
+                badge: "LAYER 4 · HANDOFF",
+                title: "置信度评估与动态人机协同",
+                sub: "Confidence Estimator & Dynamic Human Handoff",
+                motivation: "计算整体回答置信度分值。当置信度低于安全阈值或检测到用户极端投诉倾向时，平滑转接人工座席，并携带全量结构化小结。",
+                formula: "\\text{Score}_{conf} = \\lambda_1 S_{rerank} + \\lambda_2 P([\\text{IsSup}]) + \\lambda_3 (1 - |s_{emo}|) < \\theta_{handoff}",
+                formulaDesc: "多因子加权置信度评估模型与人机协同切换决策机制。",
+                metric1: "平滑无感分流",
+                metric2: "转人工准确率 98%",
+                metric3: "自动摘要生成",
+                metric4: "节省座席 65%",
+                paperTitle: "Active Learning and Human-in-the-Loop AI for Customer Support Systems",
+                paperVenue: "IEEE Intelligent Systems (2023)",
+                io: "<b>Input:</b> 综合生成置信度与对话状态向量<br><b>Output:</b> 用户端输出，或向人工工作台推送结构化工单交接包"
+            },
+            "n23": {
+                badge: "LAYER 5 · KNOWLEDGE BASE",
+                title: "非结构化文档多模态分块向量库",
+                sub: "Milvus / Qdrant Dense Vector Store (HNSW)",
+                motivation: "存储数以千万计的产品说明书、政策规程、维保指南的多模态语义切片，建立 HNSW 图索引提供毫秒级相似度匹配。",
+                formula: "\\text{HNSW}(\\mathcal{V}_{chunk}, M=16, efConstruction=200), \\quad \\text{Dist} = 1 - \\cos(u, v)",
+                formulaDesc: "分层可导航小世界图索引高维空间最近邻近搜索。",
+                metric1: "1000万+ 切片",
+                metric2: "99.2% 召回",
+                metric3: "< 12ms 检索",
+                metric4: "实时动态插入",
+                paperTitle: "Efficient and Robust Approximate Nearest Neighbor Search Using Hierarchical Navigable Small World Graphs",
+                paperVenue: "Malkov & Yashunin, IEEE TPAMI (2020)",
+                io: "<b>Data Schema:</b> ChunkID, Vector(1024), SourceDoc, PageNum, Modality, Timestamp"
+            },
+            "n24": {
+                badge: "LAYER 5 · KNOWLEDGE BASE",
+                title: "领域图谱本体与实体关系知识库",
+                sub: "Neo4j / NebulaGraph Graph Triplet Knowledge",
+                motivation: "构建高质量领域知识图谱，存储概念本体、业务实体、配件兼容关系、政策前置条件等确定性拓扑结构。",
+                formula: "\\mathcal{G} = (\\mathcal{E}, \\mathcal{R}, \\mathcal{T}), \\quad \\mathcal{T} = \\{ (h, r, t) \\mid h, t \\in \\mathcal{E}, r \\in \\mathcal{R} \\}",
+                formulaDesc: "形式化知识图谱三元组集合与 Neo4j Cypher 图模式匹配。",
+                metric1: "240万+ 实体",
+                metric2: "1800万+ 三元组",
+                metric3: "3跳查询 < 35ms",
+                metric4: "本体模型 45+",
+                paperTitle: "Graph Data Science: Techniques and Applications in Modern Enterprise",
+                paperVenue: "O'Reilly Media / Graph AI Research (2023)",
+                io: "<b>Data Schema:</b> Nodes(:Product, :Policy, :Component, :Issue), Edges[:REQUIRES, :COMPATIBLE_WITH, :CAUSED_BY]"
+            },
+            "n25": {
+                badge: "LAYER 5 · KNOWLEDGE BASE",
+                title: "结构化业务表与实时事务数据库",
+                sub: "CRM / ERP / Order Transactional Relational DB",
+                motivation: "对接企业生产核心业务系统，提供毫秒级强一致性的订单状态、实时物流轨迹、库存余量与账户余额。",
+                formula: "\\text{ACID Transaction}: \\quad \\text{SELECT status, tracking\\_no FROM orders WHERE uid = ? FOR UPDATE}",
+                formulaDesc: "分布式事务一致性与标准 SQL 结构化关联引擎。",
+                metric1: "强一致性 ACID",
+                metric2: "100k+ QPS",
+                metric3: "双活容灾备份",
+                metric4: "亚毫秒主键查询",
+                paperTitle: "Architecture of a Database System: Transactional Processing Foundations",
+                paperVenue: "Foundations and Trends in Databases (2022)",
+                io: "<b>Data Schema:</b> Relational Tables: users, orders, logistics, vouchers, audit_logs"
+            },
+            "n26": {
+                badge: "LAYER 5 · KNOWLEDGE BASE",
+                title: "高置信度黄金专家问答与政策库",
+                sub: "Verified Standard Golden FAQ & Legal Compliance",
+                motivation: "收录经法务与业务专家严格把关审核的千条官方标准问答对，命中时享有最高优先级输出权，规避任何合规风险。",
+                formula: "\\text{PriorityScore}(d_{golden}) = 1.0, \\quad \\text{Match}(q^*, Q_{std}) > \\theta_{exact}",
+                formulaDesc: "专家审核知识最高置信度覆盖策略与版本审计溯源追踪。",
+                metric1: "零法律合规风险",
+                metric2: "100% 专家审核",
+                metric3: "版本历史留痕",
+                metric4: "最高决策权重",
+                paperTitle: "Quality Assurance Frameworks for Mission-Critical Conversational Systems",
+                paperVenue: "ACM Transactions on Management Information Systems (2023)",
+                io: "<b>Data Schema:</b> QA_ID, Standard_Question, Standard_Answer, Valid_From, Expire_At, Reviewer"
+            },
+            "n27": {
+                badge: "LAYER 6 · EVALUATION",
+                title: "多维科研量化评测矩阵 (RAGAS)",
+                sub: "Faithfulness, Context Precision & Answer Relevancy",
+                motivation: "建立工业界与学术界双认可的离线/在线一体化评测流水线，摆脱人工抽检瓶颈，对问答质量进行多维度自动化打分。",
+                formula: "\\text{Faithfulness} = \\frac{|\\text{Claims in } A \\cap \\text{Context}|}{|\\text{All Claims in } A|}, \\quad \\text{Relevancy} = \\cos(v_A, v_{gen\\_Q})",
+                formulaDesc: "RAGAS 学术三维评测算法：事实忠实度、上下文精准度、回答相关度。",
+                metric1: "综合评分 92.8",
+                metric2: "Faithfulness 96.8%",
+                metric3: "Relevancy 94.2%",
+                metric4: "全自动流水线",
+                paperTitle: "RAGAS: Automated Evaluation of Retrieval Augmented Generation",
+                paperVenue: "Es et al., arXiv:2309.15217 (2023)",
+                io: "<b>Input:</b> 评测四元组 $(q^*, C_{retrieved}, Y_{generated}, Y_{ground\\_truth})$<br><b>Output:</b> RAGAS 综合质量分析雷达图与诊断报告"
+            },
+            "n28": {
+                badge: "LAYER 6 · EVALUATION",
+                title: "人机交互轨迹与隐式偏好收集器",
+                sub: "Implicit Feedback, Thumbs & Human Corrections",
+                motivation: "不仅采集显式的点赞/点踩，更通过用户是否追问、停留时长、是否重复提交订单等隐式信号，构建高质量偏好对。",
+                formula: "\\mathcal{D}_{pref} = \\{ (x, y_w, y_l) \\mid y_w \\succ y_l \\}",
+                formulaDesc: "隐式行为偏好对齐数据集构建与专家座席修正轨迹沉淀。",
+                metric1: "主动闭环沉淀",
+                metric2: "日均 5 万偏好对",
+                metric3: "修正数据留存",
+                metric4: "隐私合规采样",
+                paperTitle: "Learning from Human Feedback without Reward Models: A Direct Alignment Approach",
+                paperVenue: "NeurIPS (2023)",
+                io: "<b>Input:</b> 用户点击、复制、停顿与人工座席改写记录<br><b>Output:</b> 三元组偏好对齐样本集 $(x, y_{win}, y_{lose})$"
+            },
+            "n29": {
+                badge: "LAYER 6 · EVOLUTION",
+                title: "动态知识冲突检测与版本同步器",
+                sub: "Temporal Inconsistency Resolver & KG Updater",
+                motivation: "当业务政策更新（如退换货时限由 7 天调整为 15 天）时，自动扫描现有知识库中的潜在事实冲突，并触发自愈更新。",
+                formula: "\\text{Conflict}(d_{new}, d_{old}) \\iff \\text{Sim}(d_{new}, d_{old}) > \\tau \\wedge \\text{FactCheck}(d_{new} \\not\\models d_{old})",
+                formulaDesc: "基于时序约束的一阶事实冲突检测与知识失效标记算法。",
+                metric1: "自愈冲突检测",
+                metric2: "版本零错乱",
+                metric3: "时延 < 5 分钟",
+                metric4: "变更审计合规",
+                paperTitle: "Resolving Knowledge Inconsistencies in Continuously Updated Knowledge Bases",
+                paperVenue: "SIGKDD (2023)",
+                io: "<b>Input:</b> 新入库业务文档变更通知与已有知识节点<br><b>Output:</b> 失效实体标记、冲突报告与已更新知识图谱节点"
+            },
+            "n30": {
+                badge: "LAYER 6 · EVOLUTION",
+                title: "持续直接偏好优化流水线 (DPO)",
+                sub: "Continual DPO & Domain LoRA Online Fine-tuning",
+                motivation: "无需训练复杂的强化学习奖励模型 (Reward Model)，直接基于偏好对进行解析对齐，定期热更新轻量级领域 LoRA 适配器。",
+                formula: "\\mathcal{L}_{DPO}(\\theta; \\pi_{ref}) = -\\mathbb{E}_{(x, y_w, y_l)} \\left[ \\log \\sigma \\left( \\beta \\log \\frac{\\pi_\\theta(y_w \\mid x)}{\\pi_{ref}(y_w \\mid x)} - \\beta \\log \\frac{\\pi_\\theta(y_l \\mid x)}{\\pi_{ref}(y_l \\mid x)} \\right) \\right]",
+                formulaDesc: "直接偏好优化目标损失函数，确保模型始终契合最新业务需求与专业人设。",
+                metric1: "热更新 LoRA",
+                metric2: "训练收敛 +40%",
+                metric3: "拒绝过拟合",
+                metric4: "胜率提升 18.5%",
+                paperTitle: "Direct Preference Optimization: Your Language Model is Secretly a Reward Model",
+                paperVenue: "Rafailov et al., Stanford University / NeurIPS (2023)",
+                io: "<b>Input:</b> 偏好样本集 $\\mathcal{D}_{pref}$ 及基线模型 $\\pi_{ref}$<br><b>Output:</b> 微调更新后的领域客服 LoRA 权重文件"
+            }
+        };
+
+        // 当前画布缩放平移状态
+        let scale = 1;
+        let translateX = 0;
+        let translateY = 0;
+        let isPanning = false;
+        let startX = 0;
+        let startY = 0;
+        let isFlowAnimated = true;
+        let activeNodeId = null;
+
+        const stage = document.getElementById("stage");
+        const svg = document.getElementById("archSvg");
+        const zoomLevelDisplay = document.getElementById("zoomLevel");
+        const drawer = document.getElementById("inspectorDrawer");
+
+        // 初始化
+        function initApp() {
+            setupPanZoom();
+            setupNodeClicks();
+            setupKeyboard();
+            updateTransform();
+        }
+
+        // 缩放平移交互
+        function setupPanZoom() {
+            stage.addEventListener("wheel", (e) => {
+                e.preventDefault();
+                const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+                const newScale = Math.min(Math.max(scale * zoomFactor, 0.45), 3.5);
+                
+                const rect = stage.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                translateX = mouseX - (mouseX - translateX) * (newScale / scale);
+                translateY = mouseY - (mouseY - translateY) * (newScale / scale);
+                scale = newScale;
+
+                updateTransform();
+            }, { passive: false });
+
+            stage.addEventListener("mousedown", (e) => {
+                // 如果点在节点或其按钮上，不触发平移
+                if (e.target.closest(".arch_node") || e.target.closest(".hud_controls") || e.target.closest(".inspector_drawer")) return;
+                isPanning = true;
+                stage.classList.add("is-panning");
+                startX = e.clientX - translateX;
+                startY = e.clientY - translateY;
+            });
+
+            window.addEventListener("mousemove", (e) => {
+                if (!isPanning) return;
+                translateX = e.clientX - startX;
+                translateY = e.clientY - startY;
+                updateTransform();
+            });
+
+            window.addEventListener("mouseup", () => {
+                isPanning = false;
+                stage.classList.remove("is-panning");
+            });
+
+            // 触摸支持
+            let initialDistance = 0;
+            stage.addEventListener("touchstart", (e) => {
+                if (e.touches.length === 1) {
+                    isPanning = true;
+                    startX = e.touches[0].clientX - translateX;
+                    startY = e.touches[0].clientY - translateY;
+                } else if (e.touches.length === 2) {
+                    initialDistance = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                }
+            }, { passive: true });
+
+            stage.addEventListener("touchmove", (e) => {
+                if (isPanning && e.touches.length === 1) {
+                    translateX = e.touches[0].clientX - startX;
+                    translateY = e.touches[0].clientY - startY;
+                    updateTransform();
+                } else if (e.touches.length === 2 && initialDistance > 0) {
+                    const currentDist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    const zoom = currentDist / initialDistance;
+                    scale = Math.min(Math.max(scale * zoom, 0.45), 3.5);
+                    initialDistance = currentDist;
+                    updateTransform();
+                }
+            }, { passive: true });
+
+            stage.addEventListener("touchend", () => {
+                isPanning = false;
+                initialDistance = 0;
+            });
+        }
+
+        function updateTransform() {
+            svg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+            zoomLevelDisplay.textContent = `${Math.round(scale * 100)}%`;
+        }
+
+        function zoomIn() {
+            scale = Math.min(scale * 1.2, 3.5);
+            updateTransform();
+        }
+
+        function zoomOut() {
+            scale = Math.max(scale / 1.2, 0.45);
+            updateTransform();
+        }
+
+        function resetZoom() {
+            scale = 1;
+            translateX = 0;
+            translateY = 0;
+            updateTransform();
+        }
+
+        // 节点点击与详细面板联动
+        function setupNodeClicks() {
+            const nodes = document.querySelectorAll(".arch_node");
+            nodes.forEach(node => {
+                node.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    const nodeId = node.getAttribute("data-id");
+                    selectNode(nodeId);
+                });
+            });
+
+            // 点击画布空白处关闭面板
+            stage.addEventListener("click", (e) => {
+                if (!e.target.closest(".arch_node") && !e.target.closest(".inspector_drawer") && !e.target.closest(".hud_controls")) {
+                    closeDrawer();
+                }
+            });
+        }
+
+        function selectNode(nodeId) {
+            const data = NODE_DATABASE[nodeId];
+            if (!data) return;
+
+            activeNodeId = nodeId;
+
+            // 高亮当前选中节点
+            document.querySelectorAll(".arch_node").forEach(n => {
+                if (n.getAttribute("data-id") === nodeId) {
+                    n.classList.add("is-active");
+                    n.classList.remove("is-dimmed");
+                } else {
+                    n.classList.remove("is-active");
+                }
+            });
+
+            // 填充面板内容
+            document.getElementById("drawerBadge").textContent = data.badge;
+            document.getElementById("drawerTitle").textContent = data.title;
+            document.getElementById("drawerSub").textContent = data.sub;
+            document.getElementById("drawerMotivation").innerHTML = data.motivation;
+            document.getElementById("drawerFormula").textContent = data.formula;
+            document.getElementById("drawerFormulaDesc").textContent = data.formulaDesc;
+            document.getElementById("drawerMetric1").textContent = data.metric1;
+            document.getElementById("drawerMetric2").textContent = data.metric2;
+            document.getElementById("drawerMetric3").textContent = data.metric3;
+            document.getElementById("drawerMetric4").textContent = data.metric4;
+            document.getElementById("drawerPaperTitle").textContent = data.paperTitle;
+            document.getElementById("drawerPaperVenue").textContent = data.paperVenue;
+            document.getElementById("drawerIO").innerHTML = data.io;
+
+            drawer.classList.add("is-open");
+        }
+
+        function closeDrawer() {
+            drawer.classList.remove("is-open");
+            activeNodeId = null;
+            document.querySelectorAll(".arch_node").forEach(n => {
+                n.classList.remove("is-active");
+            });
+        }
+
+        // 键盘快捷键支持
+        function setupKeyboard() {
+            window.addEventListener("keydown", (e) => {
+                if (e.key === "Escape") {
+                    closeDrawer();
+                } else if (e.key === "+" || e.key === "=") {
+                    zoomIn();
+                } else if (e.key === "-") {
+                    zoomOut();
+                } else if (e.key === "0") {
+                    resetZoom();
+                }
+            });
+        }
+
+        // 科研模式切换器
+        function switchResearchMode(mode) {
+            document.querySelectorAll(".mode_tab").forEach(tab => {
+                tab.classList.toggle("is-active", tab.getAttribute("data-mode") === mode);
+            });
+
+            const allNodes = document.querySelectorAll(".arch_node");
+            const allFlows = document.querySelectorAll(".flow_line");
+
+            if (mode === "all") {
+                allNodes.forEach(n => n.classList.remove("is-dimmed"));
+                allFlows.forEach(f => f.classList.remove("dimmed", "highlighted"));
+                return;
+            }
+
+            // 定义各模式的高亮集合
+            const highlightMap = {
+                "rag": ["n1", "n4", "n5", "n6", "n7", "n12", "n13", "n15", "n16", "n17", "n18", "n20", "n21", "n23"],
+                "graph": ["n5", "n6", "n7", "n9", "n10", "n11", "n15", "n16", "n18", "n24"],
+                "reflection": ["n16", "n17", "n18", "n19", "n20", "n21", "n22", "n26"],
+                "evolution": ["n21", "n22", "n27", "n28", "n29", "n30", "n24", "n23"]
+            };
+
+            const targetSet = new Set(highlightMap[mode] || []);
+
+            allNodes.forEach(node => {
+                const id = node.getAttribute("data-id");
+                if (targetSet.has(id)) {
+                    node.classList.remove("is-dimmed");
+                } else {
+                    node.classList.add("is-dimmed");
+                }
+            });
+        }
+
+        // 搜索高亮定位
+        function handleSearch(query) {
+            const q = query.trim().toLowerCase();
+            const allNodes = document.querySelectorAll(".arch_node");
+            if (!q) {
+                allNodes.forEach(n => n.classList.remove("is-dimmed"));
+                return;
+            }
+
+            let firstMatch = null;
+            allNodes.forEach(node => {
+                const id = node.getAttribute("data-id");
+                const data = NODE_DATABASE[id];
+                if (!data) return;
+
+                const textToMatch = `${data.title} ${data.sub} ${data.motivation} ${data.badge} ${data.formula}`.toLowerCase();
+                if (textToMatch.includes(q)) {
+                    node.classList.remove("is-dimmed");
+                    if (!firstMatch) firstMatch = id;
+                } else {
+                    node.classList.add("is-dimmed");
+                }
+            });
+
+            if (firstMatch && q.length >= 2) {
+                selectNode(firstMatch);
+            }
+        }
+
+        // 论文模式 (Paper Light Mode) 切换
+        function toggleTheme() {
+            document.body.classList.toggle("theme-light");
+        }
+
+        // 开关数据流动动画
+        function toggleFlowAnimation() {
+            isFlowAnimated = !isFlowAnimated;
+            const flows = document.querySelectorAll(".flow_line");
+            flows.forEach(f => {
+                if (isFlowAnimated) {
+                    f.classList.add("animated");
+                } else {
+                    f.classList.remove("animated");
+                }
+            });
+            const btn = document.getElementById("animBtn");
+            btn.classList.toggle("primary", isFlowAnimated);
+        }
+
+        // 导出科研论文级矢量 SVG
+        function exportSvgFile() {
+            const svgEl = document.getElementById("archSvg");
+            const serializer = new XMLSerializer();
+            let source = serializer.serializeToString(svgEl);
+
+            // 补充完整的 XML 命名空间与样式声明
+            if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+                source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+            }
+            if (!source.match(/^<svg[^>]+xmlns\:xlink/)) {
+                source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+            }
+
+            const preface = '<?xml version="1.0" standalone="no"?>\r\n';
+            const svgBlob = new Blob([preface, source], { type: "image/svg+xml;charset=utf-8" });
+            const svgUrl = URL.createObjectURL(svgBlob);
+            const downloadLink = document.createElement("a");
+            downloadLink.href = svgUrl;
+            downloadLink.download = "18-3_Knowledge_Customer_Service_Architecture.svg";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+            URL.revokeObjectURL(svgUrl);
+        }
+
+        // 启动执行
+        window.addEventListener("DOMContentLoaded", initApp);
+    </script>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!-- 姓名：王鹏宇，日期：功能名称 -->
+<!-- 姓名：王鹏宇，日期：2026-11-02，功能名称：商品详情页-根据ID获取单个商品 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17-3 商品详情页 - 王鹏宇</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Microsoft YaHei",sans-serif;background:#f1f5f9;color:#1e293b;line-height:1.6;padding:20px 16px;}
+        .crx_container{max-width:900px;margin:0 auto;}
+        .crx_back_bar{margin-bottom:16px;}
+        .crx_btn_back{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#fff;color:#4f46e5;border:1px solid #e0e7ff;border-radius:8px;font-size:14px;font-weight:600;text-decoration:none;transition:all .2s;}
+        .crx_btn_back:hover{background:#6366f1;color:#fff;border-color:#6366f1;}
+        .crx_loading{text-align:center;padding:80px 20px;color:#6366f1;}
+        .crx_loading_spinner{display:inline-block;width:40px;height:40px;border:4px solid #e2e8f0;border-top-color:#6366f1;border-radius:50%;animation:crx_spin .8s linear infinite;margin-bottom:12px;}
+        @keyframes crx_spin{to{transform:rotate(360deg);}}
+        .crx_error_box{background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:30px;text-align:center;color:#991b1b;}
+        .crx_error_box h3{margin-bottom:8px;}
+        .crx_detail_card{background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e2e8f0;box-shadow:0 4px 16px rgba(0,0,0,.06);margin-bottom:24px;}
+        .crx_detail_top{display:flex;gap:0;}
+        .crx_detail_img_wrap{width:45%;min-height:320px;background:#f8fafc;overflow:hidden;position:relative;}
+        .crx_detail_img{width:100%;height:100%;object-fit:cover;}
+        .crx_detail_img_nav{position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:6px;}
+        .crx_img_dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.5);border:1px solid rgba(0,0,0,.15);cursor:pointer;transition:all .2s;}
+        .crx_img_dot_active{background:#6366f1;border-color:#6366f1;transform:scale(1.2);}
+        .crx_detail_info{width:55%;padding:24px;}
+        .crx_detail_category{display:inline-block;background:#e0e7ff;color:#4338ca;font-size:12px;padding:3px 10px;border-radius:6px;font-weight:600;margin-bottom:10px;}
+        .crx_detail_title{font-size:24px;font-weight:800;color:#0f172a;margin-bottom:8px;}
+        .crx_detail_brand{font-size:14px;color:#64748b;margin-bottom:12px;}
+        .crx_detail_desc{font-size:14px;color:#475569;line-height:1.7;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #f1f5f9;}
+        .crx_price_row{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;}
+        .crx_price_now{font-size:28px;font-weight:800;color:#6366f1;}
+        .crx_price_now small{font-size:16px;}
+        .crx_price_discount{background:#fef2f2;color:#dc2626;font-size:13px;padding:3px 8px;border-radius:6px;font-weight:700;}
+        .crx_detail_stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+        .crx_stat_item{background:#f8fafc;padding:10px 14px;border-radius:8px;font-size:13px;}
+        .crx_stat_label{color:#94a3b8;display:block;margin-bottom:2px;font-size:12px;}
+        .crx_stat_val{font-weight:700;color:#1e293b;}
+        .crx_detail_tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+        .crx_tag{background:#f1f5f9;color:#475569;padding:3px 10px;border-radius:6px;font-size:12px;border:1px solid #e2e8f0;}
+        .crx_detail_meta{background:#f8fafc;border-radius:10px;padding:14px 16px;font-size:13px;color:#64748b;line-height:1.8;}
+        .crx_detail_meta strong{color:#334155;}
+        .crx_review_section{padding:20px 24px;border-top:1px solid #e2e8f0;}
+        .crx_review_title{font-size:17px;font-weight:700;color:#0f172a;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+        .crx_review_grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
+        .crx_review_card{background:#f8fafc;border-radius:8px;padding:12px;border:1px solid #e2e8f0;}
+        .crx_review_top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+        .crx_review_user{font-weight:600;color:#0f172a;font-size:14px;}
+        .crx_review_rating{color:#f59e0b;font-size:13px;}
+        .crx_review_text{font-size:13px;color:#475569;line-height:1.5;}
+        .crx_review_date{font-size:11px;color:#94a3b8;margin-top:6px;}
+        .crx_footer{text-align:center;color:#94a3b8;font-size:13px;padding:14px 0;border-top:1px solid #e2e8f0;}
+        @media(max-width:700px){
+            .crx_detail_top{flex-direction:column;}
+            .crx_detail_img_wrap{width:100%;min-height:240px;}
+            .crx_detail_info{width:100%;}
+        }
+    </style>
+</head>
+<body>
+    <div class="crx_container" id="crx_app">
+        <div class="crx_back_bar">
+            <a class="crx_btn_back" href="17-3.html">⬅ 返回商品列表</a>
+        </div>
+
+        <div id="crx_detail_container">
+            <div class="crx_loading" id="crx_loading">
+                <div class="crx_loading_spinner"></div>
+                <p>正在加载商品详情，请稍候...</p>
+            </div>
+        </div>
+
+        <footer class="crx_footer">
+            <p>网页设计与制作实验 · 17-3 商品详情页 · 学生：王鹏宇 · 2026-11-02</p>
+        </footer>
+    </div>
+
+    <script>
+        // 获取 URL 参数中的商品 ID
+        function crx_getQueryParam(crx_paramName) {
+            var crx_urlParams = new URLSearchParams(window.location.search);
+            return crx_urlParams.get(crx_paramName);
+        }
+
+        // 页面加载时获取详情
+        window.addEventListener("DOMContentLoaded", function () {
+            var crx_productId = crx_getQueryParam("id") || "1";
+            crx_loadProductDetail(crx_productId);
+        });
+
+        // 请求商品详情接口
+        async function crx_loadProductDetail(crx_id) {
+            var crx_container = document.getElementById("crx_detail_container");
+            var crx_apiUrl = "https://dummyjson.com/products/" + crx_id;
+
+            try {
+                var crx_response = await fetch(crx_apiUrl);
+
+                if (!crx_response.ok) {
+                    throw new Error("请求失败，HTTP 状态码: " + crx_response.status);
+                }
+
+                var crx_product = await crx_response.json();
+                document.title = crx_product.title + " - 商品详情 - 王鹏宇";
+                crx_renderDetail(crx_product, crx_container);
+
+            } catch (crx_err) {
+                crx_container.innerHTML =
+                    '<div class="crx_error_box">' +
+                    '<h3>❌ 商品详情加载失败</h3>' +
+                    '<p>' + crx_err.message + '</p>' +
+                    '<p style="margin-top:10px;font-size:13px;color:#64748b;">请检查商品 ID 是否正确或网络是否畅通</p>' +
+                    '</div>';
+            }
+        }
+
+        // 当前显示的图片索引
+        var crx_currentImgIndex = 0;
+
+        // 渲染详情
+        function crx_renderDetail(crx_p, crx_container) {
+            var crx_images = crx_p.images || [];
+            if (crx_images.length === 0 && crx_p.thumbnail) {
+                crx_images = [crx_p.thumbnail];
+            }
+
+            // 图片导航圆点
+            var crx_dotsHtml = "";
+            for (var crx_i = 0; crx_i < crx_images.length; crx_i++) {
+                var crx_activeClass = crx_i === 0 ? " crx_img_dot_active" : "";
+                crx_dotsHtml += '<span class="crx_img_dot' + crx_activeClass + '" onclick="crx_switchImage(' + crx_i + ')" id="crx_dot_' + crx_i + '"></span>';
+            }
+
+            // 评论区
+            var crx_reviewsHtml = "";
+            if (crx_p.reviews && crx_p.reviews.length > 0) {
+                crx_reviewsHtml = '<div class="crx_review_section"><h3 class="crx_review_title">💬 用户评价 (' + crx_p.reviews.length + ' 条)</h3><div class="crx_review_grid">';
+                for (var crx_j = 0; crx_j < crx_p.reviews.length; crx_j++) {
+                    var crx_rev = crx_p.reviews[crx_j];
+                    var crx_stars = "";
+                    for (var crx_s = 0; crx_s < 5; crx_s++) {
+                        crx_stars += crx_s < crx_rev.rating ? "⭐" : "☆";
+                    }
+                    crx_reviewsHtml +=
+                        '<div class="crx_review_card">' +
+                        '<div class="crx_review_top">' +
+                        '<span class="crx_review_user">' + crx_rev.reviewerName + '</span>' +
+                        '<span class="crx_review_rating">' + crx_stars + '</span>' +
+                        '</div>' +
+                        '<p class="crx_review_text">' + crx_rev.comment + '</p>' +
+                        '<div class="crx_review_date">' + (crx_rev.date ? new Date(crx_rev.date).toLocaleDateString("zh-CN") : "") + '</div>' +
+                        '</div>';
+                }
+                crx_reviewsHtml += '</div></div>';
+            }
+
+            // 标签
+            var crx_tagsHtml = "";
+            if (crx_p.tags && crx_p.tags.length > 0) {
+                for (var crx_t = 0; crx_t < crx_p.tags.length; crx_t++) {
+                    crx_tagsHtml += '<span class="crx_tag">' + crx_p.tags[crx_t] + '</span>';
+                }
+            }
+
+            crx_container.innerHTML =
+                '<div class="crx_detail_card">' +
+                    '<div class="crx_detail_top">' +
+                        '<div class="crx_detail_img_wrap">' +
+                            '<img class="crx_detail_img" id="crx_main_image" src="' + (crx_images[0] || "") + '" alt="' + crx_p.title + '">' +
+                            '<div class="crx_detail_img_nav">' + crx_dotsHtml + '</div>' +
+                        '</div>' +
+                        '<div class="crx_detail_info">' +
+                            '<span class="crx_detail_category">' + (crx_p.category || "商品") + '</span>' +
+                            '<h1 class="crx_detail_title">' + crx_p.title + '</h1>' +
+                            '<p class="crx_detail_brand">品牌：' + (crx_p.brand || "自营商品") + ' · SKU: ' + (crx_p.sku || "N/A") + '</p>' +
+                            '<p class="crx_detail_desc">' + (crx_p.description || "") + '</p>' +
+                            '<div class="crx_price_row">' +
+                                '<span class="crx_price_now"><small>$</small>' + crx_p.price + '</span>' +
+                                (crx_p.discountPercentage ? '<span class="crx_price_discount">立减 ' + crx_p.discountPercentage + '%</span>' : '') +
+                            '</div>' +
+                            '<div class="crx_detail_stats">' +
+                                '<div class="crx_stat_item"><span class="crx_stat_label">用户评分</span><span class="crx_stat_val">⭐ ' + crx_p.rating + ' / 5.0</span></div>' +
+                                '<div class="crx_stat_item"><span class="crx_stat_label">库存数量</span><span class="crx_stat_val">' + (crx_p.stock || 0) + ' 件</span></div>' +
+                                '<div class="crx_stat_item"><span class="crx_stat_label">最低订单</span><span class="crx_stat_val">' + (crx_p.minimumOrderQuantity || 1) + ' 件起购</span></div>' +
+                                '<div class="crx_stat_item"><span class="crx_stat_label">商品状态</span><span class="crx_stat_val">' + (crx_p.availabilityStatus || "在售中") + '</span></div>' +
+                            '</div>' +
+                            (crx_tagsHtml ? '<div class="crx_detail_tags">' + crx_tagsHtml + '</div>' : '') +
+                            '<div class="crx_detail_meta">' +
+                                '<strong>退货政策：</strong>' + (crx_p.returnPolicy || "无") + '<br>' +
+                                '<strong>配送信息：</strong>' + (crx_p.shippingInformation || "无") + '<br>' +
+                                '<strong>保修服务：</strong>' + (crx_p.warrantyInformation || "无") +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    crx_reviewsHtml +
+                '</div>';
+
+            // 保存图片列表供切换使用
+            window.crx_imageList = crx_images;
+        }
+
+        // 切换商品图片
+        function crx_switchImage(crx_index) {
+            var crx_imgElem = document.getElementById("crx_main_image");
+            if (!window.crx_imageList || !crx_imgElem) return;
+
+            crx_imgElem.src = window.crx_imageList[crx_index];
+
+            // 更新圆点
+            for (var crx_d = 0; crx_d < window.crx_imageList.length; crx_d++) {
+                var crx_dot = document.getElementById("crx_dot_" + crx_d);
+                if (crx_dot) {
+                    crx_dot.className = crx_d === crx_index ? "crx_img_dot crx_img_dot_active" : "crx_img_dot";
+                }
+            }
+
+            crx_currentImgIndex = crx_index;
+        }
+    </script>
+</body>
+</html>
+

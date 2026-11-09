@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7-1 上图下文图文排版 - 王鹏宇</title>
+    <style>
+        /* 全局基础样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            background-color: #f3f5f8;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        /* 页面头部介绍 */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 28px;
+            color: #1a2530;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        header p {
+            font-size: 14px;
+            color: #667085;
+            line-height: 1.8;
+        }
+
+        header .student-info {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 4px 16px;
+            background: #e8eef6;
+            border-radius: 20px;
+            color: #2b579a;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* 
+         * 卡片容器：
+         * 使用 flex 布局让两张卡片并排居中显示，并支持响应式换行
+         */
+        .card-container {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            gap: 36px;
+            flex-wrap: wrap;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        /* 
+         * =========================================
+         * 核心知识点：CSS 实现“上图下文”卡片布局
+         * =========================================
+         * 1. display: flex; 开启弹性盒模型
+         * 2. flex-direction: column; 主轴改为垂直方向，
+         *    使内部元素自上而下排列，上方为图片，下方为文字内容
+         */
+        .card {
+            display: flex;
+            flex-direction: column; /* 核心：垂直排列，实现上图下文 */
+            width: 320px;
+            background-color: #ffffff;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e3e8ee;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+        }
+
+        /* 上方图片区域 */
+        .card-image {
+            width: 100%;
+            height: 220px;
+            overflow: hidden;
+            background-color: #1a1a2e;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 保证图片充满容器且不变形 */
+            display: block;
+            transition: transform 0.4s ease;
+        }
+
+        .card:hover .card-image img {
+            transform: scale(1.05); /* 悬浮时图片微缩放 */
+        }
+
+        /* 下方文字区域 */
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            padding: 22px 20px;
+            flex-grow: 1; /* 撑满剩余高度，使两张卡片等高 */
+        }
+
+        /* 标签 */
+        .card-content .badge {
+            align-self: flex-start;
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .badge-blue {
+            background-color: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .badge-purple {
+            background-color: #ede9fe;
+            color: #6d28d9;
+        }
+
+        /* 标题 */
+        .card-content h3 {
+            font-size: 20px;
+            color: #1e293b;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        /* 正文描述 */
+        .card-content p {
+            font-size: 14px;
+            color: #475569;
+            line-height: 1.7;
+            text-align: justify;
+        }
+
+        /* 说明区域 */
+        .tech-note {
+            max-width: 700px;
+            width: 100%;
+            margin-top: 40px;
+            background: #ffffff;
+            border-left: 4px solid #2b579a;
+            padding: 16px 20px;
+            border-radius: 4px 8px 8px 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .tech-note h4 {
+            font-size: 15px;
+            color: #1a2530;
+            margin-bottom: 6px;
+        }
+
+        .tech-note p {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .tech-note code {
+            background-color: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #d946ef;
+            font-family: Consolas, monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 顶部标题与学号信息 -->
+    <header>
+        <h1>7-1 图文排版实践</h1>
+        <p>利用 CSS Flexbox 弹性盒模型实现标准的“上图下文”图文卡片效果</p>
+        <div class="student-info">
+            姓名：王鹏宇 ｜ 班级：计科24001010218 ｜ 学号：218
+        </div>
+    </header>
+
+    <!-- 卡片展示区 -->
+    <main class="card-container">
+        
+        <!-- 卡片 1：罗辑 -->
+        <article class="card">
+            <!-- 上图 -->
+            <div class="card-image">
+                <img src="罗辑.webp" alt="罗辑">
+            </div>
+            <!-- 下文 -->
+            <div class="card-content">
+                <span class="badge badge-blue">《三体》· 面壁者</span>
+                <h3>罗辑</h3>
+                <p>
+                    知名社会学教授，危机纪元被选定为联合国面壁者之一。他参悟了宇宙社会学的黑暗森林法则，建立了针对三体世界的战略威慑，担任首任执剑人长达五十四年，以一人之力护卫人类文明半个世纪。
+                </p>
+            </div>
+        </article>
+
+        <!-- 卡片 2：太空电梯 -->
+        <article class="card">
+            <!-- 上图 -->
+            <div class="card-image">
+                <img src="太空电梯.jpg" alt="太空电梯">
+            </div>
+            <!-- 下文 -->
+            <div class="card-content">
+                <span class="badge badge-purple">科幻奇观 · 太空工程</span>
+                <h3>太空电梯</h3>
+                <p>
+                    连接地面基站与近地轨道的宏伟航天基础设施。利用超高强度碳纳米材料作为缆绳，克服地心引力，大幅降低了物资和人员进入太空的成本，是建设大型轨道舰队与太空防线的基石枢纽。
+                </p>
+            </div>
+        </article>
+
+    </main>
+
+    <!-- 布局知识点说明 -->
+    <section class="tech-note">
+        <h4>💡 CSS 上图下文实现原理</h4>
+        <p>
+            在卡片元素 <code>.card</code> 上应用 <code>display: flex;</code> 与 <code>flex-direction: column;</code>，将主轴方向设为纵向，上方放置 <code>.card-image</code>，下方放置 <code>.card-content</code>，自然形成上下堆叠结构；搭配 <code>object-fit: cover;</code> 保持图片比例，实现整洁统一的卡片排版。
+        </p>
+    </section>
+
+</body>
+</html>
+

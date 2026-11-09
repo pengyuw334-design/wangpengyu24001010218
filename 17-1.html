@@ -1,0 +1,825 @@
+<!-- 姓名：王鹏宇，日期：功能名称 -->
+<!-- 姓名：王鹏宇，日期：2026-11-02，功能名称：展示与解析JSON数据 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17-1 JSON 数据展示与解析 - 王鹏宇</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft YaHei", sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            line-height: 1.6;
+            padding: 24px 16px;
+        }
+
+        .crx_container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 头部样式 */
+        .crx_header {
+            background: linear-gradient(135deg, #0ea5e9, #2563eb);
+            color: #ffffff;
+            padding: 28px 24px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.3);
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .crx_header_tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .crx_header_title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .crx_header_desc {
+            font-size: 15px;
+            opacity: 0.95;
+            margin-bottom: 12px;
+        }
+
+        .crx_meta_bar {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-size: 14px;
+            background: rgba(0, 0, 0, 0.15);
+            padding: 8px 18px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .crx_meta_item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 知识卡片区 */
+        .crx_info_grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .crx_info_card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 16px 20px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        }
+
+        .crx_info_card_title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .crx_info_card_text {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        /* 主体双栏展示区 */
+        .crx_main_grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .crx_main_grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .crx_panel {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .crx_panel_top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .crx_panel_heading {
+            font-size: 17px;
+            font-weight: 600;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .crx_sample_select_group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .crx_select {
+            padding: 6px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: #f8fafc;
+            color: #334155;
+            font-size: 13px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .crx_textarea_box {
+            position: relative;
+            flex: 1;
+            min-height: 320px;
+            margin-bottom: 12px;
+        }
+
+        .crx_textarea {
+            width: 100%;
+            height: 100%;
+            min-height: 320px;
+            font-family: Consolas, Monaco, "Courier New", monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background-color: #0f172a;
+            color: #38bdf8;
+            outline: none;
+            resize: vertical;
+        }
+
+        .crx_textarea:focus {
+            border-color: #0284c7;
+            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+        }
+
+        /* 操作按钮组 */
+        .crx_btn_bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .crx_btn {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .crx_btn_primary {
+            background-color: #0284c7;
+            color: #ffffff;
+        }
+
+        .crx_btn_primary:hover {
+            background-color: #0369a1;
+        }
+
+        .crx_btn_success {
+            background-color: #10b981;
+            color: #ffffff;
+        }
+
+        .crx_btn_success:hover {
+            background-color: #059669;
+        }
+
+        .crx_btn_default {
+            background-color: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+        }
+
+        .crx_btn_default:hover {
+            background-color: #e2e8f0;
+        }
+
+        /* 渲染展示卡片 */
+        .crx_rendered_wrapper {
+            flex: 1;
+            min-height: 320px;
+            max-height: 480px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            background-color: #f8fafc;
+        }
+
+        .crx_profile_card {
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 18px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 14px;
+        }
+
+        .crx_profile_header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .crx_profile_name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .crx_badge {
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .crx_field_row {
+            display: flex;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .crx_field_label {
+            width: 100px;
+            color: #64748b;
+            flex-shrink: 0;
+        }
+
+        .crx_field_val {
+            color: #1e293b;
+            font-weight: 500;
+        }
+
+        .crx_tag_list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .crx_tag {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* 状态与提示条 */
+        .crx_status_alert {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .crx_alert_success {
+            display: block;
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .crx_alert_error {
+            display: block;
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        /* 控制台与日志 */
+        .crx_console_section {
+            background-color: #0f172a;
+            color: #f8fafc;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-bottom: 24px;
+        }
+
+        .crx_console_header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .crx_console_title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #38bdf8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .crx_console_body {
+            background-color: #020617;
+            border-radius: 8px;
+            padding: 12px;
+            height: 180px;
+            overflow-y: auto;
+            font-family: Consolas, Monaco, "Courier New", monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            border: 1px solid #1e293b;
+        }
+
+        .crx_log_line {
+            margin-bottom: 4px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .crx_log_time {
+            color: #64748b;
+        }
+
+        .crx_log_op {
+            color: #f59e0b;
+        }
+
+        .crx_log_text {
+            color: #a3e635;
+        }
+
+        .crx_footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 13px;
+            padding: 16px 0;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="crx_container" id="crx_app">
+        <!-- 头部信息 -->
+        <header class="crx_header">
+            <span class="crx_header_tag">Web 前端实验 17-1</span>
+            <h1 class="crx_header_title">JSON 数据展示、解析与格式化演示</h1>
+            <p class="crx_header_desc">深入理解 JSON 数据格式、JSON.parse() 对象反序列化与 JSON.stringify() 数据渲染</p>
+            <div class="crx_meta_bar">
+                <span class="crx_meta_item"><strong>姓名：</strong>王鹏宇</span>
+                <span class="crx_meta_item"><strong>日期：</strong>2026-11-02</span>
+                <span class="crx_meta_item"><strong>功能：</strong>JSON 文本解析与结构化可视化展示</span>
+            </div>
+        </header>
+
+        <!-- JSON 基础知识栏 -->
+        <div class="crx_info_grid">
+            <div class="crx_info_card">
+                <div class="crx_info_card_title">
+                    <span>💡 什么是 JSON？</span>
+                </div>
+                <div class="crx_info_card_text">
+                    JavaScript Object Notation，轻量级文本数据交换格式，独立于语言，具备极高的可读性。
+                </div>
+            </div>
+            <div class="crx_info_card">
+                <div class="crx_info_card_title">
+                    <span>⚙️ JSON.parse()</span>
+                </div>
+                <div class="crx_info_card_text">
+                    将符合标准 JSON 语法的字符串转换为 JavaScript 对象或数组，若语法有误会抛出异常。
+                </div>
+            </div>
+            <div class="crx_info_card">
+                <div class="crx_info_card_title">
+                    <span>📦 JSON.stringify()</span>
+                </div>
+                <div class="crx_info_card_text">
+                    将 JavaScript 对象或数组序列化为 JSON 字符串，支持传递参数进行缩进排版美化。
+                </div>
+            </div>
+        </div>
+
+        <!-- 核心演示区（左侧编辑，右侧可视化呈现） -->
+        <div class="crx_main_grid">
+            <!-- 左侧：JSON 文本与编辑器 -->
+            <div class="crx_panel">
+                <div class="crx_panel_top">
+                    <div class="crx_panel_heading">
+                        <span>📝 JSON 原始文本编辑器</span>
+                    </div>
+                    <div class="crx_sample_select_group">
+                        <label for="crx_sample_selector">载入预设示例：</label>
+                        <select class="crx_select" id="crx_sample_selector" onchange="crx_loadSampleData()">
+                            <option value="student">学生个人档案 (学生:王鹏宇)</option>
+                            <option value="courses">选修课程列表 (数组形式)</option>
+                            <option value="config">系统项目配置</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="crx_textarea_box">
+                    <textarea class="crx_textarea" id="crx_json_input" placeholder="在此输入合法的 JSON 字符串..."></textarea>
+                </div>
+
+                <div class="crx_btn_bar">
+                    <button class="crx_btn crx_btn_primary" id="crx_btn_render" onclick="crx_parseAndRender()">
+                        ✨ 解析并可视化展示
+                    </button>
+                    <button class="crx_btn crx_btn_success" id="crx_btn_format" onclick="crx_formatJSON()">
+                        📐 格式化美化 (Indent: 2)
+                    </button>
+                    <button class="crx_btn crx_btn_default" id="crx_btn_compress" onclick="crx_compressJSON()">
+                        🗜️ 压缩紧凑
+                    </button>
+                    <button class="crx_btn crx_btn_default" id="crx_btn_validate" onclick="crx_validateOnly()">
+                        🔍 语法校验
+                    </button>
+                </div>
+
+                <div class="crx_status_alert" id="crx_parse_msg"></div>
+            </div>
+
+            <!-- 右侧：解析后 DOM 结构化渲染 -->
+            <div class="crx_panel">
+                <div class="crx_panel_top">
+                    <div class="crx_panel_heading">
+                        <span>📊 JSON 解析后结构化界面展示</span>
+                    </div>
+                    <span class="crx_badge" id="crx_parsed_type_badge">等待解析</span>
+                </div>
+
+                <div class="crx_rendered_wrapper" id="crx_render_container">
+                    <!-- 动态渲染内容将插入到这里 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 控制台日志面板 -->
+        <section class="crx_console_section">
+            <div class="crx_console_header">
+                <div class="crx_console_title">
+                    <span>💻 控制台实时日志 (Console Logs)</span>
+                </div>
+                <button class="crx_btn crx_btn_default" style="background: #1e293b; color: #94a3b8; border-color: #334155;" onclick="crx_clearConsole()">
+                    清空控制台
+                </button>
+            </div>
+            <div class="crx_console_body" id="crx_console_display">
+                <div class="crx_log_line">
+                    <span class="crx_log_time">[系统启动]</span>
+                    <span class="crx_log_op">[初始化]</span>
+                    <span class="crx_log_text">页面 17-1.html 载入成功，预置样例加载中...</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 页脚 -->
+        <footer class="crx_footer">
+            <p>网页设计与制作实验课件 · 实验 17-1 · 学生：王鹏宇 · 2026-11-02</p>
+        </footer>
+    </div>
+
+    <!-- 严格遵守规则：所有变量名称均以 crx_ 开头 -->
+    <script>
+        // 预设样例库
+        const crx_sampleDatabase = {
+            student: {
+                "name": "王鹏宇",
+                "studentId": "20261102001",
+                "class": "网络工程2401班",
+                "isGraduated": false,
+                "gpa": 3.92,
+                "contact": {
+                    "email": "wangpengyu@school.edu.cn",
+                    "phone": "138-0000-2026",
+                    "city": "中国"
+                },
+                "skills": ["HTML5", "CSS3", "JavaScript", "JSON", "Ajax / Fetch", "CORS跨域"],
+                "projectScores": [
+                    { "project": "14-1 实验", "score": 98 },
+                    { "project": "14-2 数据类型", "score": 100 },
+                    { "project": "17-1 JSON展示", "score": 100 }
+                ]
+            },
+            courses: [
+                {
+                    "courseCode": "CS101",
+                    "courseName": "Web 前端核心技术",
+                    "credit": 4,
+                    "teacher": "张教授",
+                    "semester": "2026秋季",
+                    "status": "学习中"
+                },
+                {
+                    "courseCode": "CS102",
+                    "courseName": "JavaScript 深度交互编程",
+                    "credit": 3,
+                    "teacher": "李老师",
+                    "semester": "2026秋季",
+                    "status": "学习中"
+                },
+                {
+                    "courseCode": "CS103",
+                    "courseName": "网络接口与跨域通信",
+                    "credit": 3.5,
+                    "teacher": "王老师",
+                    "semester": "2026秋季",
+                    "status": "计划中"
+                }
+            ],
+            config: {
+                "application": "Web前端实验教学平台",
+                "author": "王鹏宇",
+                "version": "1.7.0",
+                "releaseDate": "2026-11-02",
+                "settings": {
+                    "theme": "light",
+                    "enableLogging": true,
+                    "maxTimeout": 5000,
+                    "allowedOrigins": ["*"]
+                }
+            }
+        };
+
+        // 日志打印函数
+        function crx_writeLog(crx_operation, crx_content) {
+            const crx_logDisplay = document.getElementById("crx_console_display");
+            if (!crx_logDisplay) return;
+
+            const crx_timeStr = new Date().toTimeString().split(" ")[0];
+            const crx_line = document.createElement("div");
+            crx_line.className = "crx_log_line";
+            crx_line.innerHTML = `
+                <span class="crx_log_time">[${crx_timeStr}]</span>
+                <span class="crx_log_op">[${crx_operation}]</span>
+                <span class="crx_log_text">${crx_content}</span>
+            `;
+            crx_logDisplay.appendChild(crx_line);
+            crx_logDisplay.scrollTop = crx_logDisplay.scrollHeight;
+            console.log(`[王鹏宇的JSON操作 - ${crx_operation}]`, crx_content);
+        }
+
+        // 清空控制台
+        function crx_clearConsole() {
+            const crx_logDisplay = document.getElementById("crx_console_display");
+            if (crx_logDisplay) {
+                crx_logDisplay.innerHTML = `
+                    <div class="crx_log_line">
+                        <span class="crx_log_time">[控制台]</span>
+                        <span class="crx_log_op">[已清空]</span>
+                        <span class="crx_log_text">准备就绪...</span>
+                    </div>
+                `;
+            }
+        }
+
+        // 载入预设示例数据
+        function crx_loadSampleData() {
+            const crx_selector = document.getElementById("crx_sample_selector");
+            const crx_input = document.getElementById("crx_json_input");
+            const crx_key = crx_selector.value;
+            const crx_data = crx_sampleDatabase[crx_key];
+
+            const crx_formatted = JSON.stringify(crx_data, null, 2);
+            crx_input.value = crx_formatted;
+            crx_writeLog("加载预设", `已载入预设数据模板：${crx_key}`);
+            crx_parseAndRender();
+        }
+
+        // 格式化美化 JSON
+        function crx_formatJSON() {
+            const crx_input = document.getElementById("crx_json_input");
+            const crx_msg = document.getElementById("crx_parse_msg");
+            try {
+                const crx_obj = JSON.parse(crx_input.value);
+                crx_input.value = JSON.stringify(crx_obj, null, 2);
+                crx_msg.className = "crx_status_alert crx_alert_success";
+                crx_msg.textContent = "✅ JSON 语法正确，已完成 2 空格缩进格式化排版！";
+                crx_writeLog("格式化美化", "使用 JSON.stringify(obj, null, 2) 重新排版成功");
+            } catch (crx_err) {
+                crx_msg.className = "crx_status_alert crx_alert_error";
+                crx_msg.textContent = `❌ JSON 格式错误: ${crx_err.message}`;
+                crx_writeLog("格式化失败", crx_err.message);
+            }
+        }
+
+        // 压缩 JSON
+        function crx_compressJSON() {
+            const crx_input = document.getElementById("crx_json_input");
+            const crx_msg = document.getElementById("crx_parse_msg");
+            try {
+                const crx_obj = JSON.parse(crx_input.value);
+                crx_input.value = JSON.stringify(crx_obj);
+                crx_msg.className = "crx_status_alert crx_alert_success";
+                crx_msg.textContent = "✅ 已成功压缩为单行紧凑 JSON 字符串！";
+                crx_writeLog("压缩处理", "去除所有换行与缩进空格完成压缩");
+            } catch (crx_err) {
+                crx_msg.className = "crx_status_alert crx_alert_error";
+                crx_msg.textContent = `❌ JSON 格式错误: ${crx_err.message}`;
+                crx_writeLog("压缩失败", crx_err.message);
+            }
+        }
+
+        // 仅语法校验
+        function crx_validateOnly() {
+            const crx_input = document.getElementById("crx_json_input");
+            const crx_msg = document.getElementById("crx_parse_msg");
+            try {
+                JSON.parse(crx_input.value);
+                crx_msg.className = "crx_status_alert crx_alert_success";
+                crx_msg.textContent = "🎉 恭喜！当前输入是完全合法的有效 JSON 格式数据！";
+                crx_writeLog("语法校验", "校验通过：符合 RFC 8259 规范");
+            } catch (crx_err) {
+                crx_msg.className = "crx_status_alert crx_alert_error";
+                crx_msg.textContent = `⚠️ 校验未通过: ${crx_err.message}`;
+                crx_writeLog("语法校验失败", crx_err.message);
+            }
+        }
+
+        // 解析并渲染为 DOM
+        function crx_parseAndRender() {
+            const crx_input = document.getElementById("crx_json_input");
+            const crx_msg = document.getElementById("crx_parse_msg");
+            const crx_container = document.getElementById("crx_render_container");
+            const crx_badge = document.getElementById("crx_parsed_type_badge");
+
+            try {
+                const crx_parsedData = JSON.parse(crx_input.value);
+                crx_msg.className = "crx_status_alert crx_alert_success";
+                crx_msg.textContent = "✅ JSON.parse() 解析成功，已渲染到右侧界面！";
+                
+                crx_container.innerHTML = "";
+
+                if (Array.isArray(crx_parsedData)) {
+                    crx_badge.textContent = `数组对象 Array (${crx_parsedData.length} 项)`;
+                    crx_renderArray(crx_parsedData, crx_container);
+                } else if (typeof crx_parsedData === "object" && crx_parsedData !== null) {
+                    crx_badge.textContent = "复合对象 Object";
+                    crx_renderObject(crx_parsedData, crx_container);
+                } else {
+                    crx_badge.textContent = `基本类型 (${typeof crx_parsedData})`;
+                    crx_container.innerHTML = `<div class="crx_profile_card"><strong>原始基础值：</strong>${crx_parsedData}</div>`;
+                }
+
+                crx_writeLog("解析渲染", `成功解析类型: ${crx_badge.textContent}`);
+            } catch (crx_err) {
+                crx_msg.className = "crx_status_alert crx_alert_error";
+                crx_msg.textContent = `❌ 解析异常: ${crx_err.message}`;
+                crx_badge.textContent = "解析失败";
+                crx_container.innerHTML = `
+                    <div style="color: #dc2626; padding: 20px; text-align: center;">
+                        <p style="font-weight: 700; font-size: 16px;">⚠️ 无法解析该 JSON 文本</p>
+                        <p style="font-size: 13px; margin-top: 6px; color: #64748b;">${crx_err.message}</p>
+                    </div>
+                `;
+                crx_writeLog("解析失败", crx_err.message);
+            }
+        }
+
+        // 渲染对象类型
+        function crx_renderObject(crx_obj, crx_targetDom) {
+            const crx_card = document.createElement("div");
+            crx_card.className = "crx_profile_card";
+
+            let crx_headerTitle = crx_obj.name || crx_obj.application || crx_obj.title || "数据项详情";
+            let crx_html = `
+                <div class="crx_profile_header">
+                    <span class="crx_profile_name">${crx_headerTitle}</span>
+                    <span class="crx_badge">JSON Object</span>
+                </div>
+            `;
+
+            for (const [crx_key, crx_val] of Object.entries(crx_obj)) {
+                if (Array.isArray(crx_val)) {
+                    crx_html += `
+                        <div class="crx_field_row">
+                            <span class="crx_field_label">${crx_key}:</span>
+                            <div class="crx_field_val">
+                                <div class="crx_tag_list">
+                                    ${crx_val.map(crx_item => {
+                                        if (typeof crx_item === "object") {
+                                            return `<span class="crx_tag">${JSON.stringify(crx_item)}</span>`;
+                                        }
+                                        return `<span class="crx_tag">${crx_item}</span>`;
+                                    }).join("")}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else if (typeof crx_val === "object" && crx_val !== null) {
+                    crx_html += `
+                        <div class="crx_field_row">
+                            <span class="crx_field_label">${crx_key}:</span>
+                            <div class="crx_field_val" style="background:#f1f5f9; padding:6px 10px; border-radius:6px; width:100%;">
+                                <code style="font-size:12px; color:#0369a1;">${JSON.stringify(crx_val, null, 2)}</code>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    crx_html += `
+                        <div class="crx_field_row">
+                            <span class="crx_field_label">${crx_key}:</span>
+                            <span class="crx_field_val">${crx_val}</span>
+                        </div>
+                    `;
+                }
+            }
+
+            crx_card.innerHTML = crx_html;
+            crx_targetDom.appendChild(crx_card);
+        }
+
+        // 渲染数组类型
+        function crx_renderArray(crx_arr, crx_targetDom) {
+            crx_arr.forEach((crx_item, crx_idx) => {
+                const crx_card = document.createElement("div");
+                crx_card.className = "crx_profile_card";
+
+                if (typeof crx_item === "object" && crx_item !== null) {
+                    let crx_title = crx_item.courseName || crx_item.name || crx_item.title || `第 ${crx_idx + 1} 项`;
+                    let crx_html = `
+                        <div class="crx_profile_header">
+                            <span class="crx_profile_name">#${crx_idx + 1} ${crx_title}</span>
+                            <span class="crx_badge">${crx_item.status || "Item"}</span>
+                        </div>
+                    `;
+                    for (const [crx_k, crx_v] of Object.entries(crx_item)) {
+                        crx_html += `
+                            <div class="crx_field_row">
+                                <span class="crx_field_label">${crx_k}:</span>
+                                <span class="crx_field_val">${typeof crx_v === 'object' ? JSON.stringify(crx_v) : crx_v}</span>
+                            </div>
+                        `;
+                    }
+                    crx_card.innerHTML = crx_html;
+                } else {
+                    crx_card.innerHTML = `<div class="crx_field_row"><span class="crx_field_label">项 #${crx_idx + 1}:</span><span class="crx_field_val">${crx_item}</span></div>`;
+                }
+                crx_targetDom.appendChild(crx_card);
+            });
+        }
+
+        // 页面初始化
+        window.addEventListener("DOMContentLoaded", () => {
+            crx_loadSampleData();
+        });
+    </script>
+</body>
+</html>
+

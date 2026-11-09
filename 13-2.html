@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>13-2 Lucide SVG 图标应用</title>
+    <style>
+        :root {
+            --primary-color: #06b6d4;
+            --primary-hover: #0891b2;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-indigo: #6366f1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 页面头部 */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 24px 20px;
+            background: linear-gradient(135deg, #0e7490, #06b6d4);
+            color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.3);
+        }
+
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 15px;
+            opacity: 0.95;
+        }
+
+        /* 顶部导航切换链接 */
+        .page-switch-bar {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin: 16px 0 24px;
+        }
+
+        .page-switch-bar a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .page-switch-bar .active {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(6, 182, 212, 0.3);
+        }
+
+        .page-switch-bar .inactive {
+            background-color: #ffffff;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .page-switch-bar .inactive:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        /* 通用卡片容器 */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-main);
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 10px;
+        }
+
+        .card-title i, .card-title svg {
+            color: var(--primary-color);
+        }
+
+        /* SVG 图标原理提示条 */
+        .principle-banner {
+            background-color: #ecfeff;
+            border-left: 4px solid var(--primary-color);
+            padding: 14px 18px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 16px;
+            font-size: 14px;
+            color: #155e75;
+        }
+
+        .principle-banner code {
+            background-color: #cffafe;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: Consolas, monospace;
+        }
+
+        /* 图标网格布局 */
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 14px;
+        }
+
+        .icon-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 10px;
+            background-color: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.25s ease;
+            cursor: pointer;
+        }
+
+        .icon-box:hover {
+            transform: translateY(-3px);
+            background-color: #ffffff;
+            border-color: var(--primary-color);
+            box-shadow: 0 6px 14px -2px rgba(6, 182, 212, 0.2);
+        }
+
+        .icon-box i, .icon-box svg {
+            width: 28px;
+            height: 28px;
+            margin-bottom: 8px;
+            color: #334155;
+            transition: color 0.2s, transform 0.2s;
+        }
+
+        .icon-box:hover i, .icon-box:hover svg {
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        .icon-box span {
+            font-size: 12px;
+            color: var(--text-muted);
+            word-break: break-all;
+            font-family: Consolas, monospace;
+        }
+
+        /* SVG 独特特性展示网格 */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+        }
+
+        .feature-block {
+            background-color: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .feature-block h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .feature-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            min-height: 70px;
+            background-color: #ffffff;
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            flex-wrap: wrap;
+        }
+
+        .feature-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        /* SVG 动画 */
+        .spin {
+            animation: svgSpin 2s linear infinite;
+        }
+
+        @keyframes svgSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .pulse {
+            animation: svgPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes svgPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        /* SVG 动态绘制描边动画 */
+        .draw-animation {
+            stroke-dasharray: 80;
+            stroke-dashoffset: 80;
+            animation: drawPath 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes drawPath {
+            0% { stroke-dashoffset: 80; }
+            100% { stroke-dashoffset: 0; }
+        }
+
+        /* 综合实战 UI */
+        .demo-dashboard {
+            background-color: #0f172a;
+            color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            min-height: 280px;
+        }
+
+        .dash-sidebar {
+            width: 200px;
+            background-color: #1e293b;
+            padding: 20px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border-right: 1px solid #334155;
+        }
+
+        .dash-logo {
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #38bdf8;
+            margin-bottom: 16px;
+            padding-left: 6px;
+        }
+
+        .dash-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .dash-item:hover, .dash-item.active {
+            background-color: #0284c7;
+            color: #ffffff;
+        }
+
+        .dash-main {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .dash-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .dash-header-title {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dash-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+        }
+
+        .dash-card {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .dash-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .dash-card-val {
+            font-size: 22px;
+            font-weight: 700;
+            color: #f8fafc;
+        }
+
+        .dash-card-trend {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .trend-up { color: #34d399; }
+        .trend-down { color: #f87171; }
+
+        /* 操作按钮组 */
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 16px;
+            font-size: 14px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-cyan {
+            background-color: var(--primary-color);
+            color: #ffffff;
+        }
+        .btn-cyan:hover { background-color: var(--primary-hover); }
+
+        .btn-green {
+            background-color: var(--accent-green);
+            color: #ffffff;
+        }
+        .btn-green:hover { background-color: #059669; }
+
+        .btn-rose {
+            background-color: var(--accent-rose);
+            color: #ffffff;
+        }
+        .btn-rose:hover { background-color: #e11d48; }
+
+        .btn-outline {
+            background-color: transparent;
+            border-color: var(--border-color);
+            color: var(--text-main);
+        }
+        .btn-outline:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        /* 状态横幅 */
+        .alert-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-top: 14px;
+        }
+
+        .alert-success {
+            background-color: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-warning {
+            background-color: #fffbeb;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        /* 交互实验台 */
+        .sandbox-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+            background-color: #f1f5f9;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .control-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .control-item label {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .sandbox-stage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 180px;
+            background-color: #ffffff;
+            border: 2px dashed #cbd5e1;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .code-preview {
+            background-color: #0f172a;
+            color: #38bdf8;
+            padding: 14px 18px;
+            border-radius: 8px;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            margin-top: 14px;
+            width: 100%;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        /* 对比表格 */
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 14px;
+            font-size: 14px;
+        }
+
+        .compare-table th, .compare-table td {
+            border: 1px solid var(--border-color);
+            padding: 10px 14px;
+            text-align: left;
+        }
+
+        .compare-table th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+        }
+
+        .compare-table tr:hover {
+            background-color: #f8fafc;
+        }
+
+        /* 页脚 */
+        footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 头部横幅 -->
+    <header>
+        <h1>王鹏宇的网页设计实验 13-2</h1>
+        <p>Lucide 图标库应用展示 —— 采用基于 DOM 的现代“SVG 矢量图形”方式渲染</p>
+    </header>
+
+    <!-- 实验页面快捷切换导航 -->
+    <div class="page-switch-bar">
+        <a href="13-1.html" class="inactive">
+            <i data-lucide="type"></i> 13-1: Font Awesome 字体图标
+        </a>
+        <a href="13-2.html" class="active">
+            <i data-lucide="vector-square"></i> 13-2: Lucide SVG 图标
+        </a>
+    </div>
+
+    <!-- 1. SVG 图标原理说明卡片 -->
+    <div class="card">
+        <div class="card-title">
+            <i data-lucide="info"></i>
+            <span>SVG 图标（Scalable Vector Graphics）实现原理</span>
+        </div>
+        <div class="principle-banner">
+            <p><strong>技术本质：</strong>Lucide 是一套纯粹基于 SVG（可缩放矢量图形）的轻量开源图标库。在页面中声明带有 <code>data-lucide="图标名"</code> 的占位标签，引入 <code>lucide.min.js</code> 并调用 <code>lucide.createIcons()</code>，脚本会自动将占位标签替换为标准的 <code>&lt;svg&gt;&lt;path d="..." /&gt;&lt;/svg&gt;</code> DOM 节点。</p>
+            <p style="margin-top: 6px;"><strong>SVG 独特优势：</strong>支持细粒度控制线条粗细（<code>stroke-width</code>）、端点与折角样式（<code>stroke-linecap</code>、<code>stroke-linejoin</code>）、多色及镂空填充（<code>fill</code>），并能实现令人惊叹的 SVG 描边动画（<code>stroke-dasharray</code>），彻底摆脱字体渲染反锯齿模糊问题！</p>
+        </div>
+    </div>
+
+    <!-- 2. 分类图标展示 -->
+    <div class="card">
+        <div class="card-title">
+            <i data-lucide="layout-grid"></i>
+            <span>Lucide 常用分类图标展示（自动替换为 SVG）</span>
+        </div>
+
+        <h3 style="font-size: 15px; margin: 12px 0 10px; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+            <i data-lucide="sparkles" style="color: var(--primary-color);"></i> 界面核心图标 (UI & Navigation)
+        </h3>
+        <div class="icon-grid">
+            <div class="icon-box"><i data-lucide="home"></i><span>home</span></div>
+            <div class="icon-box"><i data-lucide="user"></i><span>user</span></div>
+            <div class="icon-box"><i data-lucide="settings"></i><span>settings</span></div>
+            <div class="icon-box"><i data-lucide="search"></i><span>search</span></div>
+            <div class="icon-box"><i data-lucide="bell" style="color: #f59e0b;"></i><span>bell</span></div>
+            <div class="icon-box"><i data-lucide="mail" style="color: #06b6d4;"></i><span>mail</span></div>
+            <div class="icon-box"><i data-lucide="heart" style="color: #f43f5e;"></i><span>heart</span></div>
+            <div class="icon-box"><i data-lucide="star" style="color: #eab308;"></i><span>star</span></div>
+            <div class="icon-box"><i data-lucide="bookmark" style="color: #8b5cf6;"></i><span>bookmark</span></div>
+            <div class="icon-box"><i data-lucide="check" style="color: #10b981;"></i><span>check</span></div>
+            <div class="icon-box"><i data-lucide="x" style="color: #ef4444;"></i><span>x</span></div>
+            <div class="icon-box"><i data-lucide="plus" style="color: #06b6d4;"></i><span>plus</span></div>
+        </div>
+
+        <h3 style="font-size: 15px; margin: 20px 0 10px; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+            <i data-lucide="folder" style="color: #f59e0b;"></i> 文件与多媒体 (Files & Media)
+        </h3>
+        <div class="icon-grid">
+            <div class="icon-box"><i data-lucide="folder"></i><span>folder</span></div>
+            <div class="icon-box"><i data-lucide="file-text"></i><span>file-text</span></div>
+            <div class="icon-box"><i data-lucide="image"></i><span>image</span></div>
+            <div class="icon-box"><i data-lucide="camera"></i><span>camera</span></div>
+            <div class="icon-box"><i data-lucide="video"></i><span>video</span></div>
+            <div class="icon-box"><i data-lucide="music" style="color: #ec4899;"></i><span>music</span></div>
+            <div class="icon-box"><i data-lucide="play" style="color: #10b981;"></i><span>play</span></div>
+            <div class="icon-box"><i data-lucide="pause"></i><span>pause</span></div>
+            <div class="icon-box"><i data-lucide="download" style="color: #06b6d4;"></i><span>download</span></div>
+            <div class="icon-box"><i data-lucide="share-2" style="color: #6366f1;"></i><span>share-2</span></div>
+        </div>
+
+        <h3 style="font-size: 15px; margin: 20px 0 10px; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+            <i data-lucide="cpu" style="color: #6366f1;"></i> 科技与硬件设备 (Tech & Devices)
+        </h3>
+        <div class="icon-grid">
+            <div class="icon-box"><i data-lucide="laptop"></i><span>laptop</span></div>
+            <div class="icon-box"><i data-lucide="smartphone"></i><span>smartphone</span></div>
+            <div class="icon-box"><i data-lucide="monitor"></i><span>monitor</span></div>
+            <div class="icon-box"><i data-lucide="cpu" style="color: #6366f1;"></i><span>cpu</span></div>
+            <div class="icon-box"><i data-lucide="database" style="color: #06b6d4;"></i><span>database</span></div>
+            <div class="icon-box"><i data-lucide="server"></i><span>server</span></div>
+            <div class="icon-box"><i data-lucide="wifi" style="color: #10b981;"></i><span>wifi</span></div>
+            <div class="icon-box"><i data-lucide="battery-charging" style="color: #10b981;"></i><span>battery-charging</span></div>
+            <div class="icon-box"><i data-lucide="code"></i><span>code</span></div>
+            <div class="icon-box"><i data-lucide="terminal"></i><span>terminal</span></div>
+        </div>
+
+        <h3 style="font-size: 15px; margin: 20px 0 10px; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+            <i data-lucide="sun" style="color: #f59e0b;"></i> 天气、自然与电商 (Weather & Commerce)
+        </h3>
+        <div class="icon-grid">
+            <div class="icon-box"><i data-lucide="sun" style="color: #f59e0b;"></i><span>sun</span></div>
+            <div class="icon-box"><i data-lucide="moon" style="color: #6366f1;"></i><span>moon</span></div>
+            <div class="icon-box"><i data-lucide="cloud" style="color: #06b6d4;"></i><span>cloud</span></div>
+            <div class="icon-box"><i data-lucide="cloud-rain" style="color: #3b82f6;"></i><span>cloud-rain</span></div>
+            <div class="icon-box"><i data-lucide="zap" style="color: #eab308;"></i><span>zap</span></div>
+            <div class="icon-box"><i data-lucide="shopping-cart" style="color: #06b6d4;"></i><span>shopping-cart</span></div>
+            <div class="icon-box"><i data-lucide="credit-card"></i><span>credit-card</span></div>
+            <div class="icon-box"><i data-lucide="gift" style="color: #ec4899;"></i><span>gift</span></div>
+            <div class="icon-box"><i data-lucide="truck" style="color: #10b981;"></i><span>truck</span></div>
+            <div class="icon-box"><i data-lucide="map-pin" style="color: #ef4444;"></i><span>map-pin</span></div>
+        </div>
+    </div>
+
+    <!-- 3. SVG 专属特性与动态控制 -->
+    <div class="card">
+        <div class="card-title">
+            <i data-lucide="sliders"></i>
+            <span>SVG 独有特性展示（线宽调节、填充填充、路径动画）</span>
+        </div>
+
+        <div class="features-grid">
+            <!-- 特性 1: 描边粗细控制 (Stroke Width) - 字体图标无法做到的功能! -->
+            <div class="feature-block">
+                <h4><i data-lucide="pen-tool"></i> 线条粗细精细调节 (stroke-width)</h4>
+                <div class="feature-display">
+                    <i data-lucide="heart" stroke-width="1" title="1px 极细风格" style="color: #f43f5e;"></i>
+                    <i data-lucide="heart" stroke-width="1.5" title="1.5px 常规" style="color: #f43f5e;"></i>
+                    <i data-lucide="heart" stroke-width="2" title="2px 标准" style="color: #f43f5e;"></i>
+                    <i data-lucide="heart" stroke-width="3" title="3px 强调" style="color: #f43f5e;"></i>
+                </div>
+                <div class="feature-desc">字体图标无法调整笔画粗细，而 SVG 可通过 <code>stroke-width</code> 任意控制粗细！</div>
+            </div>
+
+            <!-- 特性 2: 填充与多色组合 (Fill & Stroke) -->
+            <div class="feature-block">
+                <h4><i data-lucide="palette"></i> 镂空、填充与双色搭配</h4>
+                <div class="feature-display">
+                    <i data-lucide="star" fill="none" stroke="#eab308" stroke-width="2" title="仅描边"></i>
+                    <i data-lucide="star" fill="#fde047" stroke="#ca8a04" stroke-width="2" title="填充+描边"></i>
+                    <i data-lucide="bookmark" fill="#c7d2fe" stroke="#4f46e5" stroke-width="2"></i>
+                    <i data-lucide="bell" fill="#fecdd3" stroke="#e11d48" stroke-width="2"></i>
+                </div>
+                <div class="feature-desc">支持独立配置 <code>fill</code> 颜色与 <code>stroke</code> 描边，实现双色或半透明质感。</div>
+            </div>
+
+            <!-- 特性 3: 尺寸无损矢量缩放 -->
+            <div class="feature-block">
+                <h4><i data-lucide="maximize-2"></i> 矢量多级缩放</h4>
+                <div class="feature-display">
+                    <i data-lucide="shield-check" width="16" height="16" style="color: #10b981;"></i>
+                    <i data-lucide="shield-check" width="24" height="24" style="color: #10b981;"></i>
+                    <i data-lucide="shield-check" width="32" height="32" style="color: #10b981;"></i>
+                    <i data-lucide="shield-check" width="44" height="44" style="color: #10b981;"></i>
+                </div>
+                <div class="feature-desc">通过 <code>width</code> 与 <code>height</code> 精确指定宽高，在任何视网膜屏上边缘锐利。</div>
+            </div>
+
+            <!-- 特性 4: SVG 专属路径描边动效 (Path Animation) -->
+            <div class="feature-block">
+                <h4><i data-lucide="activity"></i> SVG 路径描边与微动效</h4>
+                <div class="feature-display">
+                    <!-- SVG 动态绘制效果 -->
+                    <i data-lucide="zap" class="draw-animation" style="color: #eab308; stroke-width: 2.5;"></i>
+                    <!-- 旋转加载 -->
+                    <i data-lucide="loader-2" class="spin" style="color: #06b6d4; stroke-width: 2;"></i>
+                    <!-- 脉冲跳动 -->
+                    <i data-lucide="heart" class="pulse" fill="#f43f5e" stroke="#f43f5e" style="stroke-width: 2;"></i>
+                    <!-- 刷新旋转 -->
+                    <i data-lucide="refresh-cw" class="spin" style="color: #10b981; stroke-width: 2;"></i>
+                </div>
+                <div class="feature-desc">利用 CSS <code>stroke-dasharray</code> 实现路径描绘，配合平移旋转动效。</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 综合界面实战应用：现代控制台与组件 -->
+    <div class="card">
+        <div class="card-title">
+            <i data-lucide="layout-dashboard"></i>
+            <span>实际 UI 场景综合应用（现代仪表盘与交互控件）</span>
+        </div>
+
+        <!-- 模拟 SaaS 暗色仪表盘 -->
+        <div class="demo-dashboard">
+            <div class="dash-sidebar">
+                <div class="dash-logo">
+                    <i data-lucide="sparkles"></i>
+                    <span>CloudFlow</span>
+                </div>
+                <a href="#" class="dash-item active"><i data-lucide="gauge"></i> 仪表总览</a>
+                <a href="#" class="dash-item"><i data-lucide="server"></i> 节点监控</a>
+                <a href="#" class="dash-item"><i data-lucide="database"></i> 数据仓储</a>
+                <a href="#" class="dash-item"><i data-lucide="shield-alert"></i> 安全审计</a>
+                <a href="#" class="dash-item"><i data-lucide="settings"></i> 平台设置</a>
+            </div>
+
+            <div class="dash-main">
+                <div class="dash-header">
+                    <div class="dash-header-title">
+                        <i data-lucide="activity" style="color: #38bdf8;"></i> 实时系统负载监控
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <span style="font-size: 12px; color: #94a3b8; display: flex; align-items: center; gap: 4px;">
+                            <i data-lucide="wifi" width="14" height="14" style="color: #34d399;"></i> 正常连接
+                        </span>
+                    </div>
+                </div>
+
+                <div class="dash-cards">
+                    <div class="dash-card">
+                        <div class="dash-card-top">
+                            <span>CPU 使用率</span>
+                            <i data-lucide="cpu" width="16" height="16"></i>
+                        </div>
+                        <div class="dash-card-val">34.2%</div>
+                        <div class="dash-card-trend trend-down">
+                            <i data-lucide="trending-down" width="14" height="14"></i> 较昨日 -4.1%
+                        </div>
+                    </div>
+
+                    <div class="dash-card">
+                        <div class="dash-card-top">
+                            <span>API 请求数</span>
+                            <i data-lucide="arrow-up-right" width="16" height="16"></i>
+                        </div>
+                        <div class="dash-card-val">1.28M</div>
+                        <div class="dash-card-trend trend-up">
+                            <i data-lucide="trending-up" width="14" height="14"></i> 增长 +18.2%
+                        </div>
+                    </div>
+
+                    <div class="dash-card">
+                        <div class="dash-card-top">
+                            <span>安全拦截</span>
+                            <i data-lucide="shield-check" width="16" height="16" style="color: #34d399;"></i>
+                        </div>
+                        <div class="dash-card-val">99.98%</div>
+                        <div class="dash-card-trend trend-up">
+                            <i data-lucide="check" width="14" height="14"></i> 零异常威胁
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 按钮组展示 -->
+        <div class="btn-group">
+            <button class="btn btn-cyan">
+                <i data-lucide="plus-circle"></i> 创建新实例
+            </button>
+            <button class="btn btn-green">
+                <i data-lucide="check-check"></i> 批准通过
+            </button>
+            <button class="btn btn-rose">
+                <i data-lucide="trash-2"></i> 清理容器
+            </button>
+            <button class="btn btn-outline">
+                <i data-lucide="filter"></i> 筛选规则
+            </button>
+            <button class="btn btn-outline">
+                <i data-lucide="download"></i> 导出配置
+            </button>
+        </div>
+
+        <!-- 状态通知卡片 -->
+        <div class="alert-box alert-success">
+            <i data-lucide="check-circle-2" style="color: #059669;"></i>
+            <span>系统已成功挂载本地 CDN 资源（<code>./cdn/lucide/lucide.min.js</code>），所有 SVG 矢量图形均在本地离线高效渲染！</span>
+        </div>
+        <div class="alert-box alert-warning">
+            <i data-lucide="alert-triangle" style="color: #d97706;"></i>
+            <span>提示：SVG 图标直接以 DOM 树结构呈现在 HTML 中，随时可以通过右键“审查元素”查看底层的 <code>&lt;svg&gt;</code> 与 <code>&lt;path&gt;</code> 标签。</span>
+        </div>
+    </div>
+
+    <!-- 5. 交互式 SVG 调试实验台与代码审查 -->
+    <div class="card">
+        <div class="card-title">
+            <i data-lucide="wand-2"></i>
+            <span>实时 SVG 参数调试与代码检查器</span>
+        </div>
+
+        <div class="sandbox-controls">
+            <div class="control-item">
+                <label for="iconSelect">选择图标：</label>
+                <select id="iconSelect" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color);">
+                    <option value="compass" selected>🧭 罗盘 (compass)</option>
+                    <option value="zap">⚡ 闪电 (zap)</option>
+                    <option value="heart">❤️ 爱心 (heart)</option>
+                    <option value="sun">☀️ 太阳 (sun)</option>
+                    <option value="shield-check">🛡️ 安全盾牌 (shield-check)</option>
+                    <option value="sparkles">✨ 闪耀星星 (sparkles)</option>
+                </select>
+            </div>
+
+            <div class="control-item">
+                <label for="strokeRange">描边线宽 (stroke-width)：<span id="strokeVal">2px</span></label>
+                <input type="range" id="strokeRange" min="1" max="4" step="0.5" value="2" style="cursor: pointer;">
+            </div>
+
+            <div class="control-item">
+                <label for="sizeRange">尺寸 (width/height)：<span id="sizeVal">48px</span></label>
+                <input type="range" id="sizeRange" min="20" max="96" value="48" style="cursor: pointer;">
+            </div>
+
+            <div class="control-item">
+                <label for="strokeColor">描边颜色：</label>
+                <input type="color" id="strokeColor" value="#06b6d4" style="width: 38px; height: 32px; border: none; cursor: pointer; border-radius: 4px;">
+            </div>
+
+            <div class="control-item">
+                <label for="fillColor">填充颜色：</label>
+                <input type="color" id="fillColor" value="#ffffff" style="width: 38px; height: 32px; border: none; cursor: pointer; border-radius: 4px;">
+                <label><input type="checkbox" id="transparentFill" checked style="margin-left: 6px;"> 无填充 (none)</label>
+            </div>
+        </div>
+
+        <div class="sandbox-stage">
+            <div id="dynamicStage" style="display: flex; align-items: center; justify-content: center; min-height: 100px;">
+                <i id="dynamicLucideIcon" data-lucide="compass"></i>
+            </div>
+            <div class="code-preview" id="codePreview">
+                &lt;!-- 正在解析生成的真实 SVG DOM 代码... --&gt;
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. 核心对比总结：Font Awesome 字体图标 vs Lucide SVG 图标 -->
+    <div class="card">
+        <div class="card-title">
+            <i data-lucide="git-compare"></i>
+            <span>技术选型对比：Font Awesome（字体图标） VS Lucide（SVG 图标）</span>
+        </div>
+
+        <table class="compare-table">
+            <thead>
+                <tr>
+                    <th style="width: 18%;">对比维度</th>
+                    <th style="width: 41%;">Font Awesome (13-1.html · 字体图标方式)</th>
+                    <th style="width: 41%;">Lucide (13-2.html · SVG 图标方式)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>实现底层</strong></td>
+                    <td><code>@font-face</code> 载入矢量字体文件，通过 <code>::before</code> 输出 Unicode 字符。</td>
+                    <td>直接在 DOM 中生成 <code>&lt;svg&gt;&lt;path&gt;</code> 矢量图形节点。</td>
+                </tr>
+                <tr>
+                    <td><strong>线宽调节</strong></td>
+                    <td>❌ 不支持（字体的笔画粗细由字体文件固定，无法动态变细或变粗）。</td>
+                    <td>✅ 完美支持（可直接设置 <code>stroke-width="1.5"</code> 任意调节粗细）。</td>
+                </tr>
+                <tr>
+                    <td><strong>双色与填充</strong></td>
+                    <td>❌ 字体默认只能是单色（受限于 text color），无法实现复杂局部填充。</td>
+                    <td>✅ 支持分别控制 <code>stroke</code>（描边）与 <code>fill</code>（填充），支持渐变色。</td>
+                </tr>
+                <tr>
+                    <td><strong>渲染清晰度</strong></td>
+                    <td>受浏览器文字反锯齿（Antialiasing）与子像素渲染影响，特定字号可能微糊。</td>
+                    <td>纯矢量数学几何，高分屏与任何缩放比下 100% 绝对锐利清晰。</td>
+                </tr>
+                <tr>
+                    <td><strong>高级动效</strong></td>
+                    <td>仅支持常规 CSS 旋转、缩放、透明度动画。</td>
+                    <td>支持独有的 SVG 路径描边绘制动画（<code>stroke-dashoffset</code>）与图形变形。</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 页面底部 -->
+    <footer>
+        <p>13-2.html | 网页设计课程作业 | 制作者：王鹏宇 | 资源路径：<code>./cdn/lucide/lucide.min.js</code></p>
+    </footer>
+</div>
+
+<!-- 引入本地 cdn 目录下的 Lucide 核心脚本库 -->
+<script src="./cdn/lucide/lucide.min.js"></script>
+
+<script>
+    // 1. 初始化页面中所有的 Lucide 图标（扫描 data-lucide 并替换为 SVG 节点）
+    lucide.createIcons();
+
+    // 2. 交互实验台控制脚本
+    const iconSelect = document.getElementById('iconSelect');
+    const strokeRange = document.getElementById('strokeRange');
+    const strokeVal = document.getElementById('strokeVal');
+    const sizeRange = document.getElementById('sizeRange');
+    const sizeVal = document.getElementById('sizeVal');
+    const strokeColor = document.getElementById('strokeColor');
+    const fillColor = document.getElementById('fillColor');
+    const transparentFill = document.getElementById('transparentFill');
+    const dynamicStage = document.getElementById('dynamicStage');
+    const codePreview = document.getElementById('codePreview');
+
+    function updateDynamicSvg() {
+        const iconName = iconSelect.value;
+        const strokeWidth = strokeRange.value;
+        const size = sizeRange.value;
+        const sColor = strokeColor.value;
+        const fColor = transparentFill.checked ? 'none' : fillColor.value;
+
+        strokeVal.textContent = strokeWidth + 'px';
+        sizeVal.textContent = size + 'px';
+
+        // 重新在舞台中渲染目标图标占位标签
+        dynamicStage.innerHTML = `<i data-lucide="${iconName}" width="${size}" height="${size}" stroke="${sColor}" stroke-width="${strokeWidth}" fill="${fColor}"></i>`;
+
+        // 触发 Lucide 替换为 SVG
+        lucide.createIcons({
+            root: dynamicStage
+        });
+
+        // 提取生成的真实 <svg> HTML 代码展示给用户
+        setTimeout(() => {
+            const svgElement = dynamicStage.querySelector('svg');
+            if (svgElement) {
+                // 格式化输出 SVG 字符串
+                const outer = svgElement.outerHTML
+                    .replace(/></g, '>\n  <')
+                    .replace(/><\/svg>/g, '>\n</svg>');
+                codePreview.textContent = `<!-- 声明方式：-->\n<i data-lucide="${iconName}" width="${size}" height="${size}" stroke="${sColor}" stroke-width="${strokeWidth}" fill="${fColor}"></i>\n\n<!-- Lucide 最终生成的真实 SVG DOM 结构：-->\n` + outer;
+            }
+        }, 30);
+    }
+
+    iconSelect.addEventListener('change', updateDynamicSvg);
+    strokeRange.addEventListener('input', updateDynamicSvg);
+    sizeRange.addEventListener('input', updateDynamicSvg);
+    strokeColor.addEventListener('input', updateDynamicSvg);
+    fillColor.addEventListener('input', updateDynamicSvg);
+    transparentFill.addEventListener('change', updateDynamicSvg);
+
+    // 初始运行一次
+    updateDynamicSvg();
+</script>
+
+</body>
+</html>

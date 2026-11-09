@@ -1,0 +1,1440 @@
+<!-- 姓名：王鹏宇，日期：2026-11-05，功能名称：基于 Three.js 的 3D 数据可视化图表 (3D空间矩阵柱状图与3D立体环形占比图) -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#060b17">
+    <meta name="color-scheme" content="dark light">
+    <title>18-7 Three.js 3D 数据可视化图表 · 王鹏宇</title>
+    <!-- 本地下载的 Three.js r128 及 OrbitControls 轨道控制器 -->
+    <script src="cdn/three.min.js"></script>
+    <script src="cdn/OrbitControls.js"></script>
+    <style>
+        :root {
+            --bg: #060b17;
+            --surface: rgba(10, 20, 38, 0.75);
+            --surface-solid: #0d1729;
+            --surface-elevated: #13223d;
+            --ink: #f0f6fc;
+            --muted: #8b9eb7;
+            --dim: #50647e;
+            --line: rgba(148, 184, 220, 0.16);
+            --line-strong: rgba(148, 184, 220, 0.32);
+            --line-subtle: rgba(148, 184, 220, 0.08);
+
+            /* Modern Cyber & Scientific Accents */
+            --cyan: #38bdf8;
+            --blue: #2563eb;
+            --violet: #8b5cf6;
+            --purple: #a855f7;
+            --green: #10b981;
+            --amber: #f59e0b;
+            --rose: #f43f5e;
+            --teal: #14b8a6;
+
+            --mono: "SFMono-Regular", Consolas, "Cascadia Code", "Fira Code", monospace;
+            --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Roboto, sans-serif;
+            --ease: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* 浅色主题模式 */
+        body.theme-light {
+            --bg: #f8fafc;
+            --surface: rgba(255, 255, 255, 0.92);
+            --surface-solid: #ffffff;
+            --surface-elevated: #f1f5f9;
+            --ink: #0f172a;
+            --muted: #475569;
+            --dim: #94a3b8;
+            --line: rgba(51, 65, 85, 0.14);
+            --line-strong: rgba(51, 65, 85, 0.28);
+            --line-subtle: rgba(51, 65, 85, 0.06);
+
+            --cyan: #0284c7;
+            --blue: #1d4ed8;
+            --violet: #7c3aed;
+            --purple: #9333ea;
+            --green: #059669;
+            --amber: #d97706;
+            --rose: #e11d48;
+            --teal: #0d9488;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            font-family: var(--sans);
+            color: var(--ink);
+            background: var(--bg);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 背景几何微网格 */
+        body::before {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            content: "";
+            background-image:
+                linear-gradient(var(--line-subtle) 1px, transparent 1px),
+                linear-gradient(90deg, var(--line-subtle) 1px, transparent 1px);
+            background-size: 52px 52px;
+            opacity: 0.85;
+        }
+
+        body::after {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            content: "";
+            background: radial-gradient(circle at 18% 18%, rgba(56, 189, 248, 0.08), transparent 60%),
+                        radial-gradient(circle at 82% 82%, rgba(139, 92, 246, 0.07), transparent 65%);
+        }
+
+        .app {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ==================== 顶部导航栏 ==================== */
+        .topbar {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 16px;
+            height: 70px;
+            padding: 0 24px;
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--line);
+            flex-shrink: 0;
+        }
+
+        .identity {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .identity_mark {
+            display: grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(139, 92, 246, 0.15));
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+        }
+
+        .identity_text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .identity_text strong {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            color: var(--ink);
+        }
+
+        .identity_text small {
+            font-family: var(--mono);
+            font-size: 9px;
+            color: var(--muted);
+            letter-spacing: 0.1em;
+        }
+
+        .page_title {
+            text-align: center;
+            min-width: 0;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: 0.18em;
+            color: var(--cyan);
+            text-transform: uppercase;
+        }
+
+        .eyebrow_dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 8px var(--green);
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+
+        .page_title h1 {
+            font-size: 19px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            color: var(--ink);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+        }
+
+        .top_right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px;
+            background: var(--surface-solid);
+            border: 1px solid var(--line);
+            border-radius: 999px;
+        }
+
+        .nav a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            text-decoration: none;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav a .nav_code {
+            font-family: var(--mono);
+            font-size: 9px;
+            opacity: 0.8;
+        }
+
+        .nav a:hover {
+            color: var(--ink);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav a.is-active {
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--blue), var(--cyan));
+            box-shadow: 0 2px 10px rgba(56, 189, 248, 0.3);
+        }
+
+        .live_badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: var(--cyan);
+            font-family: var(--mono);
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+        }
+
+        /* ==================== 次顶控制栏 ==================== */
+        .subbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 10px 24px;
+            background: var(--surface-solid);
+            border-bottom: 1px solid var(--line-subtle);
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .view_tabs {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tab_btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: 1px solid var(--line);
+            background: var(--surface);
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .tab_btn:hover {
+            color: var(--ink);
+            border-color: var(--line-strong);
+        }
+
+        .tab_btn.is-active {
+            color: var(--ink);
+            background: rgba(56, 189, 248, 0.12);
+            border-color: var(--cyan);
+            box-shadow: inset 0 0 0 1px var(--cyan);
+        }
+
+        .subbar_actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .action_pill_btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 30px;
+            padding: 0 12px;
+            border-radius: 6px;
+            border: 1px solid var(--line);
+            background: var(--surface);
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action_pill_btn:hover {
+            color: var(--ink);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--line-strong);
+        }
+
+        .action_pill_btn.active {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        /* ==================== 3D 图表主展示网格 ==================== */
+        .chart_grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px 24px;
+            flex: 1;
+            transition: all 0.3s ease;
+        }
+
+        .chart_grid.mode-bar {
+            grid-template-columns: 1fr;
+        }
+
+        .chart_grid.mode-bar #donutCard {
+            display: none;
+        }
+
+        .chart_grid.mode-donut {
+            grid-template-columns: 1fr;
+        }
+
+        .chart_grid.mode-donut #barCard {
+            display: none;
+        }
+
+        .chart_card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            background: var(--surface-solid);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+            overflow: hidden;
+            transition: border-color 0.25s ease;
+        }
+
+        .chart_card:hover {
+            border-color: var(--line-strong);
+        }
+
+        .card_header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--line-subtle);
+            background: var(--surface);
+            flex-wrap: wrap;
+            z-index: 2;
+        }
+
+        .card_title_group {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .card_title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card_sub {
+            font-family: var(--mono);
+            font-size: 9.5px;
+            color: var(--muted);
+        }
+
+        .card_tools {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tool_btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            height: 28px;
+            padding: 0 10px;
+            border-radius: 6px;
+            border: 1px solid var(--line);
+            background: var(--surface);
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .tool_btn:hover {
+            color: var(--ink);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--line-strong);
+        }
+
+        .tool_btn.primary {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(37, 99, 235, 0.22));
+            border-color: rgba(56, 189, 248, 0.35);
+            color: var(--cyan);
+        }
+
+        /* 3D WebGL 视口画布 */
+        .three_viewport {
+            position: relative;
+            flex: 1;
+            min-height: 520px;
+            max-height: 680px;
+            background: radial-gradient(circle at 50% 50%, rgba(13, 24, 46, 0.8), rgba(4, 8, 16, 0.98));
+            overflow: hidden;
+            cursor: grab;
+        }
+
+        .three_viewport:active {
+            cursor: grabbing;
+        }
+
+        .three_viewport canvas {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+            outline: none;
+        }
+
+        /* 浮动 HUD 悬浮信息框 (Raycast Tooltip) */
+        .chart_hud_tooltip {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0;
+            transform: translate(-50%, -120%);
+            padding: 10px 14px;
+            background: rgba(13, 23, 41, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--cyan);
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 15px rgba(56, 189, 248, 0.2);
+            transition: opacity 0.2s ease;
+            z-index: 10;
+            white-space: nowrap;
+        }
+
+        .chart_hud_tooltip.is-visible {
+            opacity: 1;
+        }
+
+        .hud_title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 4px;
+        }
+
+        .hud_item {
+            font-family: var(--mono);
+            font-size: 10.5px;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .hud_item b {
+            color: var(--cyan);
+        }
+
+        /* 视口浮动控制手柄 */
+        .viewport_hud_tools {
+            position: absolute;
+            left: 18px;
+            bottom: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 6px;
+            background: rgba(10, 20, 38, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            z-index: 5;
+        }
+
+        .hud_ctrl_btn {
+            display: grid;
+            place-items: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 5px;
+            border: 1px solid var(--line-subtle);
+            background: var(--surface);
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 11px;
+            font-family: var(--mono);
+        }
+
+        .hud_ctrl_btn:hover {
+            color: var(--ink);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--line);
+        }
+
+        /* 卡片底部说明与指标 */
+        .card_footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            border-top: 1px solid var(--line-subtle);
+            background: var(--surface);
+            font-size: 11px;
+            color: var(--muted);
+            font-family: var(--mono);
+            z-index: 2;
+        }
+
+        .footer_pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pill_dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--cyan);
+            box-shadow: 0 0 8px var(--cyan);
+        }
+
+        /* ==================== 底部状态栏 ==================== */
+        .footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 24px;
+            background: var(--surface-solid);
+            border-top: 1px solid var(--line);
+            font-size: 11px;
+            color: var(--muted);
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .footer_links a {
+            color: var(--cyan);
+            text-decoration: none;
+        }
+
+        .footer_links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 1024px) {
+            .chart_grid {
+                grid-template-columns: 1fr;
+            }
+            .three_viewport {
+                min-height: 420px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- 顶部导航栏 -->
+        <header class="topbar">
+            <a class="identity" href="18-7.html">
+                <div class="identity_mark">WP</div>
+                <div class="identity_text">
+                    <strong>王鹏宇 · 3D 可视化</strong>
+                    <small>DATE: 2026-11-05 · THREE.JS R128</small>
+                </div>
+            </a>
+
+            <div class="page_title">
+                <div class="eyebrow">
+                    <span class="eyebrow_dot"></span>
+                    <span>WebGL &amp; 3D Spatial Data Visualization Engine</span>
+                </div>
+                <h1>基于 Three.js 的 3D 数据可视化图表</h1>
+            </div>
+
+            <div class="top_right">
+                <nav class="nav" aria-label="章节导航">
+                    <a href="18-1.html">
+                        <span class="nav_code">18—01</span>
+                        <span class="nav_label">粒子文字</span>
+                    </a>
+                    <a href="18-2.html">
+                        <span class="nav_code">18—02</span>
+                        <span class="nav_label">电商架构</span>
+                    </a>
+                    <a href="18-3.html">
+                        <span class="nav_code">18—03</span>
+                        <span class="nav_label">智能客服</span>
+                    </a>
+                    <a href="18-4.html">
+                        <span class="nav_code">18—04</span>
+                        <span class="nav_label">图表分析</span>
+                    </a>
+                    <a href="18-6.html">
+                        <span class="nav_code">18—06</span>
+                        <span class="nav_label">流程与ER</span>
+                    </a>
+                    <a class="is-active" href="18-7.html" aria-current="page">
+                        <span class="nav_code">18—07</span>
+                        <span class="nav_label">3D图表</span>
+                    </a>
+                    <a href="18-8.html">
+                        <span class="nav_code">18—08</span>
+                        <span class="nav_label">数据大屏</span>
+                    </a>
+                </nav>
+                <div class="live_badge">
+                    <span>WEBGL 3D LIVE</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 次顶控制与视图栏 -->
+        <div class="subbar">
+            <div class="view_tabs">
+                <button class="tab_btn is-active" data-view="split" onclick="switchView('split', this)">
+                    <span>🔀 双图并列视图 (Split)</span>
+                </button>
+                <button class="tab_btn" data-view="bar" onclick="switchView('bar', this)">
+                    <span>📊 3D 矩阵柱状图全屏</span>
+                </button>
+                <button class="tab_btn" data-view="donut" onclick="switchView('donut', this)">
+                    <span>🍩 3D 立体圆环占比图全屏</span>
+                </button>
+            </div>
+
+            <div class="subbar_actions">
+                <button class="action_pill_btn active" id="globalRotateBtn" onclick="toggleGlobalAutoRotate()">
+                    <span>⟳ 自动巡检自转: 开</span>
+                </button>
+                <button class="action_pill_btn" onclick="toggleThemeMode()">
+                    <span>🌓 浅色/深色主题</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 3D WebGL 主图表展示网格 -->
+        <main class="chart_grid" id="chartGrid">
+            <!-- ================= 图表 1: 3D 空间矩阵柱状图 ================= -->
+            <article class="chart_card" id="barCard">
+                <header class="card_header">
+                    <div class="card_title_group">
+                        <div class="card_title">
+                            <span>📊 3D 空间时序与多维信道意图矩阵柱状图</span>
+                        </div>
+                        <span class="card_sub">X: 接入信道(6) × Z: 业务意图(7) × Y: 请求并发量与推理时延</span>
+                    </div>
+                    <div class="card_tools">
+                        <button class="tool_btn" onclick="togglePillarGeometry()" id="geomToggleBtn" title="切换方柱体/圆柱体">
+                            <span>形态: 圆柱</span>
+                        </button>
+                        <button class="tool_btn" onclick="randomizeBarData()" title="随机扰动数据生成">
+                            <span>🎲 数据更新</span>
+                        </button>
+                        <button class="tool_btn primary" onclick="export3DCanvas('barViewport', '3D_Bar_Matrix.png')" title="导出 3D 高清截图">
+                            <span>📷 导出 PNG</span>
+                        </button>
+                    </div>
+                </header>
+
+                <div class="three_viewport" id="barViewport">
+                    <!-- 浮动 HUD Tooltip -->
+                    <div class="chart_hud_tooltip" id="barTooltip">
+                        <div class="hud_title" id="barTipTitle">通道 - 意图</div>
+                        <div class="hud_item"><span>请求并发量:</span> <b id="barTipVal">1,240 次</b></div>
+                        <div class="hud_item"><span>P95 时延:</span> <b id="barTipLatency">280 ms</b></div>
+                        <div class="hud_item"><span>置信度:</span> <b id="barTipConf">97.8%</b></div>
+                    </div>
+
+                    <!-- 视口快捷控制按钮 -->
+                    <div class="viewport_hud_tools">
+                        <button class="hud_ctrl_btn" onclick="setBarCameraView('iso')" title="等轴透视">ISO</button>
+                        <button class="hud_ctrl_btn" onclick="setBarCameraView('top')" title="俯视顶视">TOP</button>
+                        <button class="hud_ctrl_btn" onclick="setBarCameraView('front')" title="正面视图">FRT</button>
+                    </div>
+                </div>
+
+                <footer class="card_footer">
+                    <div class="footer_pill">
+                        <span class="pill_dot"></span>
+                        <span>42 组立体高光柱体 · 悬浮 Raycaster 光线投射拾取 · 空间网格投影</span>
+                    </div>
+                    <div>左键旋转 / 右键平移 / 滚轮缩放</div>
+                </footer>
+            </article>
+
+            <!-- ================= 图表 2: 3D 立体分面环形占比图 ================= -->
+            <article class="chart_card" id="donutCard">
+                <header class="card_header">
+                    <div class="card_title_group">
+                        <div class="card_title">
+                            <span>🍩 3D 立体发光圆环与工单领域占比图</span>
+                        </div>
+                        <span class="card_sub">3D ExtrudeGeometry · 8大核心业务领域悬停飞出爆炸视图</span>
+                    </div>
+                    <div class="card_tools">
+                        <button class="tool_btn" onclick="toggleExplodedView()" id="explodeBtn" title="一键扇区爆炸分解展开">
+                            <span>💥 爆炸视图: 关</span>
+                        </button>
+                        <button class="tool_btn" onclick="randomizeDonutData()" title="随机刷新比例数据">
+                            <span>🎲 随机权重</span>
+                        </button>
+                        <button class="tool_btn primary" onclick="export3DCanvas('donutViewport', '3D_Donut_Chart.png')" title="导出 3D 高清截图">
+                            <span>📷 导出 PNG</span>
+                        </button>
+                    </div>
+                </header>
+
+                <div class="three_viewport" id="donutViewport">
+                    <!-- 浮动 HUD Tooltip -->
+                    <div class="chart_hud_tooltip" id="donutTooltip">
+                        <div class="hud_title" id="donutTipTitle">业务领域</div>
+                        <div class="hud_item"><span>工单占比:</span> <b id="donutTipPercent">26.4%</b></div>
+                        <div class="hud_item"><span>工单总量:</span> <b id="donutTipCount">394,120 件</b></div>
+                        <div class="hud_item"><span>自主解决率:</span> <b id="donutTipRate">98.2%</b></div>
+                    </div>
+
+                    <!-- 视口快捷控制按钮 -->
+                    <div class="viewport_hud_tools">
+                        <button class="hud_ctrl_btn" onclick="setDonutCameraView('iso')" title="透视斜视">ISO</button>
+                        <button class="hud_ctrl_btn" onclick="setDonutCameraView('top')" title="正上方俯视">TOP</button>
+                        <button class="hud_ctrl_btn" onclick="setDonutCameraView('front')" title="正前平视">FRT</button>
+                    </div>
+                </div>
+
+                <footer class="card_footer">
+                    <div class="footer_pill">
+                        <span class="pill_dot" style="background: var(--purple); box-shadow: 0 0 8px var(--purple);"></span>
+                        <span>贝塞尔弧形 ExtrudeGeometry 挤出倒角 · 悬停平滑径向浮动 · 核心能量球</span>
+                    </div>
+                    <div>点击选中高亮 / 鼠标悬停飞出</div>
+                </footer>
+            </article>
+        </main>
+
+        <!-- 页面底部 -->
+        <footer class="footer">
+            <div>
+                <span>Three.js r128 本地 CDN 离线引擎驱动 · <code>cdn/three.min.js</code> &amp; <code>cdn/OrbitControls.js</code></span>
+            </div>
+            <div class="footer_links">
+                <span>开发者: 王鹏宇 (2026-11-05) · WebGL 3D 数据可视化</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Three.js 核心可视化驱动脚本 -->
+    <script>
+        // 检测 Three.js 核心库与控制器
+        if (typeof THREE === 'undefined' || typeof THREE.OrbitControls === 'undefined') {
+            alert('本地 Three.js 或 OrbitControls 脚本加载失败，请检查 cdn/three.min.js 和 cdn/OrbitControls.js！');
+        }
+
+        // 全局控制状态
+        let isGlobalAutoRotate = true;
+        let isThemeLight = false;
+
+        /* =========================================================================
+           一、图表 1: 3D 空间矩阵柱状图 (3D Holographic Spatial Bar Matrix)
+           ========================================================================= */
+        const CHANNELS = ['Web客服端', 'iOS App', 'Android端', '微信小程序', '智能语音IVR', '企业IM协同'];
+        const INTENTS = ['售后维保', '账单纠纷', '物流跟踪', '软件故障', '合规政策', '促销满减', '账号安全'];
+        const CHANNEL_COLORS = [0x38bdf8, 0x818cf8, 0xa855f7, 0xf43f5e, 0xf59e0b, 0x10b981];
+
+        let barScene, barCamera, barRenderer, barControls;
+        let barPillars = [];
+        let barRaycaster, barMouse;
+        let hoveredPillar = null;
+        let currentPillarShape = 'cylinder'; // 'cylinder' 或 'box'
+
+        function initBarChart() {
+            const container = document.getElementById('barViewport');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // 1. 场景
+            barScene = new THREE.Scene();
+            barScene.fog = new THREE.FogExp2(0x060b17, 0.015);
+
+            // 2. 相机
+            barCamera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            barCamera.position.set(24, 22, 28);
+
+            // 3. 渲染器
+            barRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+            barRenderer.setSize(width, height);
+            barRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            barRenderer.shadowMap.enabled = true;
+            barRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(barRenderer.domElement);
+
+            // 4. 轨道控制器
+            barControls = new THREE.OrbitControls(barCamera, barRenderer.domElement);
+            barControls.enableDamping = true;
+            barControls.dampingFactor = 0.05;
+            barControls.maxPolarAngle = Math.PI / 2 - 0.02; // 禁止穿透地面
+            barControls.minDistance = 10;
+            barControls.maxDistance = 60;
+            barControls.target.set(0, 3, 0);
+            barControls.autoRotate = isGlobalAutoRotate;
+            barControls.autoRotateSpeed = 0.8;
+
+            // 5. 光照体系
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            barScene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0xe0f2fe, 1.2);
+            dirLight.position.set(15, 30, 20);
+            dirLight.castShadow = true;
+            dirLight.shadow.mapSize.width = 1024;
+            dirLight.shadow.mapSize.height = 1024;
+            barScene.add(dirLight);
+
+            const pointLight1 = new THREE.PointLight(0x38bdf8, 1.5, 50);
+            pointLight1.position.set(-15, 10, -15);
+            barScene.add(pointLight1);
+
+            const pointLight2 = new THREE.PointLight(0xa855f7, 1.2, 50);
+            pointLight2.position.set(15, 8, 15);
+            barScene.add(pointLight2);
+
+            // 6. 地面网格辅助与反射底座
+            const gridHelper = new THREE.GridHelper(30, 20, 0x38bdf8, 0x1e293b);
+            gridHelper.position.y = -0.01;
+            barScene.add(gridHelper);
+
+            const floorPlane = new THREE.Mesh(
+                new THREE.PlaneGeometry(36, 36),
+                new THREE.MeshStandardMaterial({
+                    color: 0x070e1c,
+                    roughness: 0.4,
+                    metalness: 0.8
+                })
+            );
+            floorPlane.rotation.x = -Math.PI / 2;
+            floorPlane.receiveShadow = true;
+            barScene.add(floorPlane);
+
+            // 7. 构建矩阵柱体
+            buildBarMatrix();
+
+            // 8. 射线检测拾取
+            barRaycaster = new THREE.Raycaster();
+            barMouse = new THREE.Vector2(-999, -999);
+
+            container.addEventListener('mousemove', onBarMouseMove);
+            container.addEventListener('mouseleave', () => {
+                document.getElementById('barTooltip').classList.remove('is-visible');
+                if (hoveredPillar) resetPillarHighlight(hoveredPillar);
+                hoveredPillar = null;
+            });
+        }
+
+        function buildBarMatrix() {
+            // 清理旧柱体
+            barPillars.forEach(p => barScene.remove(p.mesh));
+            barPillars = [];
+
+            const spacingX = 3.2;
+            const spacingZ = 2.8;
+            const offsetX = ((CHANNELS.length - 1) * spacingX) / 2;
+            const offsetZ = ((INTENTS.length - 1) * spacingZ) / 2;
+
+            for (let i = 0; i < CHANNELS.length; i++) {
+                for (let j = 0; j < INTENTS.length; j++) {
+                    const posX = i * spacingX - offsetX;
+                    const posZ = j * spacingZ - offsetZ;
+
+                    const height = Math.random() * 8 + 1.5;
+                    const color = CHANNEL_COLORS[i % CHANNEL_COLORS.length];
+
+                    // 构建单体几何与底轴对齐
+                    let geom;
+                    if (currentPillarShape === 'cylinder') {
+                        geom = new THREE.CylinderGeometry(0.85, 0.85, 1, 32);
+                    } else {
+                        geom = new THREE.BoxGeometry(1.4, 1, 1.4);
+                    }
+                    geom.translate(0, 0.5, 0); // 锚点置于底部
+
+                    const mat = new THREE.MeshStandardMaterial({
+                        color: color,
+                        metalness: 0.4,
+                        roughness: 0.25,
+                        emissive: color,
+                        emissiveIntensity: 0.15,
+                        transparent: true,
+                        opacity: 0.92
+                    });
+
+                    const mesh = new THREE.Mesh(geom, mat);
+                    mesh.position.set(posX, 0, posZ);
+                    mesh.scale.set(1, 0.01, 1); // 初始从地面生长
+                    mesh.castShadow = true;
+                    mesh.receiveShadow = true;
+
+                    // 柱顶发光光晕帽
+                    const capGeom = new THREE.CylinderGeometry(0.9, 0.9, 0.12, 32);
+                    const capMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+                    const capMesh = new THREE.Mesh(capGeom, capMat);
+                    capMesh.position.y = 1.0;
+                    mesh.add(capMesh);
+
+                    // 业务元数据绑定
+                    const pillarData = {
+                        mesh: mesh,
+                        targetHeight: height,
+                        channel: CHANNELS[i],
+                        intent: INTENTS[j],
+                        value: Math.round(height * 280 + Math.random() * 50),
+                        latency: Math.round(450 - height * 25 + Math.random() * 30),
+                        conf: (94 + Math.random() * 5.8).toFixed(1) + '%',
+                        origColor: color
+                    };
+                    mesh.userData = pillarData;
+
+                    barScene.add(mesh);
+                    barPillars.push(pillarData);
+                }
+            }
+        }
+
+        function togglePillarGeometry() {
+            currentPillarShape = currentPillarShape === 'cylinder' ? 'box' : 'cylinder';
+            document.getElementById('geomToggleBtn').querySelector('span').textContent =
+                currentPillarShape === 'cylinder' ? '形态: 圆柱' : '形态: 方柱';
+            buildBarMatrix();
+        }
+
+        function randomizeBarData() {
+            barPillars.forEach(p => {
+                p.targetHeight = Math.random() * 8.5 + 1.2;
+                p.value = Math.round(p.targetHeight * 280 + Math.random() * 50);
+                p.latency = Math.round(450 - p.targetHeight * 25 + Math.random() * 30);
+            });
+        }
+
+        function setBarCameraView(view) {
+            if (view === 'top') {
+                barCamera.position.set(0, 38, 0.1);
+            } else if (view === 'front') {
+                barCamera.position.set(0, 12, 32);
+            } else {
+                barCamera.position.set(24, 22, 28);
+            }
+            barControls.target.set(0, 3, 0);
+            barControls.update();
+        }
+
+        function onBarMouseMove(event) {
+            const container = document.getElementById('barViewport');
+            const rect = container.getBoundingClientRect();
+            barMouse.x = ((event.clientX - rect.left) / container.clientWidth) * 2 - 1;
+            barMouse.y = -((event.clientY - rect.top) / container.clientHeight) * 2 + 1;
+
+            barRaycaster.setFromCamera(barMouse, barCamera);
+            const intersects = barRaycaster.intersectObjects(barPillars.map(p => p.mesh), false);
+
+            const tooltip = document.getElementById('barTooltip');
+
+            if (intersects.length > 0) {
+                const targetMesh = intersects[0].object;
+                const data = targetMesh.userData;
+
+                if (hoveredPillar !== targetMesh) {
+                    if (hoveredPillar) resetPillarHighlight(hoveredPillar);
+                    hoveredPillar = targetMesh;
+                    highlightPillar(hoveredPillar);
+                }
+
+                tooltip.style.left = `${event.clientX - rect.left}px`;
+                tooltip.style.top = `${event.clientY - rect.top}px`;
+                document.getElementById('barTipTitle').textContent = `${data.channel} · ${data.intent}`;
+                document.getElementById('barTipVal').textContent = `${data.value.toLocaleString()} 次`;
+                document.getElementById('barTipLatency').textContent = `${data.latency} ms`;
+                document.getElementById('barTipConf').textContent = data.conf;
+                tooltip.classList.add('is-visible');
+            } else {
+                if (hoveredPillar) resetPillarHighlight(hoveredPillar);
+                hoveredPillar = null;
+                tooltip.classList.remove('is-visible');
+            }
+        }
+
+        function highlightPillar(mesh) {
+            mesh.material.emissiveIntensity = 0.65;
+            mesh.material.color.setHex(0xffffff);
+        }
+
+        function resetPillarHighlight(mesh) {
+            mesh.material.emissiveIntensity = 0.15;
+            mesh.material.color.setHex(mesh.userData.origColor);
+        }
+
+
+        /* =========================================================================
+           二、图表 2: 3D 立体分面环形占比图 (3D Extruded Donut & Ring Segment)
+           ========================================================================= */
+        const DOMAIN_DATA = [
+            { name: '售后保修与配件更换', value: 26.4, count: 394120, rate: '98.5%', color: 0x38bdf8 },
+            { name: '账单纠纷与极速退款', value: 21.2, count: 316500, rate: '97.9%', color: 0x818cf8 },
+            { name: '软件故障排障协助', value: 16.8, count: 250800, rate: '96.2%', color: 0xa855f7 },
+            { name: '物流轨迹与派件催促', value: 13.5, count: 201600, rate: '99.1%', color: 0xec4899 },
+            { name: '专家法规与政策条款', value: 9.1, count: 135800, rate: '99.8%', color: 0xf43f5e },
+            { name: '账号注销与密保安全', value: 5.8, count: 86600, rate: '98.0%', color: 0xf59e0b },
+            { name: '促销优惠与满减核销', value: 4.6, count: 68700, rate: '95.4%', color: 0x10b981 },
+            { name: 'VIP专属通道与工单交接', value: 2.6, count: 38800, rate: '99.4%', color: 0x14b8a6 }
+        ];
+
+        let donutScene, donutCamera, donutRenderer, donutControls;
+        let donutSectors = [];
+        let donutRaycaster, donutMouse;
+        let hoveredSector = null;
+        let isExploded = false;
+
+        function initDonutChart() {
+            const container = document.getElementById('donutViewport');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // 1. 场景
+            donutScene = new THREE.Scene();
+            donutScene.fog = new THREE.FogExp2(0x060b17, 0.015);
+
+            // 2. 相机
+            donutCamera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            donutCamera.position.set(0, 26, 26);
+
+            // 3. 渲染器
+            donutRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+            donutRenderer.setSize(width, height);
+            donutRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            donutRenderer.shadowMap.enabled = true;
+            donutRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(donutRenderer.domElement);
+
+            // 4. 轨道控制器
+            donutControls = new THREE.OrbitControls(donutCamera, donutRenderer.domElement);
+            donutControls.enableDamping = true;
+            donutControls.dampingFactor = 0.05;
+            donutControls.minDistance = 12;
+            donutControls.maxDistance = 65;
+            donutControls.target.set(0, 1, 0);
+            donutControls.autoRotate = isGlobalAutoRotate;
+            donutControls.autoRotateSpeed = 0.9;
+
+            // 5. 光照体系
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            donutScene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 1.3);
+            dirLight.position.set(10, 30, 15);
+            dirLight.castShadow = true;
+            donutScene.add(dirLight);
+
+            const centerPointLight = new THREE.PointLight(0xa855f7, 2.5, 40);
+            centerPointLight.position.set(0, 3, 0);
+            donutScene.add(centerPointLight);
+
+            // 6. 核心发光能量球与轨道环
+            const coreGeom = new THREE.SphereGeometry(2.4, 32, 32);
+            const coreMat = new THREE.MeshStandardMaterial({
+                color: 0x9333ea,
+                emissive: 0x7e22ce,
+                emissiveIntensity: 0.8,
+                roughness: 0.2,
+                metalness: 0.5
+            });
+            const coreMesh = new THREE.Mesh(coreGeom, coreMat);
+            coreMesh.position.y = 1.2;
+            donutScene.add(coreMesh);
+
+            // 外围能量轨道线
+            const ringGeom = new THREE.RingGeometry(11.8, 12.0, 64);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0.3 });
+            const ringMesh = new THREE.Mesh(ringGeom, ringMat);
+            ringMesh.rotation.x = -Math.PI / 2;
+            ringMesh.position.y = 0.05;
+            donutScene.add(ringMesh);
+
+            // 7. 构建立体扇区
+            buildDonutSectors(DOMAIN_DATA);
+
+            // 8. 射线交互
+            donutRaycaster = new THREE.Raycaster();
+            donutMouse = new THREE.Vector2(-999, -999);
+
+            container.addEventListener('mousemove', onDonutMouseMove);
+            container.addEventListener('mouseleave', () => {
+                document.getElementById('donutTooltip').classList.remove('is-visible');
+                if (hoveredSector) resetSectorElevation(hoveredSector);
+                hoveredSector = null;
+            });
+        }
+
+        function createDonutSectorGeometry(innerRadius, outerRadius, startAngle, endAngle, depth) {
+            const shape = new THREE.Shape();
+            shape.absarc(0, 0, outerRadius, startAngle, endAngle, false);
+            shape.absarc(0, 0, innerRadius, endAngle, startAngle, true);
+            shape.closePath();
+
+            const extrudeSettings = {
+                depth: depth,
+                bevelEnabled: true,
+                bevelSegments: 4,
+                steps: 1,
+                bevelSize: 0.12,
+                bevelThickness: 0.12,
+                curveSegments: 36
+            };
+
+            const geom = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+            geom.rotateX(-Math.PI / 2); // 旋转至水平放置
+            return geom;
+        }
+
+        function buildDonutSectors(dataList) {
+            donutSectors.forEach(s => donutScene.remove(s.mesh));
+            donutSectors = [];
+
+            const totalVal = dataList.reduce((acc, cur) => acc + cur.value, 0);
+            let currentAngle = 0;
+            const innerR = 4.2;
+            const outerR = 10.2;
+            const depth = 2.4;
+
+            dataList.forEach((item, idx) => {
+                const angleSpan = (item.value / totalVal) * (Math.PI * 2) - 0.035; // 预留扇区间隙
+                const midAngle = currentAngle + angleSpan / 2;
+
+                const geom = createDonutSectorGeometry(innerR, outerR, currentAngle, currentAngle + angleSpan, depth);
+                const mat = new THREE.MeshStandardMaterial({
+                    color: item.color,
+                    metalness: 0.25,
+                    roughness: 0.3,
+                    emissive: item.color,
+                    emissiveIntensity: 0.18,
+                    transparent: true,
+                    opacity: 0.95
+                });
+
+                const mesh = new THREE.Mesh(geom, mat);
+                mesh.position.set(0, 0, 0);
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+
+                // 记录向外飞出移动向量
+                const dirX = Math.cos(midAngle);
+                const dirZ = -Math.sin(midAngle);
+
+                const sectorData = {
+                    mesh: mesh,
+                    dirX: dirX,
+                    dirZ: dirZ,
+                    baseX: 0,
+                    baseZ: 0,
+                    baseY: 0,
+                    item: item,
+                    origColor: item.color,
+                    currentOffset: 0,
+                    targetOffset: 0
+                };
+                mesh.userData = sectorData;
+
+                donutScene.add(mesh);
+                donutSectors.push(sectorData);
+
+                currentAngle += angleSpan + 0.035;
+            });
+        }
+
+        function toggleExplodedView() {
+            isExploded = !isExploded;
+            const btn = document.getElementById('explodeBtn');
+            btn.querySelector('span').textContent = isExploded ? '💥 爆炸视图: 开' : '💥 爆炸视图: 关';
+            btn.classList.toggle('primary', isExploded);
+
+            donutSectors.forEach(s => {
+                s.targetOffset = isExploded ? 2.5 : 0;
+            });
+        }
+
+        function randomizeDonutData() {
+            const randomized = DOMAIN_DATA.map(d => ({
+                ...d,
+                value: Math.floor(Math.random() * 25) + 5
+            }));
+            buildDonutSectors(randomized);
+        }
+
+        function setDonutCameraView(view) {
+            if (view === 'top') {
+                donutCamera.position.set(0, 36, 0.1);
+            } else if (view === 'front') {
+                donutCamera.position.set(0, 6, 32);
+            } else {
+                donutCamera.position.set(0, 26, 26);
+            }
+            donutControls.target.set(0, 1, 0);
+            donutControls.update();
+        }
+
+        function onDonutMouseMove(event) {
+            const container = document.getElementById('donutViewport');
+            const rect = container.getBoundingClientRect();
+            donutMouse.x = ((event.clientX - rect.left) / container.clientWidth) * 2 - 1;
+            donutMouse.y = -((event.clientY - rect.top) / container.clientHeight) * 2 + 1;
+
+            donutRaycaster.setFromCamera(donutMouse, donutCamera);
+            const intersects = donutRaycaster.intersectObjects(donutSectors.map(s => s.mesh), false);
+
+            const tooltip = document.getElementById('donutTooltip');
+
+            if (intersects.length > 0) {
+                const targetMesh = intersects[0].object;
+                const data = targetMesh.userData;
+
+                if (hoveredSector !== targetMesh) {
+                    if (hoveredSector) resetSectorElevation(hoveredSector);
+                    hoveredSector = targetMesh;
+                    elevateSector(hoveredSector);
+                }
+
+                tooltip.style.left = `${event.clientX - rect.left}px`;
+                tooltip.style.top = `${event.clientY - rect.top}px`;
+                document.getElementById('donutTipTitle').textContent = data.item.name;
+                document.getElementById('donutTipPercent').textContent = `${data.item.value.toFixed(1)}%`;
+                document.getElementById('donutTipCount').textContent = `${data.item.count.toLocaleString()} 件`;
+                document.getElementById('donutTipRate').textContent = data.item.rate;
+                tooltip.classList.add('is-visible');
+            } else {
+                if (hoveredSector) resetSectorElevation(hoveredSector);
+                hoveredSector = null;
+                tooltip.classList.remove('is-visible');
+            }
+        }
+
+        function elevateSector(mesh) {
+            mesh.userData.targetOffset = (isExploded ? 2.5 : 0) + 1.8;
+            mesh.material.emissiveIntensity = 0.6;
+            mesh.position.y = 0.8;
+        }
+
+        function resetSectorElevation(mesh) {
+            mesh.userData.targetOffset = isExploded ? 2.5 : 0;
+            mesh.material.emissiveIntensity = 0.18;
+            mesh.position.y = 0;
+        }
+
+
+        /* =========================================================================
+           三、全局主循环与交互响应
+           ========================================================================= */
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // 1. 柱状图动画插值与控制器更新
+            if (barControls) barControls.update();
+            barPillars.forEach(p => {
+                // 平滑生长高度插值
+                p.mesh.scale.y += (p.targetHeight - p.mesh.scale.y) * 0.08;
+            });
+            if (barRenderer && barScene && barCamera) {
+                barRenderer.render(barScene, barCamera);
+            }
+
+            // 2. 环形占比图扇区平滑位移动画
+            if (donutControls) donutControls.update();
+            donutSectors.forEach(s => {
+                s.currentOffset += (s.targetOffset - s.currentOffset) * 0.1;
+                s.mesh.position.x = s.dirX * s.currentOffset;
+                s.mesh.position.z = s.dirZ * s.currentOffset;
+            });
+            if (donutRenderer && donutScene && donutCamera) {
+                donutRenderer.render(donutScene, donutCamera);
+            }
+        }
+
+        // 视图切换 (双图并列 / 柱状图单图 / 环形图单图)
+        function switchView(mode, btn) {
+            const grid = document.getElementById('chartGrid');
+            grid.className = 'chart_grid mode-' + mode;
+
+            document.querySelectorAll('.view_tabs .tab_btn').forEach(b => b.classList.remove('is-active'));
+            btn.classList.add('is-active');
+
+            // 延时重置相机视口宽高比
+            setTimeout(onWindowResize, 50);
+        }
+
+        // 全局巡航自转开关
+        function toggleGlobalAutoRotate() {
+            isGlobalAutoRotate = !isGlobalAutoRotate;
+            const btn = document.getElementById('globalRotateBtn');
+            btn.classList.toggle('active', isGlobalAutoRotate);
+            btn.querySelector('span').textContent = isGlobalAutoRotate ? '⟳ 自动巡检自转: 开' : '⟳ 自动巡检自转: 关';
+
+            if (barControls) barControls.autoRotate = isGlobalAutoRotate;
+            if (donutControls) donutControls.autoRotate = isGlobalAutoRotate;
+        }
+
+        // 浅色 / 深色主题切换
+        function toggleThemeMode() {
+            isThemeLight = !isThemeLight;
+            document.body.classList.toggle('theme-light', isThemeLight);
+
+            const fogColor = isThemeLight ? 0xf8fafc : 0x060b17;
+            if (barScene) barScene.fog.color.setHex(fogColor);
+            if (donutScene) donutScene.fog.color.setHex(fogColor);
+        }
+
+        // 窗口响应式缩放
+        function onWindowResize() {
+            const barContainer = document.getElementById('barViewport');
+            if (barContainer && barCamera && barRenderer) {
+                const w = barContainer.clientWidth;
+                const h = barContainer.clientHeight;
+                barCamera.aspect = w / h;
+                barCamera.updateProjectionMatrix();
+                barRenderer.setSize(w, h);
+            }
+
+            const donutContainer = document.getElementById('donutViewport');
+            if (donutContainer && donutCamera && donutRenderer) {
+                const w = donutContainer.clientWidth;
+                const h = donutContainer.clientHeight;
+                donutCamera.aspect = w / h;
+                donutCamera.updateProjectionMatrix();
+                donutRenderer.setSize(w, h);
+            }
+        }
+
+        // 导出 3D Canvas 高清 PNG 截图
+        function export3DCanvas(containerId, filename) {
+            const container = document.getElementById(containerId);
+            const canvas = container.querySelector('canvas');
+            if (!canvas) {
+                alert('画布尚未渲染完成，请稍后再试。');
+                return;
+            }
+
+            // 强制重新渲染当前帧以确保缓冲区不黑屏
+            if (containerId === 'barViewport') {
+                barRenderer.render(barScene, barCamera);
+            } else {
+                donutRenderer.render(donutScene, donutCamera);
+            }
+
+            const dataUrl = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 启动主程序
+        window.addEventListener('DOMContentLoaded', () => {
+            initBarChart();
+            initDonutChart();
+            animate();
+            window.addEventListener('resize', onWindowResize);
+        });
+    </script>
+</body>
+</html>

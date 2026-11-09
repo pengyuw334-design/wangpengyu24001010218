@@ -1,0 +1,1284 @@
+<!-- 姓名：王鹏宇，日期：2026-11-05，功能名称：基于 Mermaid 的智能客服系统业务全流程图与核心实体关系 ER 图 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#060b17">
+    <meta name="color-scheme" content="dark light">
+    <title>18-6 Mermaid 智能客服系统流程图与 ER 图 · 王鹏宇</title>
+    <!-- 本地下载的 Mermaid 10.9.1 核心库 -->
+    <script src="cdn/mermaid.min.js"></script>
+    <style>
+        :root {
+            --bg: #060b17;
+            --surface: rgba(10, 20, 38, 0.75);
+            --surface-solid: #0d1729;
+            --surface-elevated: #13223d;
+            --ink: #f0f6fc;
+            --muted: #8b9eb7;
+            --dim: #50647e;
+            --line: rgba(148, 184, 220, 0.16);
+            --line-strong: rgba(148, 184, 220, 0.32);
+            --line-subtle: rgba(148, 184, 220, 0.08);
+
+            /* Modern Palette */
+            --cyan: #38bdf8;
+            --blue: #2563eb;
+            --violet: #8b5cf6;
+            --purple: #a855f7;
+            --green: #10b981;
+            --amber: #f59e0b;
+            --rose: #f43f5e;
+            --teal: #14b8a6;
+
+            --mono: "SFMono-Regular", Consolas, "Cascadia Code", "Fira Code", monospace;
+            --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Roboto, sans-serif;
+            --ease: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* 浅色主题模式 */
+        body.theme-light {
+            --bg: #f8fafc;
+            --surface: rgba(255, 255, 255, 0.92);
+            --surface-solid: #ffffff;
+            --surface-elevated: #f1f5f9;
+            --ink: #0f172a;
+            --muted: #475569;
+            --dim: #94a3b8;
+            --line: rgba(51, 65, 85, 0.14);
+            --line-strong: rgba(51, 65, 85, 0.28);
+            --line-subtle: rgba(51, 65, 85, 0.06);
+
+            --cyan: #0284c7;
+            --blue: #1d4ed8;
+            --violet: #7c3aed;
+            --purple: #9333ea;
+            --green: #059669;
+            --amber: #d97706;
+            --rose: #e11d48;
+            --teal: #0d9488;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            font-family: var(--sans);
+            color: var(--ink);
+            background: var(--bg);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 背景几何微网格 */
+        body::before {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            content: "";
+            background-image:
+                linear-gradient(var(--line-subtle) 1px, transparent 1px),
+                linear-gradient(90deg, var(--line-subtle) 1px, transparent 1px);
+            background-size: 52px 52px;
+            opacity: 0.85;
+        }
+
+        body::after {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            content: "";
+            background: radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.08), transparent 60%),
+                        radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.07), transparent 65%);
+        }
+
+        .app {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ==================== 顶部导航栏 ==================== */
+        .topbar {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 16px;
+            height: 70px;
+            padding: 0 24px;
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--line);
+            flex-shrink: 0;
+        }
+
+        .identity {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .identity_mark {
+            display: grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(139, 92, 246, 0.15));
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+        }
+
+        .identity_text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .identity_text strong {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            color: var(--ink);
+        }
+
+        .identity_text small {
+            font-family: var(--mono);
+            font-size: 9px;
+            color: var(--muted);
+            letter-spacing: 0.1em;
+        }
+
+        .page_title {
+            text-align: center;
+            min-width: 0;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: 0.18em;
+            color: var(--cyan);
+            text-transform: uppercase;
+        }
+
+        .eyebrow_dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 8px var(--green);
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+
+        .page_title h1 {
+            font-size: 19px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            color: var(--ink);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+        }
+
+        .top_right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px;
+            background: var(--surface-solid);
+            border: 1px solid var(--line);
+            border-radius: 999px;
+        }
+
+        .nav a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            text-decoration: none;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav a .nav_code {
+            font-family: var(--mono);
+            font-size: 9px;
+            opacity: 0.8;
+        }
+
+        .nav a:hover {
+            color: var(--ink);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav a.is-active {
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--blue), var(--cyan));
+            box-shadow: 0 2px 10px rgba(56, 189, 248, 0.3);
+        }
+
+        .live_badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            color: var(--purple);
+            font-family: var(--mono);
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+        }
+
+        /* ==================== 控制与视图切换栏 ==================== */
+        .subbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 10px 24px;
+            background: var(--surface-solid);
+            border-bottom: 1px solid var(--line-subtle);
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .view_tabs {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tab_btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: 1px solid var(--line);
+            background: var(--surface);
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .tab_btn:hover {
+            color: var(--ink);
+            border-color: var(--line-strong);
+        }
+
+        .tab_btn.is-active {
+            color: var(--ink);
+            background: rgba(56, 189, 248, 0.12);
+            border-color: var(--cyan);
+            box-shadow: inset 0 0 0 1px var(--cyan);
+        }
+
+        .theme_selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme_label {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--dim);
+        }
+
+        .theme_chips {
+            display: inline-flex;
+            background: var(--bg);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 2px;
+        }
+
+        .theme_chip {
+            padding: 4px 10px;
+            border-radius: 4px;
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            font-size: 10.5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .theme_chip.is-active {
+            background: rgba(168, 85, 247, 0.18);
+            color: var(--purple);
+            font-weight: 600;
+        }
+
+        /* ==================== 主图表容器网格 ==================== */
+        .diagram_grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px 24px;
+            flex: 1;
+            transition: all 0.3s ease;
+        }
+
+        .diagram_grid.mode-flowchart {
+            grid-template-columns: 1fr;
+        }
+
+        .diagram_grid.mode-flowchart #erCard {
+            display: none;
+        }
+
+        .diagram_grid.mode-er {
+            grid-template-columns: 1fr;
+        }
+
+        .diagram_grid.mode-er #flowCard {
+            display: none;
+        }
+
+        .diagram_card {
+            display: flex;
+            flex-direction: column;
+            background: var(--surface-solid);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+            overflow: hidden;
+            transition: border-color 0.25s ease;
+        }
+
+        .diagram_card:hover {
+            border-color: var(--line-strong);
+        }
+
+        .card_header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--line-subtle);
+            background: var(--surface);
+            flex-wrap: wrap;
+        }
+
+        .card_title_group {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .card_title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--ink);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card_sub {
+            font-family: var(--mono);
+            font-size: 9.5px;
+            color: var(--muted);
+        }
+
+        .card_actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .action_btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            height: 28px;
+            padding: 0 10px;
+            border-radius: 6px;
+            border: 1px solid var(--line);
+            background: var(--surface);
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .action_btn:hover {
+            color: var(--ink);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--line-strong);
+        }
+
+        .action_btn svg {
+            width: 13px;
+            height: 13px;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            fill: none;
+        }
+
+        .action_btn.primary {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(37, 99, 235, 0.22));
+            border-color: rgba(56, 189, 248, 0.35);
+            color: var(--cyan);
+        }
+
+        /* Mermaid 渲染舞台 */
+        .stage_viewport {
+            position: relative;
+            flex: 1;
+            min-height: 580px;
+            max-height: 720px;
+            overflow: auto;
+            background: rgba(5, 10, 20, 0.65);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .stage_viewport.is-dragging {
+            cursor: grabbing;
+        }
+
+        .mermaid_canvas {
+            transform-origin: center center;
+            transition: transform 0.15s ease-out;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .mermaid_canvas svg {
+            max-width: 100%;
+            height: auto;
+            filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.35));
+        }
+
+        /* 浮动微型控制器 */
+        .viewport_controls {
+            position: absolute;
+            right: 18px;
+            bottom: 18px;
+            display: flex;
+            gap: 4px;
+            padding: 4px;
+            background: var(--surface-solid);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+            z-index: 5;
+        }
+
+        .ctrl_btn {
+            display: grid;
+            place-items: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 5px;
+            border: 1px solid var(--line-subtle);
+            background: var(--surface);
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .ctrl_btn:hover {
+            color: var(--ink);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* 卡片底部说明与指标 */
+        .card_footer {
+            padding: 14px 20px;
+            border-top: 1px solid var(--line-subtle);
+            background: var(--surface);
+            font-size: 11.5px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .card_footer b {
+            color: var(--ink);
+        }
+
+        /* ==================== 源码抽屉/模态框 ==================== */
+        .code_drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 500px;
+            max-width: 90vw;
+            height: 100%;
+            background: var(--surface-solid);
+            border-left: 1px solid var(--line);
+            box-shadow: -10px 0 40px rgba(0, 0, 0, 0.6);
+            transform: translateX(100%);
+            transition: transform 0.3s var(--ease);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .code_drawer.is-open {
+            transform: translateX(0);
+        }
+
+        .drawer_header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .drawer_title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .drawer_close {
+            display: grid;
+            place-items: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid var(--line);
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .drawer_close:hover {
+            color: var(--ink);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .drawer_body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .code_textarea {
+            flex: 1;
+            width: 100%;
+            min-height: 400px;
+            padding: 14px;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            background: #040812;
+            color: #7dd3fc;
+            font-family: var(--mono);
+            font-size: 11px;
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+        }
+
+        .drawer_actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 14px 20px;
+            border-top: 1px solid var(--line);
+            background: var(--surface);
+        }
+
+        /* ==================== 底部状态栏 ==================== */
+        .footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 24px;
+            background: var(--surface-solid);
+            border-top: 1px solid var(--line);
+            font-size: 11px;
+            color: var(--muted);
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .footer_left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer_links a {
+            color: var(--cyan);
+            text-decoration: none;
+        }
+
+        @media (max-width: 1100px) {
+            .diagram_grid {
+                grid-template-columns: 1fr;
+            }
+            .stage_viewport {
+                min-height: 480px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- 顶部导航栏 -->
+        <header class="topbar">
+            <a class="identity" href="18-6.html">
+                <div class="identity_mark">WP</div>
+                <div class="identity_text">
+                    <strong>王鹏宇 · 架构建模</strong>
+                    <small>DATE: 2026-11-05 · MERMAID 10.9</small>
+                </div>
+            </a>
+
+            <div class="page_title">
+                <div class="eyebrow">
+                    <span class="eyebrow_dot"></span>
+                    <span>System Workflow &amp; Relational Data Architecture</span>
+                </div>
+                <h1>基于 Mermaid 的智能客服系统流程图与 ER 图</h1>
+            </div>
+
+            <div class="top_right">
+                <nav class="nav" aria-label="章节导航">
+                    <a href="18-1.html">
+                        <span class="nav_code">18—01</span>
+                        <span class="nav_label">粒子文字</span>
+                    </a>
+                    <a href="18-2.html">
+                        <span class="nav_code">18—02</span>
+                        <span class="nav_label">电商架构</span>
+                    </a>
+                    <a href="18-3.html">
+                        <span class="nav_code">18—03</span>
+                        <span class="nav_label">智能客服</span>
+                    </a>
+                    <a href="18-4.html">
+                        <span class="nav_code">18—04</span>
+                        <span class="nav_label">图表分析</span>
+                    </a>
+                    <a class="is-active" href="18-6.html" aria-current="page">
+                        <span class="nav_code">18—06</span>
+                        <span class="nav_label">流程与ER</span>
+                    </a>
+                    <a href="18-7.html">
+                        <span class="nav_code">18—07</span>
+                        <span class="nav_label">3D图表</span>
+                    </a>
+                    <a href="18-8.html">
+                        <span class="nav_code">18—08</span>
+                        <span class="nav_label">数据大屏</span>
+                    </a>
+                </nav>
+                <div class="live_badge">
+                    <span>MERMAID LOCAL CDN</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 控制与视图切换栏 -->
+        <div class="subbar">
+            <div class="view_tabs">
+                <button class="tab_btn is-active" data-view="split" onclick="switchView('split', this)">
+                    <span>🔀 双图并列视图 (Split)</span>
+                </button>
+                <button class="tab_btn" data-view="flowchart" onclick="switchView('flowchart', this)">
+                    <span>🔄 业务全流程图 (Flowchart)</span>
+                </button>
+                <button class="tab_btn" data-view="er" onclick="switchView('er', this)">
+                    <span>🗄️ 全量核心 ER 图 (ER Diagram)</span>
+                </button>
+            </div>
+
+            <div class="theme_selector">
+                <span class="theme_label">MERMAID 主题:</span>
+                <div class="theme_chips">
+                    <button class="theme_chip is-active" data-theme="dark" onclick="changeMermaidTheme('dark', this)">暗黑 (Dark)</button>
+                    <button class="theme_chip" data-theme="neutral" onclick="changeMermaidTheme('neutral', this)">论文浅色 (Neutral)</button>
+                    <button class="theme_chip" data-theme="forest" onclick="changeMermaidTheme('forest', this)">赛博森林 (Forest)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主内容区：双图卡片容器 -->
+        <main class="diagram_grid" id="diagramGrid">
+            <!-- ================= 卡片 1: 智能客服系统端到端业务全流程图 ================= -->
+            <article class="diagram_card" id="flowCard">
+                <header class="card_header">
+                    <div class="card_title_group">
+                        <div class="card_title">
+                            <span>🔄 智能客服系统端到端全链路业务流程图</span>
+                        </div>
+                        <span class="card_sub">Flowchart TD · 涵盖交互接入、语义DST、双轨GraphRAG、大模型推理与反馈闭环</span>
+                    </div>
+                    <div class="card_actions">
+                        <button class="action_btn" onclick="openCodeDrawer('flow')" title="查看与复制 Mermaid 源码">
+                            <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                            <span>Mermaid 源码</span>
+                        </button>
+                        <button class="action_btn primary" onclick="exportDiagramSvg('flowSvgTarget', 'Customer_Service_Workflow.svg')" title="导出高保真矢量 SVG">
+                            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            <span>导出 SVG</span>
+                        </button>
+                    </div>
+                </header>
+
+                <div class="stage_viewport" id="flowViewport">
+                    <div class="mermaid_canvas" id="flowCanvas">
+                        <div id="flowSvgTarget"></div>
+                    </div>
+                    <div class="viewport_controls">
+                        <button class="ctrl_btn" onclick="zoomDiagram('flow', 1.2)" title="放大">+</button>
+                        <button class="ctrl_btn" onclick="zoomDiagram('flow', 0.8)" title="缩小">-</button>
+                        <button class="ctrl_btn" onclick="resetDiagram('flow')" title="重置">↺</button>
+                    </div>
+                </div>
+
+                <footer class="card_footer">
+                    <b>核心机制说明：</b>流程涵盖 6 大关键环节——全渠道接入脱敏、多轮指代消解与对话状态跟踪（DST）、知识图谱与多向量稠密双轨检索增强（RRF+Cross-Encoder）、基座大模型与 ReAct 智能体工具协同、Self-RAG 细粒度事实反思核验以及持续 DPO 偏好对齐闭环。
+                </footer>
+            </article>
+
+            <!-- ================= 卡片 2: 智能客服系统核心数据资产实体关系 ER 图 ================= -->
+            <article class="diagram_card" id="erCard">
+                <header class="card_header">
+                    <div class="card_title_group">
+                        <div class="card_title">
+                            <span>🗄️ 智能客服系统核心数据资产实体关系 ER 图</span>
+                        </div>
+                        <span class="card_sub">erDiagram · 涵盖用户、会话、消息、知识分块、图谱实体、工具调用与工单反馈</span>
+                    </div>
+                    <div class="card_actions">
+                        <button class="action_btn" onclick="openCodeDrawer('er')" title="查看与复制 Mermaid 源码">
+                            <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                            <span>Mermaid 源码</span>
+                        </button>
+                        <button class="action_btn primary" onclick="exportDiagramSvg('erSvgTarget', 'Customer_Service_ER_Diagram.svg')" title="导出高保真矢量 SVG">
+                            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            <span>导出 SVG</span>
+                        </button>
+                    </div>
+                </header>
+
+                <div class="stage_viewport" id="erViewport">
+                    <div class="mermaid_canvas" id="erCanvas">
+                        <div id="erSvgTarget"></div>
+                    </div>
+                    <div class="viewport_controls">
+                        <button class="ctrl_btn" onclick="zoomDiagram('er', 1.2)" title="放大">+</button>
+                        <button class="ctrl_btn" onclick="zoomDiagram('er', 0.8)" title="缩小">-</button>
+                        <button class="ctrl_btn" onclick="resetDiagram('er')" title="重置">↺</button>
+                    </div>
+                </div>
+
+                <footer class="card_footer">
+                    <b>数据架构说明：</b>ER 模型规范设计了 11 大核心实体，完整刻画了用户（USER）从发起会话（SESSION）、产出消息（MESSAGE）、关联知识分块（DOCUMENT_CHUNK）与图谱关系（KG_RELATION）、触发工具调用（TOOL_INVOCATION）到转接工单（TICKET）并生成偏好对齐（FEEDBACK）的完整主外键依赖。
+                </footer>
+            </article>
+        </main>
+
+        <!-- 源码查看抽屉 (Drawer) -->
+        <aside class="code_drawer" id="codeDrawer">
+            <div class="drawer_header">
+                <span class="drawer_title" id="drawerTitle">Mermaid 原始定义代码</span>
+                <button class="drawer_close" onclick="closeCodeDrawer()" title="关闭 (Esc)">✕</button>
+            </div>
+            <div class="drawer_body">
+                <textarea class="code_textarea" id="drawerCodeText" readonly spellcheck="false"></textarea>
+            </div>
+            <div class="drawer_actions">
+                <button class="action_btn primary" onclick="copyMermaidCode()">
+                    <span>📋 一键复制 Mermaid 代码</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- 页面底部 -->
+        <footer class="footer">
+            <div class="footer_left">
+                <span>Mermaid 10.9.1 本地离线解析驱动 · <code>cdn/mermaid.min.js</code></span>
+            </div>
+            <div class="footer_links">
+                <span>开发者: 王鹏宇 (2026-11-05) · 流程图 &amp; ER图建模规范</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 脚本：Mermaid 定义、渲染与动态交互 -->
+    <script>
+        // Mermaid 流程图源码定义
+        const FLOWCHART_CODE = `flowchart TD
+    subgraph S1["一、全渠道交互与安全感知层"]
+        A["用户与客户终端 (App / Web / 小程序 / 语音)"] --> B["API 实时网关与 WebSocket 双工接入"]
+        B --> C["语音识别 (Whisper ASR) 与多模态 OCR 提取"]
+        C --> D["安全防御防火墙 (隐私脱敏与越狱提示拦截)"]
+    end
+
+    subgraph S2["二、语义理解与动态状态跟踪 (DST)"]
+        D --> E["层次意图识别 (Intent Tree)"]
+        D --> F["情感倾向分析 (Sentiment Mining)"]
+        E --> G["指代消解与多轮 Query 语义重写"]
+        F --> G
+        G --> H["动态对话状态跟踪器 (DST 与槽位填充)"]
+        H <--> M["分层会话记忆栈 (短期工作记忆与长程向量栈)"]
+    end
+
+    subgraph S3["三、双轨混合检索增强 (GraphRAG 与稠密检索)"]
+        G --> I1["轨道A: 实体链接与知识图谱多跳推理"]
+        G --> I2["轨道B: 稠密多向量双塔语义检索"]
+        G --> I3["轨道C: 学习型稀疏词项匹配 (SPLADE)"]
+
+        KB1[("领域知识图谱 Neo4j")] -.-> I1
+        KB2[("多模态向量库 Milvus/Qdrant")] -.-> I2
+        KB3[("专家高频问答与政策规范库")] -.-> I3
+
+        I1 --> J["多路倒数排序融合器 (RRF: k=60)"]
+        I2 --> J
+        I3 --> J
+        J --> K["深度交叉注意力重排精滤器 (Cross-Encoder)"]
+        K --> L["信息瓶颈上下文自适应剪枝压缩"]
+    end
+
+    subgraph S4["四、大模型认知推理与 Agent 工具编排"]
+        L --> N["基座大模型高效推理服务 (Foundation LLM)"]
+        H --> N
+        N --> O{"是否需要业务操作与外部 API 事务?"}
+        O -- "是 (需要调用)" --> P["ReAct 智能体工具执行器"]
+        P --> API[("业务系统 CRM / ERP / 订单接口")]
+        API --> P
+        P --> N
+        O -- "否 (直接回答)" --> Q["生成候选回复草稿"]
+    end
+
+    subgraph S5["五、Self-RAG 自反思与人机协同评估"]
+        Q --> R["Self-RAG 细粒度事实反思核验器"]
+        R --> S{"事实核验是否通过且无事实幻觉?"}
+        S -- "存在幻觉/缺乏支撑" --> T["检索补偿与 Prompt 自校准重生成"]
+        T --> N
+        S -- "核验通过 (事实对准)" --> U["可控语言生成与证据链溯源标注 [1][2]"]
+        U --> V{"综合响应置信度评估"}
+        V -- "高置信度 (>= 阈值)" --> W["流式推送至用户端 (SSE / WebSocket)"]
+        V -- "低置信度/情绪负向激化" --> X["平滑转接人工专家座席 (携带结构化小结)"]
+    end
+
+    subgraph S6["六、学术评测与持续对齐演进闭环"]
+        W --> Y["用户主动评价与交互轨迹采集中枢"]
+        X --> Y
+        Y --> Z1["RAGAS 多维学术量化评测体系"]
+        Y --> Z2["时序知识冲突检测与图谱自动同步"]
+        Y --> Z3["DPO 偏好对齐数据集构建与微调"]
+        Z2 -.-> KB1
+        Z2 -.-> KB2
+        Z3 -.-> N
+    end`;
+
+        // Mermaid ER 图源码定义
+        const ER_DIAGRAM_CODE = `erDiagram
+    USER ||--o{ SESSION : initiates
+    USER ||--o{ TICKET : associated_with
+    USER ||--o{ FEEDBACK : submits
+    
+    SESSION ||--|{ MESSAGE : contains
+    SESSION ||--o| TICKET : escalates_to
+    
+    MESSAGE ||--o{ TOOL_INVOCATION : triggers
+    TOOL_API ||--o{ TOOL_INVOCATION : defines
+    
+    KNOWLEDGE_BASE ||--|{ DOCUMENT_CHUNK : chunks_into
+    DOCUMENT_CHUNK ||--o{ MESSAGE : cited_by
+    
+    KG_ENTITY ||--o{ KG_RELATION : head_source
+    KG_ENTITY ||--o{ KG_RELATION : tail_target
+    KG_RELATION ||--o{ MESSAGE : supports
+    
+    MESSAGE ||--o| FEEDBACK : evaluates
+    AGENT_STAFF ||--o{ TICKET : handles
+    AGENT_STAFF ||--o{ FEEDBACK : reviews
+
+    USER {
+        string user_id PK
+        string username
+        string phone
+        string vip_tier
+        json dynamic_tags
+        datetime created_at
+    }
+
+    SESSION {
+        string session_id PK
+        string user_id FK
+        string channel_type
+        string dialogue_state
+        json belief_slots
+        datetime start_time
+        datetime end_time
+    }
+
+    MESSAGE {
+        string message_id PK
+        string session_id FK
+        string sender_role
+        string raw_content
+        string rewritten_query
+        string intent_code
+        float sentiment_score
+        float confidence_score
+        int tokens_consumed
+        datetime created_at
+    }
+
+    KNOWLEDGE_BASE {
+        string kb_id PK
+        string kb_name
+        string domain_category
+        string embedding_model
+        int total_chunks
+        string version_tag
+        datetime updated_at
+    }
+
+    DOCUMENT_CHUNK {
+        string chunk_id PK
+        string kb_id FK
+        string doc_title
+        string chunk_text
+        string vector_index_id
+        int token_length
+        string hash_code
+    }
+
+    KG_ENTITY {
+        string entity_id PK
+        string entity_name
+        string entity_type
+        string ontology_uri
+        json properties
+    }
+
+    KG_RELATION {
+        string relation_id PK
+        string head_entity_id FK
+        string tail_entity_id FK
+        string relation_type
+        float weight_score
+    }
+
+    TOOL_API {
+        string tool_id PK
+        string tool_name
+        string endpoint_url
+        string http_method
+        json param_schema
+        int timeout_ms
+    }
+
+    TOOL_INVOCATION {
+        string call_id PK
+        string message_id FK
+        string tool_id FK
+        json request_payload
+        json response_payload
+        string exec_status
+        int latency_ms
+        datetime invoked_at
+    }
+
+    TICKET {
+        string ticket_id PK
+        string session_id FK
+        string user_id FK
+        string agent_id FK
+        string priority
+        string ticket_status
+        string summary_report
+        datetime created_at
+        datetime resolved_at
+    }
+
+    FEEDBACK {
+        string feedback_id PK
+        string message_id FK
+        string user_id FK
+        int star_rating
+        string thumb_type
+        string comment_text
+        string human_correction
+        boolean is_dpo_sampled
+    }
+
+    AGENT_STAFF {
+        string agent_id PK
+        string staff_name
+        string skill_group
+        string online_status
+        int max_concurrency
+    }`;
+
+        // 缩放平移状态管理
+        const zoomState = {
+            flow: { scale: 1, x: 0, y: 0 },
+            er: { scale: 1, x: 0, y: 0 }
+        };
+
+        let currentMermaidTheme = 'dark';
+
+        // 初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            initMermaid();
+            setupDragPan('flow');
+            setupDragPan('er');
+        });
+
+        // 初始化并渲染 Mermaid
+        async function initMermaid() {
+            if (typeof mermaid === 'undefined') {
+                console.error('Mermaid library not loaded');
+                return;
+            }
+
+            mermaid.initialize({
+                startOnLoad: false,
+                theme: currentMermaidTheme,
+                securityLevel: 'loose',
+                fontFamily: 'var(--sans)',
+                flowchart: {
+                    useMaxWidth: false,
+                    htmlLabels: true,
+                    curve: 'basis'
+                },
+                er: {
+                    useMaxWidth: false
+                }
+            });
+
+            try {
+                // 渲染流程图
+                const flowTarget = document.getElementById('flowSvgTarget');
+                flowTarget.innerHTML = '';
+                const { svg: flowSvg } = await mermaid.render('flowSvg_' + Date.now(), FLOWCHART_CODE);
+                flowTarget.innerHTML = flowSvg;
+
+                // 渲染 ER 图
+                const erTarget = document.getElementById('erSvgTarget');
+                erTarget.innerHTML = '';
+                const { svg: erSvg } = await mermaid.render('erSvg_' + Date.now(), ER_DIAGRAM_CODE);
+                erTarget.innerHTML = erSvg;
+
+                console.log('Mermaid diagrams successfully rendered!');
+            } catch (err) {
+                console.error('Mermaid render error:', err);
+            }
+        }
+
+        // 切换视图模式 (双图并列 / 流程图单图 / ER图单图)
+        function switchView(mode, btn) {
+            const grid = document.getElementById('diagramGrid');
+            grid.className = 'diagram_grid mode-' + mode;
+
+            document.querySelectorAll('.view_tabs .tab_btn').forEach(b => b.classList.remove('is-active'));
+            btn.classList.add('is-active');
+
+            // 自动重置视图比例
+            resetDiagram('flow');
+            resetDiagram('er');
+        }
+
+        // 切换 Mermaid 主题并重新渲染
+        function changeMermaidTheme(themeName, chip) {
+            currentMermaidTheme = themeName;
+            document.querySelectorAll('.theme_chips .theme_chip').forEach(c => c.classList.remove('is-active'));
+            chip.classList.add('is-active');
+
+            if (themeName === 'neutral') {
+                document.body.classList.add('theme-light');
+            } else {
+                document.body.classList.remove('theme-light');
+            }
+
+            initMermaid();
+        }
+
+        // 缩放控制
+        function zoomDiagram(target, factor) {
+            const state = zoomState[target];
+            state.scale = Math.min(Math.max(state.scale * factor, 0.4), 3.0);
+            applyTransform(target);
+        }
+
+        function resetDiagram(target) {
+            const state = zoomState[target];
+            state.scale = 1;
+            state.x = 0;
+            state.y = 0;
+            applyTransform(target);
+        }
+
+        function applyTransform(target) {
+            const canvas = document.getElementById(target + 'Canvas');
+            const state = zoomState[target];
+            canvas.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
+        }
+
+        // 拖拽平移与滚轮缩放
+        function setupDragPan(target) {
+            const viewport = document.getElementById(target + 'Viewport');
+            let isDragging = false;
+            let startX = 0;
+            let startY = 0;
+
+            viewport.addEventListener('mousedown', (e) => {
+                if (e.target.closest('.viewport_controls')) return;
+                isDragging = true;
+                viewport.classList.add('is-dragging');
+                startX = e.clientX - zoomState[target].x;
+                startY = e.clientY - zoomState[target].y;
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                zoomState[target].x = e.clientX - startX;
+                zoomState[target].y = e.clientY - startY;
+                applyTransform(target);
+            });
+
+            window.addEventListener('mouseup', () => {
+                isDragging = false;
+                viewport.classList.remove('is-dragging');
+            });
+
+            viewport.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const factor = e.deltaY < 0 ? 1.1 : 0.9;
+                zoomDiagram(target, factor);
+            }, { passive: false });
+        }
+
+        // 导出高清 SVG
+        function exportDiagramSvg(targetId, filename) {
+            const container = document.getElementById(targetId);
+            const svg = container.querySelector('svg');
+            if (!svg) {
+                alert('SVG 尚未渲染完成，请稍候再试。');
+                return;
+            }
+
+            const serializer = new XMLSerializer();
+            let source = serializer.serializeToString(svg);
+
+            if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+                source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+            }
+
+            const preface = '<?xml version="1.0" standalone="no"?>\r\n';
+            const blob = new Blob([preface, source], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // 源码抽屉控制
+        let currentViewingCode = '';
+
+        function openCodeDrawer(type) {
+            const drawer = document.getElementById('codeDrawer');
+            const title = document.getElementById('drawerTitle');
+            const textarea = document.getElementById('drawerCodeText');
+
+            if (type === 'flow') {
+                title.textContent = '智能客服全链路流程图 · Mermaid 源码';
+                currentViewingCode = FLOWCHART_CODE;
+            } else {
+                title.textContent = '核心实体关系 ER 图 · Mermaid 源码';
+                currentViewingCode = ER_DIAGRAM_CODE;
+            }
+
+            textarea.value = currentViewingCode;
+            drawer.classList.add('is-open');
+        }
+
+        function closeCodeDrawer() {
+            document.getElementById('codeDrawer').classList.remove('is-open');
+        }
+
+        function copyMermaidCode() {
+            if (!currentViewingCode) return;
+            navigator.clipboard.writeText(currentViewingCode).then(() => {
+                alert('Mermaid 源码已成功复制到剪贴板！');
+            }).catch(() => {
+                const textarea = document.getElementById('drawerCodeText');
+                textarea.select();
+                document.execCommand('copy');
+                alert('Mermaid 源码已复制！');
+            });
+        }
+
+        // 键盘快捷键 (Esc 关闭抽屉)
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeCodeDrawer();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1232 @@
+<!-- 姓名：王鹏宇，日期：2026-11-05，功能名称：基于 ECharts 的智能客服全域监控数据大屏 (三列布局/中间地理信息图) -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#030712">
+    <meta name="color-scheme" content="dark">
+    <title>18-8 智能客服全域运维监控数据大屏 · 王鹏宇</title>
+    <!-- 本地下载的 ECharts 5.5.0 及中国地图 GeoJSON 脚本 -->
+    <script src="cdn/echarts.min.js"></script>
+    <script src="cdn/china.js"></script>
+    <style>
+        :root {
+            --bg: #030712;
+            --surface: rgba(9, 18, 36, 0.78);
+            --surface-card: #081226;
+            --ink: #f0f6fc;
+            --muted: #8b9eb7;
+            --dim: #475a73;
+            --line: rgba(56, 189, 248, 0.18);
+            --line-strong: rgba(56, 189, 248, 0.45);
+
+            /* Data Screen Cyber Colors */
+            --cyan: #38bdf8;
+            --blue: #2563eb;
+            --glow-blue: #0ea5e9;
+            --green: #10b981;
+            --emerald: #34d399;
+            --amber: #f59e0b;
+            --purple: #a855f7;
+            --rose: #f43f5e;
+
+            --mono: "SFMono-Regular", Consolas, "Cascadia Code", "Fira Code", monospace;
+            --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Roboto, sans-serif;
+            --ease: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: var(--sans);
+            color: var(--ink);
+            background: var(--bg);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 科技大屏背景网格与径向辉光 */
+        body::before {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            content: "";
+            background-image:
+                linear-gradient(rgba(56, 189, 248, 0.035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(56, 189, 248, 0.035) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        body::after {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            content: "";
+            background: radial-gradient(circle at 50% 35%, rgba(14, 165, 233, 0.12), transparent 60%),
+                        radial-gradient(circle at 10% 90%, rgba(139, 92, 246, 0.08), transparent 50%),
+                        radial-gradient(circle at 90% 90%, rgba(16, 185, 129, 0.08), transparent 50%);
+        }
+
+        .screen_container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            padding: 10px 14px 14px;
+        }
+
+        /* ==================== 顶部科技大屏标题栏 ==================== */
+        .screen_header {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+            padding: 0 16px;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+            background: linear-gradient(180deg, rgba(8, 20, 42, 0.85) 0%, rgba(3, 7, 18, 0.4) 100%);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .header_deco_line {
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, var(--cyan) 50%, transparent 100%);
+            box-shadow: 0 0 12px var(--cyan);
+        }
+
+        .header_left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            min-width: 300px;
+        }
+
+        .identity_badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .identity_mark {
+            display: grid;
+            place-items: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(37, 99, 235, 0.2));
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
+        }
+
+        .identity_text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .identity_text strong {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            color: var(--ink);
+        }
+
+        .identity_text small {
+            font-family: var(--mono);
+            font-size: 9px;
+            color: var(--muted);
+            letter-spacing: 0.1em;
+        }
+
+        /* 中央大屏发光主标题 */
+        .header_center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .main_title {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, #ffffff 0%, #bae6fd 60%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 25px rgba(56, 189, 248, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header_right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 300px;
+            justify-content: flex-end;
+        }
+
+        .screen_nav {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            padding: 3px 6px;
+            background: var(--surface-card);
+            border: 1px solid var(--line);
+            border-radius: 999px;
+        }
+
+        .screen_nav a {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            text-decoration: none;
+            color: var(--muted);
+            font-size: 10.5px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .screen_nav a:hover {
+            color: var(--ink);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .screen_nav a.is-active {
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--blue), var(--cyan));
+            box-shadow: 0 2px 10px rgba(56, 189, 248, 0.35);
+        }
+
+        .clock_box {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--cyan);
+            letter-spacing: 0.08em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .clock_pulse {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 8px var(--green);
+            animation: pulse 1.8s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(0.85); }
+        }
+
+        /* ==================== 三列大屏主网格 ==================== */
+        .screen_main_grid {
+            display: grid;
+            grid-template-columns: 28% 44% 28%;
+            gap: 14px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .screen_col {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            min-height: 0;
+        }
+
+        /* 科技风格卡片通用容器 */
+        .dash_card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            overflow: hidden;
+            flex: 1;
+            min-height: 0;
+            transition: border-color 0.25s ease;
+        }
+
+        .dash_card:hover {
+            border-color: var(--line-strong);
+        }
+
+        /* 四角科技折线装饰边角 */
+        .dash_card::before, .dash_card::after {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            content: "";
+            pointer-events: none;
+            z-index: 2;
+        }
+        .dash_card::before {
+            top: 0;
+            left: 0;
+            border-top: 2px solid var(--cyan);
+            border-left: 2px solid var(--cyan);
+        }
+        .dash_card::after {
+            bottom: 0;
+            right: 0;
+            border-bottom: 2px solid var(--cyan);
+            border-right: 2px solid var(--cyan);
+        }
+
+        .card_header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.1);
+            background: linear-gradient(90deg, rgba(14, 165, 233, 0.15) 0%, transparent 80%);
+            flex-shrink: 0;
+        }
+
+        .card_title {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: #e0f2fe;
+        }
+
+        .title_icon {
+            color: var(--cyan);
+            font-size: 12px;
+        }
+
+        .card_badge {
+            font-family: var(--mono);
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            color: var(--cyan);
+        }
+
+        .card_body {
+            position: relative;
+            flex: 1;
+            min-height: 0;
+            width: 100%;
+        }
+
+        /* ==================== 中间列定制：地理信息图 + 核心 KPI 翻牌 ==================== */
+        .mid_top_card {
+            flex: 1.85 !important;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mid_bottom_card {
+            flex: 1.15 !important;
+        }
+
+        /* 顶部数字翻牌汇总器 */
+        .kpi_banner {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            padding: 10px 14px 6px;
+            background: rgba(8, 18, 38, 0.5);
+            border-bottom: 1px solid rgba(56, 189, 248, 0.1);
+            flex-shrink: 0;
+        }
+
+        .kpi_item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            padding: 6px 10px;
+            background: rgba(14, 165, 233, 0.06);
+            border: 1px solid rgba(56, 189, 248, 0.15);
+            border-radius: 6px;
+        }
+
+        .kpi_label {
+            font-size: 10px;
+            color: var(--muted);
+            letter-spacing: 0.02em;
+        }
+
+        .kpi_number {
+            font-family: var(--mono);
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 0.04em;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+        }
+
+        .kpi_number.green { color: var(--emerald); text-shadow: 0 0 10px rgba(52, 211, 153, 0.4); }
+        .kpi_number.purple { color: var(--purple); text-shadow: 0 0 10px rgba(168, 85, 247, 0.4); }
+
+        .map_container {
+            flex: 1;
+            min-height: 0;
+            width: 100%;
+            position: relative;
+        }
+
+        /* 悬浮地图交互控制器 */
+        .map_hud_layer {
+            position: absolute;
+            left: 14px;
+            bottom: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 6px 10px;
+            background: rgba(9, 18, 36, 0.85);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            font-family: var(--mono);
+            font-size: 10px;
+            z-index: 5;
+            color: var(--muted);
+        }
+
+        .hud_legend_item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend_dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        /* ==================== 右侧列表与滚动流定制 ==================== */
+        .rank_list {
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .rank_item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .rank_info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+        }
+
+        .rank_name {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .rank_num {
+            display: grid;
+            place-items: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            font-family: var(--mono);
+            font-size: 9px;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--muted);
+        }
+
+        .rank_item:nth-child(1) .rank_num { background: #ef4444; color: #fff; }
+        .rank_item:nth-child(2) .rank_num { background: #f97316; color: #fff; }
+        .rank_item:nth-child(3) .rank_num { background: #eab308; color: #000; }
+
+        .rank_bar_wrap {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.07);
+            overflow: hidden;
+        }
+
+        .rank_bar_inner {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--blue), var(--cyan));
+            transition: width 0.6s ease;
+        }
+
+        /* 实时事件滚动流 */
+        .stream_log_box {
+            padding: 10px 14px;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .log_item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            color: var(--muted);
+            padding: 4px 6px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 4px;
+            border-left: 2px solid var(--cyan);
+            animation: fadeIn 0.4s ease;
+        }
+
+        .log_item.warn { border-left-color: var(--amber); }
+        .log_item.success { border-left-color: var(--green); }
+
+        .log_time {
+            font-family: var(--mono);
+            font-size: 9.5px;
+            color: var(--dim);
+            flex-shrink: 0;
+        }
+
+        .log_tag {
+            font-family: var(--mono);
+            font-size: 8.5px;
+            padding: 1px 4px;
+            border-radius: 2px;
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--cyan);
+        }
+
+        .log_item.warn .log_tag { background: rgba(245, 158, 11, 0.15); color: var(--amber); }
+        .log_item.success .log_tag { background: rgba(16, 185, 129, 0.15); color: var(--green); }
+
+        .log_desc {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #d1d5db;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 响应式降级 */
+        @media (max-width: 1200px) {
+            body { overflow-y: auto; }
+            .screen_container { height: auto; min-height: 100vh; overflow-y: auto; }
+            .screen_main_grid { grid-template-columns: 1fr; }
+            .map_container { min-height: 480px; }
+            .dash_card { min-height: 260px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="screen_container">
+        <!-- 顶部科技大屏标题栏 -->
+        <header class="screen_header">
+            <div class="header_left">
+                <a class="identity_badge" href="18-8.html">
+                    <div class="identity_mark">WP</div>
+                    <div class="identity_text">
+                        <strong>王鹏宇 · 数据大屏</strong>
+                        <small>DATE: 2026-11-05 · COMMAND CENTER</small>
+                    </div>
+                </a>
+            </div>
+
+            <div class="header_center">
+                <h1 class="main_title">
+                    <span>⚡ 基于知识库智能客服系统全域运行监控大屏 ⚡</span>
+                </h1>
+            </div>
+
+            <div class="header_right">
+                <nav class="screen_nav" aria-label="章节导航">
+                    <a href="18-1.html" title="粒子文字">18-01 粒子</a>
+                    <a href="18-2.html" title="电商架构">18-02 架构</a>
+                    <a href="18-3.html" title="智能客服">18-03 客服</a>
+                    <a href="18-4.html" title="图表分析">18-04 图表</a>
+                    <a href="18-6.html" title="流程与ER">18-06 流程</a>
+                    <a href="18-7.html" title="3D图表">18-07 3D</a>
+                    <a class="is-active" href="18-8.html" aria-current="page" title="数据大屏">18-08 大屏</a>
+                </nav>
+                <div class="clock_box">
+                    <span class="clock_pulse"></span>
+                    <span id="screenClock">2026-11-05 15:30:00</span>
+                </div>
+            </div>
+            <div class="header_deco_line"></div>
+        </header>
+
+        <!-- 三列数据大屏主网格 -->
+        <main class="screen_main_grid">
+            <!-- ================= 第一列 (左侧): 实时并发、多路召回与工具调用 ================= -->
+            <section class="screen_col">
+                <!-- 卡片 L1: 实时问答并发与意图流时序趋势 -->
+                <article class="dash_card">
+                    <header class="card_header">
+                        <div class="card_title">
+                            <span class="title_icon">📈</span>
+                            <span>实时问答并发与时序检索吞吐</span>
+                        </div>
+                        <span class="card_badge">QPS 2,480</span>
+                    </header>
+                    <div class="card_body" id="chartLeftConcurrency"></div>
+                </article>
+
+                <!-- 卡片 L2: 知识库多路混合召回贡献占比 -->
+                <article class="dash_card">
+                    <header class="card_header">
+                        <div class="card_title">
+                            <span class="title_icon">🎯</span>
+                            <span>多源异构检索召回分布 (RRF)</span>
+                        </div>
+                        <span class="card_badge">双轨协同</span>
+                    </header>
+                    <div class="card_body" id="chartLeftRecall"></div>
+                </article>
+
+                <!-- 卡片 L3: 智能体外部工具 API 执行健康度 -->
+                <article class="dash_card">
+                    <header class="card_header">
+                        <div class="card_title">
+                            <span class="title_icon">⚙️</span>
+                            <span>ReAct 智能体工具调用延时</span>
+                        </div>
+                        <span class="card_badge">99.2% 成功率</span>
+                    </header>
+                    <div class="card_body" id="chartLeftTools"></div>
+                </article>
+            </section>
+
+            <!-- ================= 第二列 (中间): 上面是全国地理信息图 + 下面是阶段时延监控 ================= -->
+            <section class="screen_col">
+                <!-- 中间上面卡片: 全国各省市服务负载与业务飞线分布地理信息图 -->
+                <article class="dash_card mid_top_card">
+                    <header class="card_header">
+                        <div class="card_title">
+                            <span class="title_icon">🌐</span>
+                            <span>全国用户请求负载与计算节点迁徙飞线地理分布</span>
+                        </div>
+                        <span class="card_badge">实时地理信息 (GeoJSON)</span>
+                    </header>
+
+                    <!-- 顶部数字翻牌器 -->
+                    <div class="kpi_banner">
+                        <div class="kpi_item">
+                            <span class="kpi_label">累计服务请求总量</span>
+                            <span class="kpi_number" id="kpiTotal">18,492,305</span>
+                        </div>
+                        <div class="kpi_item">
+                            <span class="kpi_label">今日实时会话人次</span>
+                            <span class="kpi_number green" id="kpiToday">1,529,840</span>
+                        </div>
+                        <div class="kpi_item">
+                            <span class="kpi_label">图谱实体节点总数</span>
+                            <span class="kpi_number purple">2,480,000</span>
+                        </div>
+                        <div class="kpi_item">
+                            <span class="kpi_label">AI 自主闭环解决率</span>
+                            <span class="kpi_number green">97.8%</span>
+                        </div>
+                    </div>
+
+                    <!-- 中间地理信息地图画布 -->
+                    <div class="map_container" id="chartMiddleMap"></div>
+
+                    <!-- 地图悬浮图例 -->
+                    <div class="map_hud_layer">
+                        <div class="hud_legend_item">
+                            <span class="legend_dot" style="background: #38bdf8;"></span>
+                            <span>高负载城市节点 (Top Regions)</span>
+                        </div>
+                        <div class="hud_legend_item">
+                            <span class="legend_dot" style="background: #10b981;"></span>
+                            <span>算力调度核心中心 (Data Center)</span>
+                        </div>
+                        <div class="hud_legend_item">
+                            <span class="legend_dot" style="background: #f59e0b;"></span>
+                            <span>动态实时迁徙飞线 (Active Stream)</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- 中间下面卡片: 端到端各阶段时延分布与服务等级监控 -->
+                <article class="dash_card mid_bottom_card">
+                    <header class="card_header">
+                        <div class="card_title">
+                            <span class="title_icon">⏱️</span>
+                            <span>智能客服端到端全链路各阶段时延分布 (ms)</span>
+                        </div>
+                        <span class="card_badge">P99 &lt; 480ms</span>
+                    </header>
+                    <div class="card_body" id="chartMiddleLatency"></div>
+                </article>
+            </section>
+
+            <!-- ================= 第三列 (右侧): RAGAS 评测、省市排行与事件流 ================= -->
+            <section class="screen_col">
+                <!-- 卡片 R1: RAGAS 学术六维质量评测雷达 -->
+                <article class="dash_card">
+                    <header class="card_header">
+                        <div class="card_title">
+                            <span class="title_icon">🎯</span>
+                            <span>RAGAS 学术多维质检雷达</span>
+                        </div>
+                        <span class="card_badge">综合得分 95.8</span>
+                    </header>
+                    <div class="card_body" id="chartRightRadar"></div>
+                </article>
+
+                <!-- 卡片 R2: 省市服务负载 TOP 5 动态榜单 -->
+                <article class="dash_card">
+                    <header class="card_header">
+                        <div class="card_title">
+                            <span class="title_icon">🏆</span>
+                            <span>省市访问吞吐贡献榜 TOP 5</span>
+                        </div>
+                        <span class="card_badge">实时统计</span>
+                    </header>
+                    <div class="rank_list" id="rankListContainer">
+                        <!-- 动态填充排行 -->
+                    </div>
+                </article>
+
+                <!-- 卡片 R3: 实时会话质检与预警告警滚动流 -->
+                <article class="dash_card">
+                    <header class="card_header">
+                        <div class="card_title">
+                            <span class="title_icon">🔔</span>
+                            <span>全域智能审计与预警事件流</span>
+                        </div>
+                        <span class="card_badge">实时监听</span>
+                    </header>
+                    <div class="stream_log_box" id="streamLogBox">
+                        <!-- 动态滚动条目 -->
+                    </div>
+                </article>
+            </section>
+        </main>
+    </div>
+
+    <!-- 数据大屏主逻辑驱动脚本 -->
+    <script>
+        // 自动注册并检测中国地图数据
+        if (typeof echarts !== 'undefined' && window.chinaGeoJson && !echarts.getMap('china')) {
+            echarts.registerMap('china', window.chinaGeoJson);
+        }
+
+        // 统一图表实例表
+        const charts = {};
+
+        // 核心城市经纬度坐标字典
+        const geoCoordMap = {
+            '北京': [116.405285, 39.904989],
+            '上海': [121.472644, 31.231706],
+            '广州': [113.280637, 23.125178],
+            '深圳': [114.085947, 22.547],
+            '杭州': [120.153576, 30.287459],
+            '成都': [104.065735, 30.659462],
+            '武汉': [114.298572, 30.584355],
+            '西安': [108.948024, 34.263161],
+            '南京': [118.767413, 32.041544],
+            '重庆': [106.504962, 29.533155],
+            '天津': [117.190182, 39.125596],
+            '郑州': [113.665412, 34.757975],
+            '长沙': [112.982279, 28.19409],
+            '沈阳': [123.429096, 41.796767],
+            '哈尔滨': [126.642464, 45.756967],
+            '乌鲁木齐': [87.617733, 43.792818],
+            '拉萨': [91.132212, 29.660361],
+            '昆明': [102.712251, 25.040609]
+        };
+
+        // 飞线流向数据: 各区域飞往主力智能中心 (北京 / 杭州 / 深圳)
+        const flightData = [
+            [{ name: '广州' }, { name: '北京', value: 95 }],
+            [{ name: '上海' }, { name: '北京', value: 92 }],
+            [{ name: '成都' }, { name: '北京', value: 82 }],
+            [{ name: '武汉' }, { name: '北京', value: 85 }],
+            [{ name: '西安' }, { name: '北京', value: 76 }],
+            [{ name: '沈阳' }, { name: '北京', value: 70 }],
+            [{ name: '乌鲁木齐' }, { name: '北京', value: 65 }],
+            [{ name: '昆明' }, { name: '深圳', value: 78 }],
+            [{ name: '重庆' }, { name: '杭州', value: 84 }],
+            [{ name: '郑州' }, { name: '杭州', value: 88 }],
+            [{ name: '南京' }, { name: '深圳', value: 89 }],
+            [{ name: '长沙' }, { name: '深圳', value: 80 }]
+        ];
+
+        // 转换飞线坐标函数
+        function convertFlightData(data) {
+            const res = [];
+            for (let i = 0; i < data.length; i++) {
+                const dataItem = data[i];
+                const fromCoord = geoCoordMap[dataItem[0].name];
+                const toCoord = geoCoordMap[dataItem[1].name];
+                if (fromCoord && toCoord) {
+                    res.push({
+                        fromName: dataItem[0].name,
+                        toName: dataItem[1].name,
+                        coords: [fromCoord, toCoord],
+                        value: dataItem[1].value
+                    });
+                }
+            }
+            return res;
+        }
+
+        /* ==================== 1. 初始化中间上面的地理信息图 (China Map + Lines) ==================== */
+        function initMiddleMap() {
+            const chartDom = document.getElementById('chartMiddleMap');
+            const myChart = echarts.init(chartDom);
+            charts['map'] = myChart;
+
+            const scatterData = Object.keys(geoCoordMap).map(city => ({
+                name: city,
+                value: geoCoordMap[city].concat([Math.floor(Math.random() * 800) + 200])
+            }));
+
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'item',
+                    backgroundColor: 'rgba(8, 20, 42, 0.94)',
+                    borderColor: 'rgba(56, 189, 248, 0.4)',
+                    textStyle: { color: '#f0f6fc', fontSize: 12 },
+                    formatter: function (params) {
+                        if (params.seriesType === 'lines') {
+                            return `⚡ 算力调度链路<br/>${params.data.fromName} ➜ ${params.data.toName}<br/>实时吞吐: <b>${params.data.value * 24} QPS</b>`;
+                        } else if (params.seriesType === 'effectScatter') {
+                            return `📍 ${params.name} 服务中继站<br/>并发会话: <b>${params.value[2]} 路</b>`;
+                        }
+                        return params.name;
+                    }
+                },
+                geo: {
+                    map: 'china',
+                    roam: true,
+                    zoom: 1.22,
+                    center: [105.0, 36.0],
+                    label: {
+                        show: false,
+                        color: '#bae6fd',
+                        fontSize: 9
+                    },
+                    itemStyle: {
+                        areaColor: '#0a1d37',
+                        borderColor: '#38bdf8',
+                        borderWidth: 1.1,
+                        shadowColor: 'rgba(56, 189, 248, 0.35)',
+                        shadowBlur: 14
+                    },
+                    emphasis: {
+                        itemStyle: {
+                            areaColor: '#173663',
+                            borderWidth: 1.5,
+                            shadowBlur: 20
+                        },
+                        label: {
+                            show: true,
+                            color: '#ffffff'
+                        }
+                    }
+                },
+                series: [
+                    // 1. 动态飞线 (Lines)
+                    {
+                        name: '迁徙流向',
+                        type: 'lines',
+                        zlevel: 2,
+                        effect: {
+                            show: true,
+                            period: 4.5,
+                            trailLength: 0.65,
+                            color: '#38bdf8',
+                            symbol: 'arrow',
+                            symbolSize: 5
+                        },
+                        lineStyle: {
+                            color: '#0284c7',
+                            width: 1.2,
+                            opacity: 0.4,
+                            curveness: 0.25
+                        },
+                        data: convertFlightData(flightData)
+                    },
+                    // 2. 核心节点光圈涟漪散点 (effectScatter)
+                    {
+                        name: '核心枢纽',
+                        type: 'effectScatter',
+                        coordinateSystem: 'geo',
+                        zlevel: 3,
+                        rippleEffect: {
+                            period: 3,
+                            scale: 4.5,
+                            brushType: 'stroke'
+                        },
+                        label: {
+                            show: true,
+                            position: 'right',
+                            formatter: '{b}',
+                            color: '#bae6fd',
+                            fontSize: 10,
+                            offset: [5, 0]
+                        },
+                        symbolSize: function (val) {
+                            return Math.min(Math.max(val[2] / 65, 8), 16);
+                        },
+                        itemStyle: {
+                            color: '#38bdf8',
+                            shadowBlur: 10,
+                            shadowColor: '#38bdf8'
+                        },
+                        data: scatterData
+                    }
+                ]
+            };
+
+            myChart.setOption(option);
+        }
+
+        /* ==================== 2. 左上: 实时并发折线图 ==================== */
+        function initLeftConcurrency() {
+            const chartDom = document.getElementById('chartLeftConcurrency');
+            const myChart = echarts.init(chartDom);
+            charts['concurrency'] = myChart;
+
+            const times = ['15:00', '15:05', '15:10', '15:15', '15:20', '15:25', '15:30'];
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: { trigger: 'axis', backgroundColor: 'rgba(8, 20, 42, 0.9)', borderColor: '#38bdf8', textStyle: { color: '#fff' } },
+                grid: { top: 30, right: 15, bottom: 25, left: 45 },
+                legend: { data: ['向量检索', '图谱推理', 'LLM生成'], textStyle: { color: '#94a3b8', fontSize: 10 }, top: 0 },
+                xAxis: { type: 'category', data: times, axisLine: { lineStyle: { color: '#1e293b' } }, axisLabel: { color: '#94a3b8', fontSize: 10 } },
+                yAxis: { type: 'value', splitLine: { lineStyle: { color: 'rgba(255,255,255,0.06)' } }, axisLabel: { color: '#94a3b8', fontSize: 10 } },
+                series: [
+                    {
+                        name: '向量检索',
+                        type: 'line',
+                        smooth: true,
+                        data: [1200, 1380, 1490, 1620, 1580, 1750, 1890],
+                        areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(56,189,248,0.5)' }, { offset: 1, color: 'rgba(56,189,248,0.01)' }]) },
+                        lineStyle: { color: '#38bdf8', width: 2 }
+                    },
+                    {
+                        name: '图谱推理',
+                        type: 'line',
+                        smooth: true,
+                        data: [780, 890, 940, 1120, 1050, 1280, 1340],
+                        areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(168,85,247,0.5)' }, { offset: 1, color: 'rgba(168,85,247,0.01)' }]) },
+                        lineStyle: { color: '#a855f7', width: 2 }
+                    },
+                    {
+                        name: 'LLM生成',
+                        type: 'line',
+                        smooth: true,
+                        data: [980, 1100, 1220, 1390, 1310, 1490, 1610],
+                        areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(16,185,129,0.5)' }, { offset: 1, color: 'rgba(16,185,129,0.01)' }]) },
+                        lineStyle: { color: '#10b981', width: 2 }
+                    }
+                ]
+            };
+            myChart.setOption(option);
+        }
+
+        /* ==================== 3. 左中: 知识库召回占比饼图 ==================== */
+        function initLeftRecall() {
+            const chartDom = document.getElementById('chartLeftRecall');
+            const myChart = echarts.init(chartDom);
+            charts['recall'] = myChart;
+
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: { trigger: 'item', formatter: '{b}: {c}% ({d}%)' },
+                legend: { orient: 'vertical', right: 10, top: 'middle', textStyle: { color: '#94a3b8', fontSize: 10 } },
+                series: [
+                    {
+                        name: '召回贡献',
+                        type: 'pie',
+                        radius: ['45%', '72%'],
+                        center: ['40%', '50%'],
+                        avoidLabelOverlap: false,
+                        itemStyle: { borderRadius: 6, borderColor: '#081226', borderWidth: 2 },
+                        label: { show: false },
+                        data: [
+                            { value: 42, name: '稠密向量检索 (Milvus)', itemStyle: { color: '#38bdf8' } },
+                            { value: 28, name: '知识图谱多跳 (Neo4j)', itemStyle: { color: '#a855f7' } },
+                            { value: 18, name: '稀疏词项级 (SPLADE)', itemStyle: { color: '#10b981' } },
+                            { value: 12, name: '专家黄金问答 (FAQ)', itemStyle: { color: '#f59e0b' } }
+                        ]
+                    }
+                ]
+            };
+            myChart.setOption(option);
+        }
+
+        /* ==================== 4. 左下: 工具调用时延条形图 ==================== */
+        function initLeftTools() {
+            const chartDom = document.getElementById('chartLeftTools');
+            const myChart = echarts.init(chartDom);
+            charts['tools'] = myChart;
+
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+                grid: { top: 15, right: 25, bottom: 20, left: 95 },
+                xAxis: { type: 'value', axisLabel: { color: '#94a3b8', fontSize: 9 }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.06)' } } },
+                yAxis: {
+                    type: 'category',
+                    data: ['物流轨迹查询', '极速退款审核', '用户权益核算', '知识冲突自愈'],
+                    axisLabel: { color: '#e0f2fe', fontSize: 10 },
+                    axisLine: { lineStyle: { color: '#1e293b' } }
+                },
+                series: [
+                    {
+                        name: '平均时延 (ms)',
+                        type: 'bar',
+                        barWidth: 10,
+                        itemStyle: {
+                            borderRadius: [0, 5, 5, 0],
+                            color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                                { offset: 0, color: '#38bdf8' },
+                                { offset: 1, color: '#2563eb' }
+                            ])
+                        },
+                        data: [68, 125, 45, 180]
+                    }
+                ]
+            };
+            myChart.setOption(option);
+        }
+
+        /* ==================== 5. 中间下面: 阶段时延监控 ==================== */
+        function initMiddleLatency() {
+            const chartDom = document.getElementById('chartMiddleLatency');
+            const myChart = echarts.init(chartDom);
+            charts['latency'] = myChart;
+
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: { trigger: 'axis' },
+                grid: { top: 30, right: 20, bottom: 25, left: 40 },
+                xAxis: {
+                    type: 'category',
+                    data: ['语音ASR转录', '语义DST解析', '双轨混合检索', 'LLM核心生成', 'Self-RAG核验', '网络推流'],
+                    axisLabel: { color: '#bae6fd', fontSize: 10 }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '耗时 (ms)',
+                    nameTextStyle: { color: '#94a3b8', fontSize: 9 },
+                    axisLabel: { color: '#94a3b8', fontSize: 10 },
+                    splitLine: { lineStyle: { color: 'rgba(255,255,255,0.06)' } }
+                },
+                series: [
+                    {
+                        name: '阶段耗时',
+                        type: 'bar',
+                        barWidth: 22,
+                        itemStyle: {
+                            borderRadius: [6, 6, 0, 0],
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: '#38bdf8' },
+                                { offset: 1, color: 'rgba(37, 99, 235, 0.2)' }
+                            ])
+                        },
+                        data: [42, 28, 38, 165, 32, 15]
+                    }
+                ]
+            };
+            myChart.setOption(option);
+        }
+
+        /* ==================== 6. 右上: RAGAS 评测雷达图 ==================== */
+        function initRightRadar() {
+            const chartDom = document.getElementById('chartRightRadar');
+            const myChart = echarts.init(chartDom);
+            charts['radar'] = myChart;
+
+            const option = {
+                backgroundColor: 'transparent',
+                radar: {
+                    indicator: [
+                        { name: '事实忠实度 (Faithfulness)', max: 100 },
+                        { name: '答案相关度 (Relevance)', max: 100 },
+                        { name: '上下文精准 (Precision)', max: 100 },
+                        { name: '抗幻觉率 (Anti-Halluc)', max: 100 },
+                        { name: '意图命中率 (Intent Acc)', max: 100 },
+                        { name: '合规安全度 (Safety)', max: 100 }
+                    ],
+                    radius: '65%',
+                    splitNumber: 4,
+                    axisName: { color: '#bae6fd', fontSize: 9.5 },
+                    splitLine: { lineStyle: { color: 'rgba(56, 189, 248, 0.2)' } },
+                    splitArea: { areaStyle: { color: ['rgba(14, 165, 233, 0.05)', 'rgba(14, 165, 233, 0.02)'] } }
+                },
+                series: [
+                    {
+                        type: 'radar',
+                        data: [
+                            {
+                                value: [96.8, 94.5, 93.2, 98.6, 95.0, 99.8],
+                                name: '当前版本指标',
+                                areaStyle: { color: 'rgba(56, 189, 248, 0.45)' },
+                                lineStyle: { color: '#38bdf8', width: 2 },
+                                symbolSize: 4,
+                                itemStyle: { color: '#ffffff' }
+                            }
+                        ]
+                    }
+                ]
+            };
+            myChart.setOption(option);
+        }
+
+        /* ==================== 7. 右中: 省市排行榜与右下实时流 ==================== */
+        const rankData = [
+            { name: '广东省', value: '384,120 次', pct: 92 },
+            { name: '北京市', value: '321,800 次', pct: 85 },
+            { name: '江苏省', value: '298,400 次', pct: 78 },
+            { name: '浙江省', value: '265,900 次', pct: 72 },
+            { name: '上海市', value: '241,300 次', pct: 65 }
+        ];
+
+        function renderRankList() {
+            const container = document.getElementById('rankListContainer');
+            container.innerHTML = rankData.map((item, idx) => `
+                <div class="rank_item">
+                    <div class="rank_info">
+                        <span class="rank_name">
+                            <span class="rank_num">${idx + 1}</span>
+                            <span>${item.name}</span>
+                        </span>
+                        <b style="color: var(--cyan); font-family: var(--mono);">${item.value}</b>
+                    </div>
+                    <div class="rank_bar_wrap">
+                        <div class="rank_bar_inner" style="width: ${item.pct}%;"></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        const sampleLogs = [
+            { time: '15:30:12', tag: '知识召回', desc: '检索到退换货运费险三元组证据，得分 0.94', type: 'success' },
+            { time: '15:30:08', tag: 'DPO采样', desc: '已采集一条用户正向交互偏好反馈入库', type: 'success' },
+            { time: '15:30:01', tag: '人机转接', desc: '用户情绪激化(-0.85)，触发结构化自动平滑转接', type: 'warn' },
+            { time: '15:29:54', tag: '工具调用', desc: '执行 ERP_Order_Query_API 事务成功，耗时 45ms', type: '' },
+            { time: '15:29:48', tag: '知识同步', desc: '自动修复售后时效知识冲突，版本升级为 v2.4.1', type: 'warn' }
+        ];
+
+        function renderStreamLogs() {
+            const container = document.getElementById('streamLogBox');
+            container.innerHTML = sampleLogs.map(item => `
+                <div class="log_item ${item.type}">
+                    <span class="log_time">${item.time}</span>
+                    <span class="log_tag">${item.tag}</span>
+                    <span class="log_desc">${item.desc}</span>
+                </div>
+            `).join('');
+        }
+
+        // 定时新增滚动流
+        function startStreamTicker() {
+            setInterval(() => {
+                const now = new Date();
+                const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+                const newLogs = [
+                    { time: timeStr, tag: '自反思核验', desc: 'Self-RAG 验证通过 [IsSup]=0.98，完成溯源标注', type: 'success' },
+                    { time: timeStr, tag: 'QPS突增', desc: '检测到华南区域咨询流量上升 +12%，自动弹性扩容', type: 'warn' },
+                    { time: timeStr, tag: '向量检索', desc: 'BGE-M3 召回 Top-5 文档切片，时延 14ms', type: '' }
+                ];
+                const item = newLogs[Math.floor(Math.random() * newLogs.length)];
+                sampleLogs.unshift(item);
+                if (sampleLogs.length > 5) sampleLogs.pop();
+                renderStreamLogs();
+
+                // 稍微扰动大屏数字翻牌器
+                const totalEl = document.getElementById('kpiTotal');
+                let cur = parseInt(totalEl.textContent.replace(/,/g, ''));
+                cur += Math.floor(Math.random() * 8) + 2;
+                totalEl.textContent = cur.toLocaleString();
+            }, 3000);
+        }
+
+        // 时钟实时走动
+        function startClock() {
+            const clockEl = document.getElementById('screenClock');
+            setInterval(() => {
+                const d = new Date();
+                const pad = n => String(n).padStart(2, '0');
+                clockEl.textContent = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+            }, 1000);
+        }
+
+        // 统一响应式自适应
+        window.addEventListener('resize', () => {
+            Object.values(charts).forEach(c => c && c.resize());
+        });
+
+        // 启动执行
+        window.addEventListener('DOMContentLoaded', () => {
+            initMiddleMap();
+            initLeftConcurrency();
+            initLeftRecall();
+            initLeftTools();
+            initMiddleLatency();
+            initRightRadar();
+            renderRankList();
+            renderStreamLogs();
+            startStreamTicker();
+            startClock();
+        });
+    </script>
+</body>
+</html>
