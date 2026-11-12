@@ -3,16 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>王鹏宇｜高级网页设计课堂实践</title>
+    <title>王鹏宇｜高级网页设计课堂实践作品集</title>
     <style>
         :root {
             --ink: #17212b;
-            --muted: #637181;
-            --paper: rgba(255, 255, 255, 0.86);
-            --line: #d9e1e8;
+            --muted: #627282;
+            --paper: rgba(255, 255, 255, 0.90);
+            --line: #d8e2ea;
             --blue: #1769aa;
+            --blue-light: #e8f3fb;
             --coral: #e76f51;
+            --coral-light: #fef1ed;
             --yellow: #f2c14e;
+            --yellow-light: #fef9e8;
+            --green: #2a9d8f;
+            --green-light: #e6f6f4;
+            --purple: #7b2cbf;
+            --card-shadow: 0 10px 24px rgba(23, 40, 60, 0.07);
+            --hover-shadow: 0 18px 36px rgba(23, 105, 170, 0.16);
         }
 
         * {
@@ -22,6 +30,7 @@
         html {
             min-height: 100%;
             overflow-y: auto;
+            scroll-behavior: smooth;
         }
 
         body {
@@ -30,219 +39,582 @@
             margin: 0;
             color: var(--ink);
             background:
-                linear-gradient(135deg, rgba(255, 255, 255, 0.65), transparent 42%),
-                radial-gradient(circle at 12% 10%, #f8d9b6 0, transparent 28%),
-                radial-gradient(circle at 88% 85%, #b8d8df 0, transparent 30%),
-                #eef3f4;
-            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+                linear-gradient(135deg, rgba(255, 255, 255, 0.70), transparent 42%),
+                radial-gradient(circle at 10% 12%, #f8d9b6 0, transparent 28%),
+                radial-gradient(circle at 90% 88%, #b8d8df 0, transparent 32%),
+                #edf2f5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+            line-height: 1.6;
         }
 
         .page {
-            width: min(1120px, calc(100% - 40px));
+            width: min(1200px, calc(100% - 36px));
             margin: 0 auto;
-            padding: 56px 0 48px;
+            padding: 48px 0 60px;
         }
 
+        /* 顶部横幅 */
         .hero {
             display: grid;
-            grid-template-columns: 1.35fr 0.65fr;
+            grid-template-columns: 1.4fr 0.6fr;
             gap: 28px;
             align-items: end;
-            padding: 34px;
-            border: 1px solid rgba(255, 255, 255, 0.8);
+            padding: 38px 40px;
+            border: 1px solid rgba(255, 255, 255, 0.85);
             border-radius: 24px;
-            background: rgba(255, 255, 255, 0.58);
-            box-shadow: 0 24px 70px rgba(44, 62, 80, 0.12);
+            background: rgba(255, 255, 255, 0.68);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 24px 60px rgba(44, 62, 80, 0.10);
         }
 
         .eyebrow {
-            margin: 0 0 14px;
+            margin: 0 0 12px;
             color: var(--coral);
-            font-size: 0.82rem;
+            font-size: 0.85rem;
             font-weight: 700;
-            letter-spacing: 0.2em;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
         }
 
-        h1,
-        h2,
-        p {
+        h1, h2, h3, p {
             margin-top: 0;
         }
 
         h1 {
-            max-width: 700px;
+            max-width: 720px;
             margin-bottom: 16px;
-            font-family: Georgia, "Songti SC", serif;
-            font-size: clamp(2.3rem, 6vw, 5.2rem);
-            line-height: 1.05;
-            letter-spacing: 0.02em;
+            font-family: Georgia, "Songti SC", "SimSun", serif;
+            font-size: clamp(2.2rem, 5.5vw, 4.4rem);
+            line-height: 1.12;
+            letter-spacing: 0.01em;
+            color: var(--ink);
         }
 
         .intro {
-            max-width: 640px;
-            margin-bottom: 0;
+            max-width: 680px;
+            margin-bottom: 20px;
             color: var(--muted);
             font-size: 1.05rem;
-            line-height: 1.9;
+            line-height: 1.85;
+        }
+
+        .stat-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stat-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: 999px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            background: rgba(23, 105, 170, 0.08);
+            color: var(--blue);
+            border: 1px solid rgba(23, 105, 170, 0.15);
+        }
+
+        .stat-badge.highlight {
+            background: rgba(231, 111, 81, 0.10);
+            color: var(--coral);
+            border-color: rgba(231, 111, 81, 0.22);
+        }
+
+        .stat-badge.gold {
+            background: rgba(242, 193, 78, 0.18);
+            color: #946800;
+            border-color: rgba(242, 193, 78, 0.35);
         }
 
         .identity {
             justify-self: end;
-            width: min(100%, 220px);
-            padding: 20px;
+            width: min(100%, 250px);
+            padding: 22px 24px;
             border-left: 4px solid var(--yellow);
-            background: rgba(255, 255, 255, 0.6);
+            border-radius: 0 16px 16px 0;
+            background: rgba(255, 255, 255, 0.72);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
         }
 
         .identity strong {
             display: block;
             margin-bottom: 8px;
-            font-size: 1.35rem;
+            font-size: 1.45rem;
+            letter-spacing: 0.04em;
         }
 
         .identity span {
             color: var(--muted);
-            font-size: 0.9rem;
-            line-height: 1.7;
+            font-size: 0.92rem;
+            line-height: 1.8;
+            display: block;
         }
 
-        .section-heading {
+        /* 控制栏：搜索与筛选 */
+        .controls-panel {
+            position: sticky;
+            top: 14px;
+            z-index: 100;
+            margin: 36px 0 26px;
+            padding: 18px 22px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.95);
+            box-shadow: 0 12px 35px rgba(23, 40, 60, 0.09);
+            transition: all 0.2s ease;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .search-input-wrap {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.05rem;
+            color: var(--muted);
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 42px 12px 42px;
+            border: 1.5px solid var(--line);
+            border-radius: 12px;
+            font-size: 0.96rem;
+            background: #ffffff;
+            color: var(--ink);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(23, 105, 170, 0.15);
+        }
+
+        .search-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .clear-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            border: none;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: #475569;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .clear-btn:hover {
+            background: #cbd5e1;
+        }
+
+        .search-count {
+            white-space: nowrap;
+            font-size: 0.88rem;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            padding: 7px 15px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            font-size: 0.86rem;
+            background: #ffffff;
+            color: var(--muted);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.18s ease;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--blue);
+            color: var(--blue);
+            background: var(--blue-light);
+        }
+
+        .filter-btn.active {
+            background: var(--blue);
+            color: #ffffff;
+            border-color: var(--blue);
+            box-shadow: 0 4px 12px rgba(23, 105, 170, 0.25);
+        }
+
+        /* 分组区块 */
+        .category-group {
+            margin-bottom: 40px;
+            scroll-margin-top: 130px;
+        }
+
+        .category-header {
             display: flex;
             align-items: baseline;
             justify-content: space-between;
             gap: 16px;
-            margin: 50px 0 18px;
+            padding-bottom: 12px;
+            margin-bottom: 18px;
+            border-bottom: 2px solid rgba(23, 105, 170, 0.12);
         }
 
-        .section-heading h2 {
+        .category-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             margin-bottom: 0;
-            font-size: 1.6rem;
+            font-size: 1.35rem;
+            color: var(--ink);
+            font-weight: 700;
         }
 
-        .section-heading p {
+        .category-title-badge {
+            display: inline-block;
+            padding: 2px 9px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            border-radius: 6px;
+            background: var(--blue-light);
+            color: var(--blue);
+        }
+
+        .category-desc {
             margin-bottom: 0;
             color: var(--muted);
-            font-size: 0.9rem;
+            font-size: 0.88rem;
         }
 
-        .works {
+        /* 卡片网格 */
+        .works-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 18px;
         }
 
         .work-card {
             position: relative;
             display: flex;
-            min-height: 155px;
             flex-direction: column;
             justify-content: space-between;
-            padding: 24px;
-            overflow: hidden;
+            min-height: 175px;
+            padding: 22px;
             border: 1px solid var(--line);
             border-radius: 16px;
-            color: var(--ink);
             background: var(--paper);
+            color: var(--ink);
             text-decoration: none;
+            box-shadow: var(--card-shadow);
             cursor: pointer;
-            transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+            overflow: hidden;
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                        box-shadow 0.2s ease,
+                        border-color 0.2s ease;
+        }
+
+        .work-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--blue);
+            opacity: 0;
+            transition: opacity 0.2s ease;
         }
 
         .work-card::after {
-            position: absolute;
-            top: -30px;
-            right: -30px;
-            width: 110px;
-            height: 110px;
-            border-radius: 50%;
-            background: rgba(242, 193, 78, 0.24);
             content: "";
+            position: absolute;
+            top: -35px;
+            right: -35px;
+            width: 105px;
+            height: 105px;
+            border-radius: 50%;
+            background: rgba(242, 193, 78, 0.20);
             pointer-events: none;
+            transition: transform 0.3s ease;
         }
 
         .work-card:hover,
         .work-card:focus-visible {
             border-color: var(--blue);
-            box-shadow: 0 12px 28px rgba(23, 105, 170, 0.14);
-            outline: none;
+            box-shadow: var(--hover-shadow);
             transform: translateY(-4px);
+            outline: none;
+        }
+
+        .work-card:hover::before {
+            opacity: 1;
+        }
+
+        .work-card:hover::after {
+            transform: scale(1.25);
+        }
+
+        .card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 1;
         }
 
         .work-number {
-            position: relative;
-            z-index: 1;
             color: var(--coral);
             font-family: Georgia, serif;
-            font-size: 1.3rem;
+            font-size: 1.35rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .file-badge {
+            font-family: Consolas, "SFMono-Regular", Monaco, monospace;
+            font-size: 0.76rem;
+            color: #475569;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            padding: 3px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        .card-body {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 14px;
         }
 
         .work-card h3 {
-            position: relative;
-            z-index: 1;
-            margin: 12px 0 6px;
-            font-size: 1.25rem;
+            margin: 0 0 8px;
+            font-size: 1.12rem;
+            font-weight: 600;
+            line-height: 1.35;
+            color: var(--ink);
+            transition: color 0.18s;
+        }
+
+        .work-card:hover h3 {
+            color: var(--blue);
         }
 
         .work-card p {
-            position: relative;
-            z-index: 1;
-            margin-bottom: 0;
+            margin: 0;
             color: var(--muted);
-            font-size: 0.9rem;
+            font-size: 0.88rem;
+            line-height: 1.6;
         }
 
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding-top: 12px;
+            border-top: 1px dashed var(--line);
+            position: relative;
+            z-index: 1;
+        }
+
+        .category-tag {
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: #64748b;
+        }
+
+        .go-link {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--blue);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: transform 0.18s;
+        }
+
+        .work-card:hover .go-link {
+            transform: translateX(3px);
+            color: var(--coral);
+        }
+
+        /* 空状态 */
+        .empty-state {
+            display: none;
+            text-align: center;
+            padding: 50px 20px;
+            background: rgba(255, 255, 255, 0.75);
+            border-radius: 16px;
+            border: 1px dashed var(--line);
+            margin: 20px 0;
+        }
+
+        .empty-state h3 {
+            font-size: 1.2rem;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .empty-state p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+
+        /* 提示词区域（保持要求） */
         .prompt {
-            margin-top: 50px;
-            padding: 26px 28px;
-            border-top: 4px solid var(--blue);
-            background: var(--ink);
-            color: #f5f7f8;
+            margin-top: 54px;
+            padding: 28px 32px;
+            border-radius: 18px;
+            border-top: 5px solid var(--blue);
+            background: #141d26;
+            color: #f8fafc;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
         }
 
         .prompt h2 {
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             color: var(--yellow);
-            font-size: 1.15rem;
+            font-size: 1.18rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .prompt p {
-            max-width: 900px;
+            max-width: 960px;
             margin-bottom: 0;
-            color: #dbe5eb;
+            color: #e2e8f0;
             font-size: 0.98rem;
             line-height: 1.9;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 14px 18px;
+            border-radius: 10px;
+            border-left: 3px solid var(--yellow);
         }
 
         footer {
-            padding-top: 26px;
+            padding: 32px 0 10px;
             color: var(--muted);
-            font-size: 0.82rem;
+            font-size: 0.85rem;
             text-align: center;
         }
 
-        @media (max-width: 700px) {
-            .page {
-                width: min(100% - 24px, 560px);
-                padding-top: 24px;
-            }
+        /* 回到顶部按钮 */
+        .back-to-top {
+            position: fixed;
+            right: 26px;
+            bottom: 26px;
+            z-index: 99;
+            width: 46px;
+            height: 46px;
+            border: none;
+            border-radius: 50%;
+            background: var(--blue);
+            color: #ffffff;
+            font-size: 1.25rem;
+            box-shadow: 0 6px 18px rgba(23, 105, 170, 0.35);
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(12px);
+            transition: all 0.22s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .back-to-top:hover {
+            background: #0f4c81;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(23, 105, 170, 0.45);
+        }
+
+        @media (max-width: 860px) {
             .hero {
                 grid-template-columns: 1fr;
-                padding: 26px;
+                padding: 28px;
             }
 
             .identity {
                 justify-self: start;
+                width: 100%;
+                border-radius: 0 12px 12px 0;
             }
 
-            .works {
+            .works-grid {
+                grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            .page {
+                width: calc(100% - 20px);
+                padding-top: 24px;
+            }
+
+            .hero {
+                padding: 22px;
+                border-radius: 18px;
+            }
+
+            .controls-panel {
+                padding: 14px;
+                top: 8px;
+                border-radius: 16px;
+            }
+
+            .category-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
+            .works-grid {
                 grid-template-columns: 1fr;
             }
 
-            .section-heading {
-                align-items: flex-start;
-                flex-direction: column;
-                gap: 6px;
+            .prompt {
+                padding: 20px;
             }
         }
     </style>
@@ -253,53 +625,783 @@
             <div>
                 <p class="eyebrow">ADVANCED WEB DESIGN · CLASS PRACTICE</p>
                 <h1>王鹏宇的<br>高级网页设计课堂实践</h1>
-                <p class="intro">这里记录课堂练习中的 HTML、CSS 与页面设计成果。选择一个作品，开始浏览本目录下的网页。</p>
+                <p class="intro">汇集本学期课程的所有实验与项目设计，涵盖 HTML5 结构、CSS3 进阶与动效、响应式媒体查询、矢量图标体系、JavaScript 核心语法、异步跨域 API 交互以及 Canvas 与三维数据可视化监控大屏。点击卡片即可直接进入对应页面。</p>
+                <div class="stat-badges">
+                    <span class="stat-badge gold">全收录 · 45 个网页链接</span>
+                    <span class="stat-badge">39 个目录页面 (含备份)</span>
+                    <span class="stat-badge">6 个子目录归档</span>
+                    <span class="stat-badge highlight">原生代码 · 零外部 CDN</span>
+                </div>
             </div>
             <div class="identity">
                 <strong>王鹏宇</strong>
-                <span>学号：218<br>班级：计科24001010218</span>
+                <span>学号：218</span>
+                <span>班级：计科24001010218</span>
+                <span>课程：高级网页设计</span>
             </div>
         </header>
 
-        <section aria-labelledby="works-title">
-            <div class="section-heading">
-                <h2 id="works-title">课堂网页</h2>
-                <p>本目录中的全部网页入口</p>
+        <nav class="controls-panel" aria-label="页面导航与筛选">
+            <div class="search-row">
+                <div class="search-input-wrap">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" class="search-input" placeholder="实时搜索：输入文件名、页面标题或技术词（如 18-、Canvas、Flex、API、表单）..." aria-label="搜索课堂页面">
+                    <button type="button" id="clearSearch" class="clear-btn" title="清空搜索" aria-label="清空搜索">✕</button>
+                </div>
+                <div class="search-count" id="searchCount">显示 45 / 45</div>
             </div>
-            <div class="works">
-                <a class="work-card" href="index.html">
-                    <span class="work-number">01</span>
-                    <div>
+            <div class="filter-tags" id="filterContainer" role="tablist">
+                <button type="button" class="filter-btn active" data-filter="all">全部网页 (45)</button>
+                <button type="button" class="filter-btn" data-filter="base">01 基础与选择器 (5)</button>
+                <button type="button" class="filter-btn" data-filter="layout">02 Flex与排版 (5)</button>
+                <button type="button" class="filter-btn" data-filter="animation">03 动效与响应式 (5)</button>
+                <button type="button" class="filter-btn" data-filter="icon">04 图标与导航 (6)</button>
+                <button type="button" class="filter-btn" data-filter="js">05 JS核心与对象 (5)</button>
+                <button type="button" class="filter-btn" data-filter="api">06 API与数据请求 (4)</button>
+                <button type="button" class="filter-btn" data-filter="vis">07 可视化与大屏 (7)</button>
+                <button type="button" class="filter-btn" data-filter="project">08 综合实战 (2)</button>
+                <button type="button" class="filter-btn" data-filter="archive">09 子目录归档 (6)</button>
+            </div>
+        </nav>
+
+        <div id="emptyState" class="empty-state">
+            <h3>未找到匹配的页面</h3>
+            <p>请尝试其他关键词，或点击上方分类标签重新浏览全部页面</p>
+        </div>
+
+        <section class="category-group" id="group-base" data-category="base">
+            <div class="category-header">
+                <h2 class="category-title">
+                    模块 01 · 基础语法与 CSS 选择器
+                    <span class="category-title-badge">5 个页面</span>
+                </h2>
+                <p class="category-desc">涵盖 HTML 表单基础、层叠样式表、进阶复合选择器与标准骨架结构</p>
+            </div>
+            <div class="works-grid">
+                <a class="work-card" href="index.html" data-category="base" data-search="index.html 课堂实践首页 课程作品全集总览、个人信息与各阶段实验导航中心 课程主页 模块 01 · 基础语法与 css 选择器" title="点击浏览 课堂实践首页">
+                    <div class="card-top">
+                        <span class="work-number">01</span>
+                        <span class="file-badge">index.html</span>
+                    </div>
+                    <div class="card-body">
                         <h3>课堂实践首页</h3>
-                        <p>课程作品目录与个人信息</p>
+                        <p>课程作品全集总览、个人信息与各阶段实验导航中心</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">课程主页</span>
+                        <span class="go-link">进入页面 →</span>
                     </div>
                 </a>
-                <a class="work-card" href="3-1.html">
-                    <span class="work-number">02</span>
-                    <div>
-                        <h3>HTML 表单</h3>
-                        <p>表单控件与基础页面结构</p>
+                <a class="work-card" href="3-1.html" data-category="base" data-search="3-1.html html 表单控件基础 文本框、密码框、单选/多选框、下拉菜单与基础提交交互 表单基础 模块 01 · 基础语法与 css 选择器" title="点击浏览 HTML 表单控件基础">
+                    <div class="card-top">
+                        <span class="work-number">02</span>
+                        <span class="file-badge">3-1.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>HTML 表单控件基础</h3>
+                        <p>文本框、密码框、单选/多选框、下拉菜单与基础提交交互</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">表单基础</span>
+                        <span class="go-link">进入页面 →</span>
                     </div>
                 </a>
-                <a class="work-card" href="3-2.html">
-                    <span class="work-number">03</span>
-                    <div>
-                        <h3>CSS 选择器</h3>
-                        <p>层叠样式与元素选择实践</p>
+                <a class="work-card" href="3-2.html" data-category="base" data-search="3-2.html css 选择器与层叠样式 标签、类名、id 选择器应用及样式表层叠与优先级规则 css选择器 模块 01 · 基础语法与 css 选择器" title="点击浏览 CSS 选择器与层叠样式">
+                    <div class="card-top">
+                        <span class="work-number">03</span>
+                        <span class="file-badge">3-2.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>CSS 选择器与层叠样式</h3>
+                        <p>标签、类名、ID 选择器应用及样式表层叠与优先级规则</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">CSS选择器</span>
+                        <span class="go-link">进入页面 →</span>
                     </div>
                 </a>
-                <a class="work-card" href="4-1.html">
-                    <span class="work-number">04</span>
-                    <div>
-                        <h3>CSS 进阶</h3>
-                        <p>群组选择器、后代选择器与继承</p>
+                <a class="work-card" href="4-1.html" data-category="base" data-search="4-1.html css 进阶复合选择器 群组选择器、后代选择器、伪类状态与样式继承机制实践 css进阶 模块 01 · 基础语法与 css 选择器" title="点击浏览 CSS 进阶复合选择器">
+                    <div class="card-top">
+                        <span class="work-number">04</span>
+                        <span class="file-badge">4-1.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>CSS 进阶复合选择器</h3>
+                        <p>群组选择器、后代选择器、伪类状态与样式继承机制实践</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">CSS进阶</span>
+                        <span class="go-link">进入页面 →</span>
                     </div>
                 </a>
-                <a class="work-card" href="静夜思.html">
-                    <span class="work-number">05</span>
-                    <div>
-                        <h3>静夜思</h3>
-                        <p>古诗页面排版与视觉设计</p>
+                <a class="work-card" href="5-1.html" data-category="base" data-search="5-1.html 课堂实践 5-1 基础模板 标准 html5 页面骨架结构规范与阶段性实验占位模板 实验模板 模块 01 · 基础语法与 css 选择器" title="点击浏览 课堂实践 5-1 基础模板">
+                    <div class="card-top">
+                        <span class="work-number">05</span>
+                        <span class="file-badge">5-1.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>课堂实践 5-1 基础模板</h3>
+                        <p>标准 HTML5 页面骨架结构规范与阶段性实验占位模板</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">实验模板</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section class="category-group" id="group-layout" data-category="layout">
+            <div class="category-header">
+                <h2 class="category-title">
+                    模块 02 · Flex 弹性布局与图文排版
+                    <span class="category-title-badge">5 个页面</span>
+                </h2>
+                <p class="category-desc">Flexbox 弹性盒模型、双端对齐导航、多列卡片栅格与 CSS3 交互动效</p>
+            </div>
+            <div class="works-grid">
+                <a class="work-card" href="6-1.html" data-category="layout" data-search="6-1.html flex 导航栏与标题对齐 flexbox 弹性盒两端对齐、间距分配、顶栏排版与边框修饰 flex布局 模块 02 · flex 弹性布局与图文排版" title="点击浏览 Flex 导航栏与标题对齐">
+                    <div class="card-top">
+                        <span class="work-number">06</span>
+                        <span class="file-badge">6-1.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>Flex 导航栏与标题对齐</h3>
+                        <p>Flexbox 弹性盒两端对齐、间距分配、顶栏排版与边框修饰</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">Flex布局</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="6-2.html" data-category="layout" data-search="6-2.html flex 四种经典卡片排版 经典图文混排卡片、标签徽标布局与多列弹性栅格响应实践 flex布局 模块 02 · flex 弹性布局与图文排版" title="点击浏览 Flex 四种经典卡片排版">
+                    <div class="card-top">
+                        <span class="work-number">07</span>
+                        <span class="file-badge">6-2.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>Flex 四种经典卡片排版</h3>
+                        <p>经典图文混排卡片、标签徽标布局与多列弹性栅格响应实践</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">Flex布局</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="7-1.html" data-category="layout" data-search="7-1.html 7-1 上图下文图文排版 经典图文卡片排版规范、图片自适应、圆角阴影与排版美化 图文排版 模块 02 · flex 弹性布局与图文排版" title="点击浏览 7-1 上图下文图文排版">
+                    <div class="card-top">
+                        <span class="work-number">08</span>
+                        <span class="file-badge">7-1.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>7-1 上图下文图文排版</h3>
+                        <p>经典图文卡片排版规范、图片自适应、圆角阴影与排版美化</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">图文排版</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="7-2.html" data-category="layout" data-search="7-2.html 课堂实践 7-2 实验模板 html 页面结构骨架规范与图文排版实验扩展占位页 实验模板 模块 02 · flex 弹性布局与图文排版" title="点击浏览 课堂实践 7-2 实验模板">
+                    <div class="card-top">
+                        <span class="work-number">09</span>
+                        <span class="file-badge">7-2.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>课堂实践 7-2 实验模板</h3>
+                        <p>HTML 页面结构骨架规范与图文排版实验扩展占位页</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">实验模板</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="8-1.html" data-category="layout" data-search="8-1.html css 交互悬停与动效魔方 12 种 css3 hover 状态、伪元素扩展与多重 transform/transition 变换 css动效 模块 02 · flex 弹性布局与图文排版" title="点击浏览 CSS 交互悬停与动效魔方">
+                    <div class="card-top">
+                        <span class="work-number">10</span>
+                        <span class="file-badge">8-1.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>CSS 交互悬停与动效魔方</h3>
+                        <p>12 种 CSS3 hover 状态、伪元素扩展与多重 Transform/Transition 变换</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">CSS动效</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section class="category-group" id="group-animation" data-category="animation">
+            <div class="category-header">
+                <h2 class="category-title">
+                    模块 03 · 过渡动画与响应式视口
+                    <span class="category-title-badge">5 个页面</span>
+                </h2>
+                <p class="category-desc">CSS Transition、@keyframes 关键帧复合动画、纯 CSS 轮播与多端媒体查询</p>
+            </div>
+            <div class="works-grid">
+                <a class="work-card" href="9-1.html" data-category="animation" data-search="9-1.html css transition 平滑过渡 图片缩放平滑过渡、半透明遮罩层联动与悬停浮动交互动效 css过渡 模块 03 · 过渡动画与响应式视口" title="点击浏览 CSS Transition 平滑过渡">
+                    <div class="card-top">
+                        <span class="work-number">11</span>
+                        <span class="file-badge">9-1.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>CSS Transition 平滑过渡</h3>
+                        <p>图片缩放平滑过渡、半透明遮罩层联动与悬停浮动交互动效</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">CSS过渡</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="10-1.html" data-category="animation" data-search="10-1.html css @keyframes 复合动画 关键帧无限循环：4色平滑渐变、90°~180°旋转缩放与几何变形 关键帧动画 模块 03 · 过渡动画与响应式视口" title="点击浏览 CSS @keyframes 复合动画">
+                    <div class="card-top">
+                        <span class="work-number">12</span>
+                        <span class="file-badge">10-1.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>CSS @keyframes 复合动画</h3>
+                        <p>关键帧无限循环：4色平滑渐变、90°~180°旋转缩放与几何变形</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">关键帧动画</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="10-2.html" data-category="animation" data-search="10-2.html 纯 css 幻灯片轮播图 无 javascript 依赖，通过 @keyframes 与透明度延时实现淡入淡出轮播 轮播动效 模块 03 · 过渡动画与响应式视口" title="点击浏览 纯 CSS 幻灯片轮播图">
+                    <div class="card-top">
+                        <span class="work-number">13</span>
+                        <span class="file-badge">10-2.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>纯 CSS 幻灯片轮播图</h3>
+                        <p>无 JavaScript 依赖，通过 @keyframes 与透明度延时实现淡入淡出轮播</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">轮播动效</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="10-3.html" data-category="animation" data-search="10-3.html rem / vw 响应式视口断点 移动端（红）、平板（蓝）、电脑（紫）多断点自适应与根字号联动 响应式设计 模块 03 · 过渡动画与响应式视口" title="点击浏览 rem / vw 响应式视口断点">
+                    <div class="card-top">
+                        <span class="work-number">14</span>
+                        <span class="file-badge">10-3.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>rem / vw 响应式视口断点</h3>
+                        <p>移动端（红）、平板（蓝）、电脑（紫）多断点自适应与根字号联动</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">响应式设计</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="10-4.html" data-category="animation" data-search="10-4.html 媒体查询弹性网格栅格 结合 @media 针对手机/平板/桌面自动切换列数的自适应卡片流 媒体查询 模块 03 · 过渡动画与响应式视口" title="点击浏览 媒体查询弹性网格栅格">
+                    <div class="card-top">
+                        <span class="work-number">15</span>
+                        <span class="file-badge">10-4.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>媒体查询弹性网格栅格</h3>
+                        <p>结合 @media 针对手机/平板/桌面自动切换列数的自适应卡片流</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">媒体查询</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section class="category-group" id="group-icon" data-category="icon">
+            <div class="category-header">
+                <h2 class="category-title">
+                    模块 04 · 矢量图标与移动商城导航
+                    <span class="category-title-badge">6 个页面</span>
+                </h2>
+                <p class="category-desc">Font Awesome 字体图标、Lucide SVG 矢量图标与移动商城底部固定自适应导航</p>
+            </div>
+            <div class="works-grid">
+                <a class="work-card" href="13-1.html" data-category="icon" data-search="13-1.html font awesome 字体图标应用 font awesome 矢量字体图标库集成、图标微排版与状态动效 字体图标 模块 04 · 矢量图标与移动商城导航" title="点击浏览 Font Awesome 字体图标应用">
+                    <div class="card-top">
+                        <span class="work-number">16</span>
+                        <span class="file-badge">13-1.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>Font Awesome 字体图标应用</h3>
+                        <p>Font Awesome 矢量字体图标库集成、图标微排版与状态动效</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">字体图标</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="13-2.html" data-category="icon" data-search="13-2.html lucide svg 现代图标应用 lucide 现代化 svg 矢量图标库集成、色彩自定义与轻量化渲染 svg图标 模块 04 · 矢量图标与移动商城导航" title="点击浏览 Lucide SVG 现代图标应用">
+                    <div class="card-top">
+                        <span class="work-number">17</span>
+                        <span class="file-badge">13-2.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>Lucide SVG 现代图标应用</h3>
+                        <p>Lucide 现代化 SVG 矢量图标库集成、色彩自定义与轻量化渲染</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">SVG图标</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="13-3.html" data-category="icon" data-search="13-3.html 移动商城底部固定导航 (字体图标) 东软移动商城底部自适应吸底导航栏，基于 font awesome 字体图标 移动端导航 模块 04 · 矢量图标与移动商城导航" title="点击浏览 移动商城底部固定导航 (字体图标)">
+                    <div class="card-top">
+                        <span class="work-number">18</span>
+                        <span class="file-badge">13-3.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>移动商城底部固定导航 (字体图标)</h3>
+                        <p>东软移动商城底部自适应吸底导航栏，基于 Font Awesome 字体图标</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">移动端导航</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="13-4.html" data-category="icon" data-search="13-4.html 移动商城底部固定导航 (svg) 东软移动商城底部自适应吸底导航栏，基于 lucide svg 矢量图标 移动端导航 模块 04 · 矢量图标与移动商城导航" title="点击浏览 移动商城底部固定导航 (SVG)">
+                    <div class="card-top">
+                        <span class="work-number">19</span>
+                        <span class="file-badge">13-4.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>移动商城底部固定导航 (SVG)</h3>
+                        <p>东软移动商城底部自适应吸底导航栏，基于 Lucide SVG 矢量图标</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">移动端导航</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="13-3.htm1" data-category="icon" data-search="13-3.htm1 13-3 移动导航 (htm1 备份) 13-3 移动端底部固定导航源码备份文件（兼容 .htm1 扩展名） 源码备份 模块 04 · 矢量图标与移动商城导航" title="点击浏览 13-3 移动导航 (htm1 备份)">
+                    <div class="card-top">
+                        <span class="work-number">20</span>
+                        <span class="file-badge">13-3.htm1</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>13-3 移动导航 (htm1 备份)</h3>
+                        <p>13-3 移动端底部固定导航源码备份文件（兼容 .htm1 扩展名）</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">源码备份</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="13-4.htmi" data-category="icon" data-search="13-4.htmi 13-4 移动导航 (htmi 备份) 13-4 移动端底部固定导航源码备份文件（兼容 .htmi 扩展名） 源码备份 模块 04 · 矢量图标与移动商城导航" title="点击浏览 13-4 移动导航 (htmi 备份)">
+                    <div class="card-top">
+                        <span class="work-number">21</span>
+                        <span class="file-badge">13-4.htmi</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>13-4 移动导航 (htmi 备份)</h3>
+                        <p>13-4 移动端底部固定导航源码备份文件（兼容 .htmi 扩展名）</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">源码备份</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section class="category-group" id="group-js" data-category="js">
+            <div class="category-header">
+                <h2 class="category-title">
+                    模块 05 · JavaScript 核心语法与对象模型
+                    <span class="category-title-badge">5 个页面</span>
+                </h2>
+                <p class="category-desc">6 种基本数据类型、数组高阶方法（购物车实验室）、对象原型与属性控制台</p>
+            </div>
+            <div class="works-grid">
+                <a class="work-card" href="14-1.html" data-category="js" data-search="14-1.html 课堂实践 14-1 实验模板 javascript 运行时环境与基础脚本测试页面骨架 js基础 模块 05 · javascript 核心语法与对象模型" title="点击浏览 课堂实践 14-1 实验模板">
+                    <div class="card-top">
+                        <span class="work-number">22</span>
+                        <span class="file-badge">14-1.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>课堂实践 14-1 实验模板</h3>
+                        <p>JavaScript 运行时环境与基础脚本测试页面骨架</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">JS基础</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="14-2.html" data-category="js" data-search="14-2.html javascript 基础数据类型演示 js 核心 6 种数据类型深度剖析、类型互转、全景对照表与交互测试 js基础 模块 05 · javascript 核心语法与对象模型" title="点击浏览 JavaScript 基础数据类型演示">
+                    <div class="card-top">
+                        <span class="work-number">23</span>
+                        <span class="file-badge">14-2.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>JavaScript 基础数据类型演示</h3>
+                        <p>JS 核心 6 种数据类型深度剖析、类型互转、全景对照表与交互测试</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">JS基础</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="16-1.html" data-category="js" data-search="16-1.html js 数组核心方法 · 购物车实验 常用高阶方法（map/filter/reduce 等）与动态实时联动购物车实验室 js数组 模块 05 · javascript 核心语法与对象模型" title="点击浏览 JS 数组核心方法 · 购物车实验">
+                    <div class="card-top">
+                        <span class="work-number">24</span>
+                        <span class="file-badge">16-1.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>JS 数组核心方法 · 购物车实验</h3>
+                        <p>常用高阶方法（map/filter/reduce 等）与动态实时联动购物车实验室</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">JS数组</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="16-2.html" data-category="js" data-search="16-2.html js 对象核心 · 角色工坊与属性台 object 对象属性控制台、原型机制与动态实体角色实时生成工坊 js对象 模块 05 · javascript 核心语法与对象模型" title="点击浏览 JS 对象核心 · 角色工坊与属性台">
+                    <div class="card-top">
+                        <span class="work-number">25</span>
+                        <span class="file-badge">16-2.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>JS 对象核心 · 角色工坊与属性台</h3>
+                        <p>Object 对象属性控制台、原型机制与动态实体角色实时生成工坊</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">JS对象</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="16-3.html" data-category="js" data-search="16-3.html pixiv 侧边栏交互导航组件 基于本地 iconfont 字体图标与 javascript 的 pixiv 侧边栏抽屉导航 组件实战 模块 05 · javascript 核心语法与对象模型" title="点击浏览 Pixiv 侧边栏交互导航组件">
+                    <div class="card-top">
+                        <span class="work-number">26</span>
+                        <span class="file-badge">16-3.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>Pixiv 侧边栏交互导航组件</h3>
+                        <p>基于本地 IconFont 字体图标与 JavaScript 的 Pixiv 侧边栏抽屉导航</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">组件实战</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section class="category-group" id="group-api" data-category="api">
+            <div class="category-header">
+                <h2 class="category-title">
+                    模块 06 · JSON 解析与异步 API 交互
+                    <span class="category-title-badge">4 个页面</span>
+                </h2>
+                <p class="category-desc">JSON 格式解析展示、Fetch API 跨域数据拉取、电商商品瀑布流列表与详情联动</p>
+            </div>
+            <div class="works-grid">
+                <a class="work-card" href="17-1.html" data-category="api" data-search="17-1.html json 数据解析与格式化演示 json 序列化、反序列化、格式化排版与结构化数据交互视图 json数据 模块 06 · json 解析与异步 api 交互" title="点击浏览 JSON 数据解析与格式化演示">
+                    <div class="card-top">
+                        <span class="work-number">27</span>
+                        <span class="file-badge">17-1.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>JSON 数据解析与格式化演示</h3>
+                        <p>JSON 序列化、反序列化、格式化排版与结构化数据交互视图</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">JSON数据</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="17-2.html" data-category="api" data-search="17-2.html 跨域 api 数据请求与动态渲染 fetch api 跨域调用接口，实时获取远程数据并动态生成卡片 异步api 模块 06 · json 解析与异步 api 交互" title="点击浏览 跨域 API 数据请求与动态渲染">
+                    <div class="card-top">
+                        <span class="work-number">28</span>
+                        <span class="file-badge">17-2.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>跨域 API 数据请求与动态渲染</h3>
+                        <p>Fetch API 跨域调用接口，实时获取远程数据并动态生成卡片</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">异步API</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="17-3.html" data-category="api" data-search="17-3.html 电商商品列表页 (跨域拉取) 真实电商瀑布流商品列表，支持分类筛选、搜索与详情页联动 电商实战 模块 06 · json 解析与异步 api 交互" title="点击浏览 电商商品列表页 (跨域拉取)">
+                    <div class="card-top">
+                        <span class="work-number">29</span>
+                        <span class="file-badge">17-3.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>电商商品列表页 (跨域拉取)</h3>
+                        <p>真实电商瀑布流商品列表，支持分类筛选、搜索与详情页联动</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">电商实战</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="17-3-detail.html" data-category="api" data-search="17-3-detail.html 电商商品详情页 (参数动态解析) 电商详情展示，动态解析 url 查询参数并渲染规格、多图与价格 电商实战 模块 06 · json 解析与异步 api 交互" title="点击浏览 电商商品详情页 (参数动态解析)">
+                    <div class="card-top">
+                        <span class="work-number">30</span>
+                        <span class="file-badge">17-3-detail.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>电商商品详情页 (参数动态解析)</h3>
+                        <p>电商详情展示，动态解析 URL 查询参数并渲染规格、多图与价格</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">电商实战</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section class="category-group" id="group-vis" data-category="vis">
+            <div class="category-header">
+                <h2 class="category-title">
+                    模块 07 · Canvas、WebGL 与数据可视化大屏
+                    <span class="category-title-badge">7 个页面</span>
+                </h2>
+                <p class="category-desc">Canvas 物理粒子动画、微服务架构拓扑、ECharts 看板、Mermaid、Three.js 3D 与运维大屏</p>
+            </div>
+            <div class="works-grid">
+                <a class="work-card" href="18-1.html" data-category="vis" data-search="18-1.html canvas 物理粒子文字动画 html5 canvas 像素粒子物理系统、鼠标弹簧排斥与文字动态聚合 canvas特效 模块 07 · canvas、webgl 与数据可视化大屏" title="点击浏览 Canvas 物理粒子文字动画">
+                    <div class="card-top">
+                        <span class="work-number">31</span>
+                        <span class="file-badge">18-1.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>Canvas 物理粒子文字动画</h3>
+                        <p>HTML5 Canvas 像素粒子物理系统、鼠标弹簧排斥与文字动态聚合</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">Canvas特效</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="18-2.html" data-category="vis" data-search="18-2.html canvas 电商全站架构拓扑图 动态 canvas 原生绘制电商高可用微服务全站架构与数据流转拓扑 系统架构 模块 07 · canvas、webgl 与数据可视化大屏" title="点击浏览 Canvas 电商全站架构拓扑图">
+                    <div class="card-top">
+                        <span class="work-number">32</span>
+                        <span class="file-badge">18-2.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>Canvas 电商全站架构拓扑图</h3>
+                        <p>动态 Canvas 原生绘制电商高可用微服务全站架构与数据流转拓扑</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">系统架构</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="18-3.html" data-category="vis" data-search="18-3.html 智能客服系统架构图 (科研方向) 知识图谱、大模型推理与多跳子图智能客服全景前沿架构设计 科研架构 模块 07 · canvas、webgl 与数据可视化大屏" title="点击浏览 智能客服系统架构图 (科研方向)">
+                    <div class="card-top">
+                        <span class="work-number">33</span>
+                        <span class="file-badge">18-3.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>智能客服系统架构图 (科研方向)</h3>
+                        <p>知识图谱、大模型推理与多跳子图智能客服全景前沿架构设计</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">科研架构</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="18-4.html" data-category="vis" data-search="18-4.html echarts 多维数据分析看板 apache echarts 折线、柱状、饼图等多维数据联动与交互式分析看板 数据可视化 模块 07 · canvas、webgl 与数据可视化大屏" title="点击浏览 ECharts 多维数据分析看板">
+                    <div class="card-top">
+                        <span class="work-number">34</span>
+                        <span class="file-badge">18-4.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>ECharts 多维数据分析看板</h3>
+                        <p>Apache ECharts 折线、柱状、饼图等多维数据联动与交互式分析看板</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">数据可视化</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="18-6.html" data-category="vis" data-search="18-6.html mermaid 业务流程图与 er 图 mermaid 架构引擎渲染智能客服全链路业务流时序图与数据库 er 关系模型 架构图表 模块 07 · canvas、webgl 与数据可视化大屏" title="点击浏览 Mermaid 业务流程图与 ER 图">
+                    <div class="card-top">
+                        <span class="work-number">35</span>
+                        <span class="file-badge">18-6.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>Mermaid 业务流程图与 ER 图</h3>
+                        <p>Mermaid 架构引擎渲染智能客服全链路业务流时序图与数据库 ER 关系模型</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">架构图表</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="18-7.html" data-category="vis" data-search="18-7.html three.js 3d 三维数据可视化 webgl & three.js 3d 柱体空间渲染、粒子星空背景与轨道镜头交互 3d可视化 模块 07 · canvas、webgl 与数据可视化大屏" title="点击浏览 Three.js 3D 三维数据可视化">
+                    <div class="card-top">
+                        <span class="work-number">36</span>
+                        <span class="file-badge">18-7.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>Three.js 3D 三维数据可视化</h3>
+                        <p>WebGL & Three.js 3D 柱体空间渲染、粒子星空背景与轨道镜头交互</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">3D可视化</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="18-8.html" data-category="vis" data-search="18-8.html 智能客服全域运维监控大屏 高科技深色指挥中心大屏、时序指标实时模拟与全域分布式运行状态监控 监控大屏 模块 07 · canvas、webgl 与数据可视化大屏" title="点击浏览 智能客服全域运维监控大屏">
+                    <div class="card-top">
+                        <span class="work-number">37</span>
+                        <span class="file-badge">18-8.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>智能客服全域运维监控大屏</h3>
+                        <p>高科技深色指挥中心大屏、时序指标实时模拟与全域分布式运行状态监控</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">监控大屏</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section class="category-group" id="group-project" data-category="project">
+            <div class="category-header">
+                <h2 class="category-title">
+                    模块 08 · 特别设计与综合实战
+                    <span class="category-title-badge">2 个页面</span>
+                </h2>
+                <p class="category-desc">Pixiv 移动端高保真原型界面与中国古典文化古诗视觉排版</p>
+            </div>
+            <div class="works-grid">
+                <a class="work-card" href="pixiv-mobile.html" data-category="project" data-search="pixiv-mobile.html pixiv 移动端全功能原型 pixiv 移动端高保真原型设计，包含趋势标签、插画瀑布流与底部工具条 移动ui原型 模块 08 · 特别设计与综合实战" title="点击浏览 Pixiv 移动端全功能原型">
+                    <div class="card-top">
+                        <span class="work-number">38</span>
+                        <span class="file-badge">pixiv-mobile.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>Pixiv 移动端全功能原型</h3>
+                        <p>Pixiv 移动端高保真原型设计，包含趋势标签、插画瀑布流与底部工具条</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">移动UI原型</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="静夜思.html" data-category="project" data-search="静夜思.html 静夜思 · 中华经典古诗排版 中国传统古典古诗排版、印章装饰点缀与典雅视觉设计实战 诗词排版 模块 08 · 特别设计与综合实战" title="点击浏览 静夜思 · 中华经典古诗排版">
+                    <div class="card-top">
+                        <span class="work-number">39</span>
+                        <span class="file-badge">静夜思.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>静夜思 · 中华经典古诗排版</h3>
+                        <p>中国传统古典古诗排版、印章装饰点缀与典雅视觉设计实战</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">诗词排版</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section class="category-group" id="group-archive" data-category="archive">
+            <div class="category-header">
+                <h2 class="category-title">
+                    模块 09 · 子目录归档页面 (font / http)
+                    <span class="category-title-badge">6 个页面</span>
+                </h2>
+                <p class="category-desc">项目子文件夹内的本地图标文档与早期测试阶段页面副本</p>
+            </div>
+            <div class="works-grid">
+                <a class="work-card" href="font/demo_index.html" data-category="archive" data-search="font/demo_index.html iconfont 图标集文档 本地 iconfont 字体图标库 demo 效果预览与 unicode / fontclass 调用指南 字体资源 模块 09 · 子目录归档页面 (font / http)" title="点击浏览 IconFont 图标集文档">
+                    <div class="card-top">
+                        <span class="work-number">40</span>
+                        <span class="file-badge">font/demo_index.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>IconFont 图标集文档</h3>
+                        <p>本地 IconFont 字体图标库 demo 效果预览与 Unicode / FontClass 调用指南</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">字体资源</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="http/3-1.html" data-category="archive" data-search="http/3-1.html http 归档 · 3-1 表单控件 http 测试目录下的 3-1 表单基础实验测试副本 历史归档 模块 09 · 子目录归档页面 (font / http)" title="点击浏览 http 归档 · 3-1 表单控件">
+                    <div class="card-top">
+                        <span class="work-number">41</span>
+                        <span class="file-badge">http/3-1.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>http 归档 · 3-1 表单控件</h3>
+                        <p>HTTP 测试目录下的 3-1 表单基础实验测试副本</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">历史归档</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="http/3-2.html" data-category="archive" data-search="http/3-2.html http 归档 · 3-2 选择器 http 测试目录下的 3-2 css 选择器实验测试副本 历史归档 模块 09 · 子目录归档页面 (font / http)" title="点击浏览 http 归档 · 3-2 选择器">
+                    <div class="card-top">
+                        <span class="work-number">42</span>
+                        <span class="file-badge">http/3-2.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>http 归档 · 3-2 选择器</h3>
+                        <p>HTTP 测试目录下的 3-2 CSS 选择器实验测试副本</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">历史归档</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="http/4-1.html" data-category="archive" data-search="http/4-1.html http 归档 · 4-1 css 进阶 http 测试目录下的 4-1 css 进阶选择器实验测试副本 历史归档 模块 09 · 子目录归档页面 (font / http)" title="点击浏览 http 归档 · 4-1 CSS 进阶">
+                    <div class="card-top">
+                        <span class="work-number">43</span>
+                        <span class="file-badge">http/4-1.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>http 归档 · 4-1 CSS 进阶</h3>
+                        <p>HTTP 测试目录下的 4-1 CSS 进阶选择器实验测试副本</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">历史归档</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="http/index.html" data-category="archive" data-search="http/index.html http 归档 · 早期主页 http 测试目录下的早期课堂主页结构测试备份 历史归档 模块 09 · 子目录归档页面 (font / http)" title="点击浏览 http 归档 · 早期主页">
+                    <div class="card-top">
+                        <span class="work-number">44</span>
+                        <span class="file-badge">http/index.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>http 归档 · 早期主页</h3>
+                        <p>HTTP 测试目录下的早期课堂主页结构测试备份</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">历史归档</span>
+                        <span class="go-link">进入页面 →</span>
+                    </div>
+                </a>
+                <a class="work-card" href="http/静夜思.html" data-category="archive" data-search="http/静夜思.html http 归档 · 静夜思 http 测试目录下的静夜思古诗页面排版测试备份 历史归档 模块 09 · 子目录归档页面 (font / http)" title="点击浏览 http 归档 · 静夜思">
+                    <div class="card-top">
+                        <span class="work-number">45</span>
+                        <span class="file-badge">http/静夜思.html</span>
+                    </div>
+                    <div class="card-body">
+                        <h3>http 归档 · 静夜思</h3>
+                        <p>HTTP 测试目录下的静夜思古诗页面排版测试备份</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="category-tag">历史归档</span>
+                        <span class="go-link">进入页面 →</span>
                     </div>
                 </a>
             </div>
@@ -310,7 +1412,96 @@
             <p>“创建一个新页面，包括本目录下的所有网页的超链接，使用原生代码，不使用cdn，新页面名称为index.html，主题为王鹏宇的《高级网页设计》课堂实践，美化页面，页面中包括本提示词。”</p>
         </section>
 
-        <footer>Made for 高级网页设计 · 课堂实践</footer>
+        <footer>Made for 高级网页设计 · 课堂实践 ｜ 王鹏宇 (计科24001010218)</footer>
     </main>
+
+    <button type="button" id="backToTop" class="back-to-top" title="回到顶部" aria-label="回到顶部">↑</button>
+
+    <script>
+        (function() {
+            var searchInput = document.getElementById('searchInput');
+            var clearSearch = document.getElementById('clearSearch');
+            var filterButtons = document.querySelectorAll('.filter-btn');
+            var cards = document.querySelectorAll('.work-card');
+            var groups = document.querySelectorAll('.category-group');
+            var searchCount = document.getElementById('searchCount');
+            var emptyState = document.getElementById('emptyState');
+            var backToTop = document.getElementById('backToTop');
+
+            var currentFilter = 'all';
+            var currentSearch = '';
+
+            function updateDisplay() {
+                var visibleCount = 0;
+                var query = currentSearch.trim().toLowerCase();
+
+                groups.forEach(function(group) {
+                    var groupCategory = group.getAttribute('data-category');
+                    var groupCards = group.querySelectorAll('.work-card');
+                    var groupVisibleCards = 0;
+
+                    groupCards.forEach(function(card) {
+                        var cardCategory = card.getAttribute('data-category');
+                        var cardSearchText = card.getAttribute('data-search') || '';
+
+                        var matchesCategory = (currentFilter === 'all') || (cardCategory === currentFilter);
+                        var matchesSearch = !query || (cardSearchText.indexOf(query) !== -1);
+
+                        if (matchesCategory && matchesSearch) {
+                            card.style.display = 'flex';
+                            groupVisibleCards++;
+                            visibleCount++;
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+
+                    if (groupVisibleCards === 0) {
+                        group.style.display = 'none';
+                    } else {
+                        group.style.display = 'block';
+                    }
+                });
+
+                searchCount.textContent = '显示 ' + visibleCount + ' / 45';
+                emptyState.style.display = (visibleCount === 0) ? 'block' : 'none';
+            }
+
+            searchInput.addEventListener('input', function(e) {
+                currentSearch = e.target.value;
+                clearSearch.style.display = currentSearch ? 'flex' : 'none';
+                updateDisplay();
+            });
+
+            clearSearch.addEventListener('click', function() {
+                searchInput.value = '';
+                currentSearch = '';
+                clearSearch.style.display = 'none';
+                searchInput.focus();
+                updateDisplay();
+            });
+
+            filterButtons.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    filterButtons.forEach(function(b) { b.classList.remove('active'); });
+                    btn.classList.add('active');
+                    currentFilter = btn.getAttribute('data-filter');
+                    updateDisplay();
+                });
+            });
+
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    backToTop.classList.add('show');
+                } else {
+                    backToTop.classList.remove('show');
+                }
+            });
+
+            backToTop.addEventListener('click', function() {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        })();
+    </script>
 </body>
 </html>
